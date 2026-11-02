@@ -1,0 +1,167 @@
+---
+// TEMPLATE: needs review by a legal professional before launch.
+// Bracketed items like [Grievance Officer name] must be filled in.
+import LegalPage from '../components/company/LegalPage.astro';
+import { site, contact, href, contactHref } from '../data/site';
+
+const sections = [
+  { id: 'who-we-are', title: 'Who we are' },
+  { id: 'scope', title: 'What this policy covers' },
+  { id: 'data-we-collect', title: 'Personal data we collect' },
+  { id: 'how-we-use', title: 'How we use it' },
+  { id: 'consent', title: 'Consent and legitimate uses' },
+  { id: 'sharing', title: 'Who we share it with' },
+  { id: 'client-data', title: 'Data we process for clients' },
+  { id: 'retention', title: 'How long we keep it' },
+  { id: 'security', title: 'How we protect it' },
+  { id: 'your-rights', title: 'Your rights' },
+  { id: 'cookies', title: 'Cookies and third-party services' },
+  { id: 'children', title: 'Children' },
+  { id: 'changes', title: 'Changes to this policy' },
+  { id: 'grievance', title: 'Grievance officer and contact' },
+];
+---
+
+<LegalPage
+  title="Privacy policy"
+  description={`How ${site.name} collects, uses and protects personal data, in line with India's Digital Personal Data Protection Act, 2023.`}
+  intro="How we collect, use and protect personal data when you visit this website or get in touch with us, written to align with India’s Digital Personal Data Protection Act, 2023."
+  updated="[DD Month YYYY]"
+  sections={sections}
+>
+  <section id="who-we-are">
+    <h2>1. Who we are</h2>
+    <p>
+      This website is operated by {site.name} (“Manka”, “we”, “us”), based in {site.location}. For personal data we collect through this website and our own enquiries, we act as the <strong>Data Fiduciary</strong> under the Digital Personal Data Protection Act, 2023 (the “DPDP Act”).
+    </p>
+    <p>[Registered legal name, registration number (e.g. CIN) and registered address to be added.]</p>
+  </section>
+
+  <section id="scope">
+    <h2>2. What this policy covers</h2>
+    <p>This policy covers personal data we handle when you:</p>
+    <ul>
+      <li>browse this website;</li>
+      <li>send us an enquiry through the contact form, by email or by phone;</li>
+      <li>apply for a role with us; or</li>
+      <li>are a contact at a client, prospective client or supplier.</li>
+    </ul>
+    <p>It does not cover data we process inside software we build or operate for our clients. That is explained in <a href="#client-data">section 7</a>.</p>
+  </section>
+
+  <section id="data-we-collect">
+    <h2>3. Personal data we collect</h2>
+    <ul>
+      <li><strong>Contact details you give us:</strong> name, work email, phone number, company name and anything you write in your message, including the service you are interested in and an optional budget range.</li>
+      <li><strong>Job applications:</strong> your CV and any details you choose to share, such as work history, links to your work and notice period.</li>
+      <li><strong>Business correspondence:</strong> emails, call notes and meeting notes relating to an enquiry or project.</li>
+      <li><strong>Technical data:</strong> basic information your browser sends when loading a web page, such as IP address, browser type and the pages requested, which may be logged by our hosting and font providers.</li>
+    </ul>
+    <p>We do not ask for sensitive financial information, identity documents or passwords through this website. Please do not send them in the contact form.</p>
+  </section>
+
+  <section id="how-we-use">
+    <h2>4. How we use it</h2>
+    <ul>
+      <li>To reply to your enquiry and discuss a possible project.</li>
+      <li>To prepare proposals, contracts and invoices.</li>
+      <li>To assess job applications and contact candidates.</li>
+      <li>To keep the website secure and working properly.</li>
+      <li>To meet legal, tax and accounting obligations.</li>
+    </ul>
+    <p>We do not sell personal data, and we do not use it for advertising profiles.</p>
+  </section>
+
+  <section id="consent">
+    <h2>5. Consent and legitimate uses</h2>
+    <p>
+      When you submit the contact form you give consent for us to use the details you provide to respond to your enquiry. Under the DPDP Act, consent must be free, specific, informed, unconditional and unambiguous, and limited to the purpose stated. You can withdraw consent at any time by writing to us {contact.email ? <>at <a href={`mailto:${contact.email}`}>{contact.email}</a></> : <>through the <a href={contactHref('other')}>contact form</a></>}. Withdrawal does not affect processing already carried out before it.
+    </p>
+    <p>
+      Some processing may rely on the “certain legitimate uses” permitted by the DPDP Act, for example where you voluntarily share your data for a specified purpose, or where we must comply with law. [Legal reviewer to confirm which grounds apply to each activity.]
+    </p>
+  </section>
+
+  <section id="sharing">
+    <h2>6. Who we share it with</h2>
+    <p>We share personal data only with service providers who help us run the business, acting on our instructions (Data Processors), for example:</p>
+    <ul>
+      <li><strong>Form handling:</strong> our contact form is delivered by Web3Forms, which forwards your message to our inbox.</li>
+      <li><strong>Website hosting:</strong> [hosting provider], which serves this website.</li>
+      <li><strong>Web fonts:</strong> fonts on this site are loaded from Google Fonts, which receives your IP address when the font files load.</li>
+      <li><strong>Email and productivity tools:</strong> [email provider and other tools].</li>
+      <li><strong>Professional advisers:</strong> accountants, auditors and lawyers, where needed.</li>
+    </ul>
+    <p>
+      We may also disclose data where required by law or by a lawful request from a government authority. Some providers may process data outside India; where they do, we will rely only on transfers permitted under the DPDP Act and any rules notified under it.
+    </p>
+  </section>
+
+  <section id="client-data">
+    <h2>7. Data we process for clients</h2>
+    <p>
+      When we build or operate software for a client, such as a CRM, HRMS or lending tool, the client usually decides what personal data is processed and why. In that case the client is the Data Fiduciary and we act as a Data Processor under a written contract. Requests about that data should go to the relevant client first; we will help them respond.
+    </p>
+  </section>
+
+  <section id="retention">
+    <h2>8. How long we keep it</h2>
+    <p>
+      We keep personal data only as long as needed for the purpose it was collected for, or as required by law. As a guide: enquiries that do not become projects are deleted after [X months]; job applications after [X months] unless you ask us to keep them longer; project and billing records for the period required by tax and company law. [Retention periods to be confirmed.]
+    </p>
+  </section>
+
+  <section id="security">
+    <h2>9. How we protect it</h2>
+    <p>
+      We take reasonable security safeguards to prevent personal data breaches, including access limited to people who need it, encrypted connections (HTTPS) and reputable service providers. If a personal data breach occurs, we will notify the Data Protection Board of India and affected individuals as required by the DPDP Act and its rules.
+    </p>
+  </section>
+
+  <section id="your-rights">
+    <h2>10. Your rights</h2>
+    <p>As a Data Principal under the DPDP Act, you have the right to:</p>
+    <ul>
+      <li><strong>Access information</strong> about the personal data we hold about you and how it is processed;</li>
+      <li><strong>Correction, completion, updating and erasure</strong> of your personal data;</li>
+      <li><strong>Grievance redressal</strong> through the contact in <a href="#grievance">section 14</a>;</li>
+      <li><strong>Nominate</strong> another person to exercise your rights in the event of death or incapacity; and</li>
+      <li><strong>Withdraw consent</strong> at any time, as easily as you gave it.</li>
+    </ul>
+    <p>
+      To exercise any of these, {contact.email ? <>email <a href={`mailto:${contact.email}`}>{contact.email}</a></> : <>write to us through the <a href={contactHref('other')}>contact form</a></>}. We may need to verify your identity first. If you are not satisfied with our response, you may complain to the Data Protection Board of India.
+    </p>
+  </section>
+
+  <section id="cookies">
+    <h2>11. Cookies and third-party services</h2>
+    <p>
+      This website does not use advertising or tracking cookies. Your browser may store small amounts of data needed for the site to work. If we add analytics in future, we will update this section and, where required, ask for your consent first. [Update if analytics or chat tools are added.]
+    </p>
+  </section>
+
+  <section id="children">
+    <h2>12. Children</h2>
+    <p>
+      This website is meant for businesses and job seekers, not children. We do not knowingly collect personal data from anyone under 18. If you believe a child has sent us personal data, contact us and we will delete it.
+    </p>
+  </section>
+
+  <section id="changes">
+    <h2>13. Changes to this policy</h2>
+    <p>We may update this policy as our services or the law change. The “Last updated” date at the top shows when it was last revised. Significant changes will be highlighted on this page.</p>
+  </section>
+
+  <section id="grievance">
+    <h2>14. Grievance officer and contact</h2>
+    <p>For questions, requests or complaints about personal data, contact:</p>
+    <p>
+      <strong>[Grievance Officer name]</strong><br />
+      {site.name}<br />
+      Email: {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : '[Email address]'}<br />
+      Phone: {contact.phone ?? '[Phone number]'}<br />
+      [Postal address]
+    </p>
+    <p>We aim to acknowledge requests promptly and resolve them within the time required by law. See also our <a href={href('/terms/')}>terms of use</a>.</p>
+  </section>
+</LegalPage>

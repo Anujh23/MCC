@@ -1,0 +1,33 @@
+---
+// Breadcrumb trail. "Home" is added first; the last item (no path) is the current page.
+// Usage: <Breadcrumbs items={[{ label: 'Services', path: '/services/' }, { label: 'CRM Development' }]} />
+// Pass the same array to breadcrumbList() in src/data/schema.ts.
+import { href } from '../../data/site';
+
+interface Props {
+  items: { label: string; path?: string }[];
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { items, tone = 'dark', class: className = '' } = Astro.props;
+const trail = [{ label: 'Home', path: '/' }, ...items];
+const link = tone === 'dark' ? 'text-ink-400 hover:text-white' : 'text-ink-600 hover:text-brand-700';
+const current = tone === 'dark' ? 'text-ink-200' : 'font-medium text-ink-900';
+const sep = tone === 'dark' ? 'text-ink-500' : 'text-ink-300';
+---
+
+<nav aria-label="Breadcrumb" class={className}>
+  <ol class="flex flex-wrap items-center gap-x-2 text-sm">
+    {trail.map((c, i) => {
+      const last = i === trail.length - 1;
+      return (
+        <li class="flex items-center gap-x-2">
+          {i > 0 && <span aria-hidden="true" class={sep}>/</span>}
+          {last || !c.path
+            ? <span aria-current={last ? 'page' : undefined} class={`inline-block py-2 ${current}`}>{c.label}</span>
+            : <a href={href(c.path)} class={`inline-block py-2 transition ${link}`}>{c.label}</a>}
+        </li>
+      );
+    })}
+  </ol>
+</nav>

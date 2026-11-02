@@ -1,0 +1,51 @@
+---
+// The one FAQ: native <details> in a single card. With `title`, it gets a side header
+// (h2, intro, "Ask an engineer" link to the contact form, pre-filled with `askInterest`).
+// Without `title` it's just the card, for use under a Section heading or in an aside.
+// Usage: <Section tone="muted"><Faq title="Questions about CRM builds" items={c.faqs} askInterest="crm-development" /></Section>
+import { Plus, ArrowRight } from '@lucide/astro';
+import { contactHref, cta } from '../../data/site';
+
+interface Props {
+  items: { q: string; a: string }[];
+  title?: string;
+  /** Words in the title to render with the brand gradient. Max one gradient H2 per page. */
+  highlight?: string;
+  intro?: string;
+  askInterest?: string;
+  /** Index of the item that starts open; -1 for none. */
+  open?: number;
+}
+const { items, title, highlight, intro, askInterest, open = 0 } = Astro.props;
+const [before, after] = highlight && title?.includes(highlight) ? title.split(highlight) : [title, undefined];
+---
+
+<div class={title ? 'grid gap-10 lg:grid-cols-[0.8fr_1.4fr] lg:gap-16' : ''}>
+  {title && (
+    <div class="reveal lg:sticky lg:top-28 lg:self-start">
+      <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl">
+        {before}{after !== undefined && <span class="text-gradient-brand">{highlight}</span>}{after}
+      </h2>
+      {intro && <p class="mt-4 text-lg leading-relaxed text-ink-600">{intro}</p>}
+      <p class="mt-6 text-sm text-ink-600">
+        Something else on your mind?{' '}
+        <a href={contactHref(askInterest)} class="group inline-flex items-center gap-1 py-2 font-semibold text-brand-700 hover:text-brand-800">
+          {cta.ask}<ArrowRight size={15} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+        </a>
+      </p>
+    </div>
+  )}
+  <div class="reveal divide-y divide-ink-100 rounded-2xl bg-white px-5 ring-1 ring-ink-100 sm:px-8" style={title ? '--d: 120ms' : undefined}>
+    {items.map((f, i) => (
+      <details class="group" open={i === open || undefined}>
+        <summary class="flex min-h-11 cursor-pointer list-none items-start justify-between gap-4 rounded-lg py-5 text-left text-base font-semibold text-ink-900 sm:text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 [&::-webkit-details-marker]:hidden">
+          <span>{f.q}</span>
+          <span class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink-50 text-ink-600 ring-1 ring-ink-200 transition duration-300 group-open:rotate-45 group-open:bg-brand-600 group-open:text-white group-open:ring-brand-600" aria-hidden="true">
+            <Plus size={16} />
+          </span>
+        </summary>
+        <p class="-mt-1 max-w-3xl pb-5 sm:pr-11 leading-relaxed text-ink-600">{f.a}</p>
+      </details>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,89 @@
+---
+// Hero visual for Website Development: browser window + site wireframe + Lighthouse-style target scores.
+import { Lock, RotateCw } from '@lucide/astro';
+import SampleBadge from '../ui/SampleBadge.astro';
+const scores = [
+  { label: 'Performance', value: 98 },
+  { label: 'Accessibility', value: 100 },
+  { label: 'Best practices', value: 100 },
+  { label: 'SEO', value: 100 },
+];
+---
+
+<div class="relative mx-auto w-full max-w-xl pb-14 sm:pb-10" aria-hidden="true">
+  <div class="overflow-hidden rounded-2xl bg-ink-900 shadow-2xl shadow-black/50 ring-1 ring-white/10">
+    <div class="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-rose-400/70"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-amber-400/70"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-emerald-400/70"></span>
+      <div class="ml-2 flex min-w-0 flex-1 items-center gap-2 rounded-md bg-white/[0.06] px-3 py-1.5 text-[11px] text-ink-300">
+        <Lock size={11} class="shrink-0 text-emerald-400" />
+        <span class="truncate">yourcompany.in</span>
+      </div>
+      <RotateCw size={13} class="hidden shrink-0 text-ink-500 sm:block" />
+    </div>
+
+    <div class="bg-white p-4 sm:p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="h-5 w-5 rounded-md bg-brand-600"></span>
+          <span class="h-2 w-14 rounded-full bg-ink-800"></span>
+        </div>
+        <div class="hidden items-center gap-3 sm:flex">
+          <span class="h-1.5 w-8 rounded-full bg-ink-200"></span>
+          <span class="h-1.5 w-8 rounded-full bg-ink-200"></span>
+          <span class="h-1.5 w-8 rounded-full bg-ink-200"></span>
+        </div>
+        <span class="h-5 w-16 rounded-full bg-brand-600"></span>
+      </div>
+
+      <div class="mt-6 grid grid-cols-[1.2fr_1fr] items-center gap-4">
+        <div>
+          <span class="block h-1.5 w-12 rounded-full bg-saffron-400"></span>
+          <span class="mt-3 block h-3 w-full rounded-full bg-ink-900"></span>
+          <span class="mt-2 block h-3 w-4/5 rounded-full bg-ink-900"></span>
+          <span class="mt-4 block h-1.5 w-full rounded-full bg-ink-200"></span>
+          <span class="mt-1.5 block h-1.5 w-3/4 rounded-full bg-ink-200"></span>
+          <div class="mt-4 flex gap-2">
+            <span class="h-5 w-16 rounded-full bg-brand-600"></span>
+            <span class="h-5 w-14 rounded-full ring-1 ring-ink-200"></span>
+          </div>
+        </div>
+        <div class="relative aspect-[4/3] overflow-hidden rounded-xl bg-gradient-to-br from-brand-500 to-brand-800">
+          <div class="bg-grid absolute inset-0"></div>
+          <span class="absolute bottom-3 left-3 h-6 w-2/3 rounded-md bg-white/90"></span>
+          <span class="absolute top-3 right-3 h-3 w-3 rounded-full bg-saffron-400"></span>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
+        {[0, 1, 2].map(() => (
+          <div class="rounded-lg bg-ink-50 p-2.5 ring-1 ring-ink-100">
+            <span class="block h-4 w-4 rounded bg-brand-100"></span>
+            <span class="mt-2 block h-1.5 w-4/5 rounded-full bg-ink-700"></span>
+            <span class="mt-1.5 block h-1 w-full rounded-full bg-ink-200"></span>
+            <span class="mt-1 block h-1 w-2/3 rounded-full bg-ink-200"></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute right-2 -bottom-1 left-2 rounded-2xl bg-white p-3.5 shadow-2xl shadow-black/40 ring-1 ring-ink-100 sm:right-auto sm:-left-6 sm:p-4">
+    <div class="flex items-center justify-between gap-3">
+      <span class="text-[11px] font-semibold tracking-wide text-ink-600 uppercase">Target scores <span class="font-normal tracking-normal normal-case text-ink-500">· Lighthouse, mobile</span></span>
+      <SampleBadge />
+    </div>
+    <div class="mt-3 grid grid-cols-4 gap-2 sm:gap-4">
+      {scores.map((s) => (
+        <div class="flex flex-col items-center text-center">
+          <span class="relative grid h-11 w-11 place-items-center rounded-full" style={`background: conic-gradient(var(--color-emerald-500) ${s.value}%, var(--color-ink-100) 0)`}>
+            <span class="absolute inset-[4px] rounded-full bg-white"></span>
+            <span class="relative text-xs font-bold text-emerald-600">{s.value}</span>
+          </span>
+          <span class="mt-1.5 text-[10px] leading-tight text-ink-600">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

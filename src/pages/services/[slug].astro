@@ -1,0 +1,144 @@
+---
+import { ArrowRight } from '@lucide/astro';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/ui/PageHero.astro';
+import Section from '../../components/ui/Section.astro';
+import CtaBand from '../../components/ui/CtaBand.astro';
+import Steps from '../../components/ui/Steps.astro';
+import Faq from '../../components/ui/Faq.astro';
+import RelatedCards from '../../components/ui/RelatedCards.astro';
+import ServiceVisual from '../../components/services/ServiceVisual.astro';
+import DeliverablesGrid from '../../components/services/DeliverablesGrid.astro';
+import ProblemsGrid from '../../components/services/ProblemsGrid.astro';
+import TechStack from '../../components/services/TechStack.astro';
+import EngagementModels from '../../components/services/EngagementModels.astro';
+import { services, href, contactHref, cta, relatedFrom } from '../../data/site';
+import { serviceLd, breadcrumbList } from '../../data/schema';
+import { servicesContent } from '../../data/services-content';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { service: s } }));
+}
+
+const { service } = Astro.props;
+const c = servicesContent[service.slug];
+// "Website development" -> "website development", but keep acronyms like "CRM development"
+const topic = /^[A-Z]{2}/.test(c.eyebrow) ? c.eyebrow : c.eyebrow.charAt(0).toLowerCase() + c.eyebrow.slice(1);
+const crumbs = [{ label: 'Services', path: '/services/' }, { label: service.title }];
+const path = `/services/${service.slug}/`;
+---
+
+<Base
+  title={c.metaTitle}
+  description={c.metaDescription}
+  schema={[serviceLd({ name: service.title, description: c.metaDescription, path }), breadcrumbList(crumbs, path)]}
+>
+  <PageHero title={c.headline} highlight={c.highlight} intro={c.intro} breadcrumbs={crumbs}>
+    <Fragment slot="actions">
+      <a href={contactHref(service.slug)} class="btn btn-primary group px-6 py-3 text-base">
+        {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      </a>
+      <a href="#process" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">See how it works</a>
+    </Fragment>
+    <Fragment slot="aside"><ServiceVisual visual={c.visual} /></Fragment>
+  </PageHero>
+
+  {c.productCallout && (
+    <div class="border-b border-brand-100 bg-brand-50">
+      <p class="container-page flex flex-wrap items-center gap-x-2 gap-y-1 py-4 text-sm text-ink-700 sm:text-base">
+        Want it running sooner?
+        <a href={href(`/products/${c.productCallout.slug}/`)} class="group inline-flex items-center gap-1 py-1 font-semibold text-brand-700 hover:text-brand-800">
+          Start from {c.productCallout.name} and we customise it<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+        </a>
+      </p>
+    </div>
+  )}
+
+  <div class="border-b border-ink-100 bg-white">
+    <div class="container-page">
+      <ul class="grid grid-cols-2 divide-ink-100 py-2 lg:grid-cols-4 lg:divide-x">
+        {c.included.map((item, i) => (
+          <li class="flex items-center gap-3 px-2 py-4 text-sm font-semibold text-ink-800 lg:px-6">
+            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-50 text-[11px] font-bold text-brand-700">{i + 1}</span>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <Section
+    class="max-sm:py-16"
+    eyebrow="What you get"
+    title={`Everything a good ${c.noun} project should include`}
+    highlight="should include"
+    intro="Six things you get as standard. We agree the exact list in writing during scoping."
+  >
+    <DeliverablesGrid items={c.deliverables} />
+  </Section>
+
+  <Section
+    class="max-sm:py-16"
+    tone="muted"
+    eyebrow="Problems we solve"
+    title={c.problemsTitle}
+    intro="Specific to how Indian SMEs and lenders work, from branch teams on WhatsApp to month-end in Excel."
+  >
+    <ProblemsGrid items={c.problems} />
+  </Section>
+
+  <Section
+    class="max-sm:py-16"
+    id="process"
+    tone="dark"
+    eyebrow="How the engagement runs"
+    title="A plan with dates, not a black box"
+    intro="Durations are typical ranges. You get a dated plan for your project after scoping, and a demo at every milestone."
+  >
+    <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 -z-0 opacity-60"></div>
+    <Steps tone="dark" steps={c.steps} class="relative" />
+  </Section>
+
+  <Section
+    class="max-sm:py-16"
+    eyebrow="Tech we use"
+    title="Proven, open tools your next developer will know"
+    intro="We pick the simplest stack that fits the job, favour open-source, and avoid lock-in to any single vendor."
+  >
+    <TechStack groups={c.tech} />
+  </Section>
+
+  <Section
+    class="max-sm:py-16"
+    tone="muted"
+    eyebrow="Engagement models"
+    title="Three ways to work with us"
+    intro="Every engagement gets a written quote after a scoping call. No packages, no hourly surprises."
+  >
+    <EngagementModels note={c.engagementNote} interest={service.slug} />
+  </Section>
+
+  <Section
+    class="max-sm:py-16"
+    eyebrow="Related"
+    title={`Products and services that pair with ${topic}`}
+    intro="Start from a product where one fits, and we customise from there. It’s usually faster and cheaper than building from zero."
+  >
+    <RelatedCards items={relatedFrom(c.products, c.relatedServices)} />
+  </Section>
+
+  <Section tone="muted" class="max-sm:py-16">
+    <Faq
+      title={`Questions about ${topic}`}
+      intro="Straight answers to the questions worth asking before you start."
+      items={c.faqs}
+      askInterest={service.slug}
+    />
+  </Section>
+
+  <CtaBand
+    title={`Planning your ${c.noun} project?`}
+    interest={service.slug}
+    secondary={{ label: cta.allServices, path: '/services/' }}
+  />
+</Base>

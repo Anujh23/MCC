@@ -1,0 +1,32 @@
+---
+// Manka logo: blue tile with an "M" monogram and a saffron node (the consultant: the
+// point where the two peaks meet). `tone` sets the wordmark colour for light/dark backgrounds.
+// `compactSub` hides the "Commerce & Consultancy" subline below sm (the header uses it).
+interface Props {
+  tone?: 'dark' | 'light';
+  mark?: boolean; // mark only, no wordmark
+  size?: 'sm' | 'md' | 'lg';
+  compactSub?: boolean;
+  class?: string;
+}
+const { tone = 'dark', mark = false, size = 'md', compactSub = false, class: className = '' } = Astro.props;
+const text = tone === 'dark' ? 'text-ink-900' : 'text-white';
+const sub = tone === 'dark' ? 'text-ink-500' : 'text-ink-300';
+const box = { sm: 'h-7 w-7', md: 'h-9 w-9', lg: 'h-16 w-16' }[size];
+const word = { sm: 'text-lg', md: 'text-xl', lg: 'text-3xl' }[size];
+const subSize = size === 'lg' ? 'text-xs' : 'text-[0.625rem]';
+---
+
+<span class={`inline-flex items-center gap-2.5 ${className}`}>
+  <svg class={`${box} shrink-0`} viewBox="0 0 48 48" aria-hidden="true">
+    <rect width="48" height="48" rx="12" class="fill-brand-600" />
+    <path d="M13.5 34V16l10.5 10.5L34.5 16v18" fill="none" class="stroke-white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="24" cy="11" r="3.25" class="fill-saffron-500" />
+  </svg>
+  {!mark && (
+    <span class="flex flex-col leading-none">
+      <span class={`${word} font-extrabold tracking-tight ${text}`}>Manka</span>
+      <span class={`mt-1 ${subSize} font-semibold tracking-[0.14em] uppercase ${sub} ${compactSub ? 'hidden sm:block' : ''}`}>Commerce &amp; Consultancy</span>
+    </span>
+  )}
+</span>

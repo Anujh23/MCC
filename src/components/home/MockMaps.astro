@@ -1,0 +1,46 @@
+---
+// Maps API mockup: stylised map with a route, plus the JSON the API returns. Sample data only.
+import { MapPin, Navigation } from '@lucide/astro';
+interface Props { class?: string }
+import SampleBadge from '../ui/SampleBadge.astro';
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`overflow-hidden rounded-2xl bg-ink-900 text-left shadow-2xl shadow-black/50 ring-1 ring-white/10 ${className}`} aria-hidden="true">
+  <div class="flex items-center gap-1.5 border-b border-white/10 px-4 py-2.5">
+    <span class="h-2 w-2 rounded-full bg-white/15 max-sm:hidden"></span>
+    <span class="h-2 w-2 rounded-full bg-white/15 max-sm:hidden"></span>
+    <span class="h-2 w-2 rounded-full bg-white/15 max-sm:hidden"></span>
+    <span class="min-w-0 text-[11px] leading-tight font-medium text-ink-300 sm:ml-2">Maps API · Route &amp; distance</span>
+    <SampleBadge tone="dark" class="ml-auto" />
+  </div>
+
+  <div class="relative h-52 overflow-hidden bg-ink-950 sm:h-60">
+    <div class="bg-grid absolute inset-0 opacity-60"></div>
+    <!-- "roads" -->
+    <svg class="absolute inset-0 h-full w-full" viewBox="0 0 400 240" preserveAspectRatio="none" fill="none">
+      <path d="M0 170 C 80 160, 120 120, 200 128 S 330 70, 400 60" stroke="rgb(255 255 255 / 0.10)" stroke-width="10" />
+      <path d="M90 0 C 100 80, 140 150, 130 240" stroke="rgb(255 255 255 / 0.08)" stroke-width="7" />
+      <path d="M260 0 C 250 60, 300 140, 340 240" stroke="rgb(255 255 255 / 0.08)" stroke-width="7" />
+      <path d="M60 196 C 120 180, 150 140, 205 130 S 300 96, 318 72" stroke="var(--color-brand-400)" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 6" />
+      <circle cx="60" cy="196" r="22" fill="var(--color-saffron-500)" fill-opacity="0.12" />
+      <circle cx="318" cy="72" r="26" fill="var(--color-brand-400)" fill-opacity="0.14" />
+    </svg>
+    <span class="absolute text-saffron-400" style="left: calc(15% - 10px); top: calc(81% - 22px)"><MapPin size={22} stroke-width={2.25} fill="var(--color-ink-950)" /></span>
+    <span class="absolute text-brand-300" style="left: calc(79.5% - 10px); top: calc(30% - 22px)"><MapPin size={22} stroke-width={2.25} fill="var(--color-ink-950)" /></span>
+    <span class="absolute h-1.5 w-1.5 rounded-full bg-white/40" style="left: 40%; top: 66%"></span>
+    <span class="absolute h-1.5 w-1.5 rounded-full bg-white/40" style="left: 62%; top: 22%"></span>
+    <span class="absolute h-1.5 w-1.5 rounded-full bg-white/40" style="left: 24%; top: 34%"></span>
+
+    <div class="absolute top-3 left-3 rounded-xl bg-white/95 p-2.5 shadow-lg ring-1 ring-ink-900/5">
+      <p class="flex items-center gap-1 text-[10px] font-semibold text-ink-500"><Navigation size={10} stroke-width={2.5} />Branch → Customer</p>
+      <p class="mt-0.5 text-sm font-extrabold text-ink-900 tabular-nums">12.4 km <span class="text-xs font-semibold text-ink-500">· 31 min</span></p>
+    </div>
+    <div class="absolute right-3 bottom-3 rounded-lg bg-ink-900/90 px-2 py-1 text-[10px] font-medium text-ink-200 ring-1 ring-white/10">Territory: Pune West · PIN 411038</div>
+  </div>
+
+  <div class="border-t border-white/10 bg-ink-950/60 p-3 font-mono text-[10px] leading-relaxed sm:text-[11px]">
+    <p class="break-all"><span class="text-emerald-300">GET</span> <span class="text-ink-300">/v1/distance?from=branch_12&amp;to=lead_8841</span></p>
+    <p class="mt-1 text-ink-400">{'{'} <span class="text-brand-300">"distance_km"</span>: <span class="text-saffron-400">12.4</span>, <span class="text-brand-300">"eta_min"</span>: <span class="text-saffron-400">31</span>, <span class="text-brand-300">"pincode"</span>: <span class="text-emerald-300">"411038"</span> {'}'}</p>
+  </div>
+</div>

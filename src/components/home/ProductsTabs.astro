@@ -1,0 +1,217 @@
+---
+import { ArrowRight, Check } from '@lucide/astro';
+import Section from '../ui/Section.astro';
+import { products, href, contactHref, cta, productStatus } from '../../data/site';
+import MockBsa from './MockBsa.astro';
+import MockPayslip from './MockPayslip.astro';
+import MockCrm from './MockCrm.astro';
+import MockMaps from './MockMaps.astro';
+import MockHrms from './MockHrms.astro';
+
+const details: Record<string, { label: string; headline: string; points: string[] }> = {
+  crm: {
+    label: 'CRM',
+    headline: 'Every lead, follow-up and field visit in one place.',
+    points: [
+      'Leads from your website, calls and walk-ins land in one queue, auto-assigned by branch or product.',
+      'Daily follow-up lists and reminders, so no lead goes cold because someone forgot.',
+      'Stages that match your process, from first call to sanction and disbursal.',
+    ],
+  },
+  'bank-statement-analyser': {
+    label: 'BSA',
+    headline: 'A six-month statement, summarised for credit.',
+    points: [
+      'Upload PDF statements and get every transaction categorised: salary, EMI, UPI, cash, cheques.',
+      'Average bank balance, monthly credits and debits, and existing EMI outflow at a glance.',
+      'Flags cheque bounces, cash-deposit spikes and circular transactions for your credit team.',
+    ],
+  },
+  'payslip-checker': {
+    label: 'Payslip',
+    headline: 'Catch an edited salary slip before you lend.',
+    points: [
+      'Checks the arithmetic: gross, PF, PT, TDS and net pay have to add up.',
+      'Matches net pay against the salary credit in the applicant’s bank statement.',
+      'Looks for edits in fonts, layout and PDF metadata, and explains each flag in plain words.',
+    ],
+  },
+  'maps-api': {
+    label: 'Maps API',
+    headline: 'Distance, location and territory, as simple API calls.',
+    points: [
+      'Turn Indian addresses into coordinates and PIN codes your systems can use.',
+      'Distance and travel time between branches, customers and field agents.',
+      'Draw territories and assign PIN codes to teams for visits and collections.',
+    ],
+  },
+  hrms: {
+    label: 'HRMS',
+    headline: 'Attendance and leave that feed payroll directly.',
+    points: [
+      'Attendance, shifts and leave, with approvals on the manager’s phone.',
+      'Monthly payroll with PF, ESI, PT and TDS worked out for you.',
+      'Employees download payslips and apply for leave themselves.',
+    ],
+  },
+};
+const mocks: Record<string, any> = {
+  crm: MockCrm,
+  'bank-statement-analyser': MockBsa,
+  'payslip-checker': MockPayslip,
+  'maps-api': MockMaps,
+  hrms: MockHrms,
+};
+---
+
+<Section
+  id="products"
+  tone="muted"
+  eyebrow="Products"
+  title="Products built around FOIR, PF and PIN codes."
+  intro="Built and ready to deploy. Use them as they are, or have us customise them to your process."
+  class="cv-auto max-sm:py-14"
+>
+  <div class="reveal grid gap-6 lg:grid-cols-[19rem_1fr] lg:gap-8" data-tabs>
+    <!-- Tab list: horizontal scroll on mobile, vertical on desktop -->
+    <div
+      role="tablist"
+      aria-label="Manka products"
+      aria-orientation="vertical"
+      class="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [mask-image:linear-gradient(to_right,#000_80%,transparent)] [scrollbar-width:none] sm:mx-0 sm:px-0 lg:flex-col lg:overflow-visible lg:pb-0 lg:[mask-image:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {products.map((p, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`ptab-${p.slug}`}
+          aria-controls={`ppanel-${p.slug}`}
+          aria-labelledby={`ptab-${p.slug}-name`}
+          aria-describedby={`ptab-${p.slug}-blurb`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          class="group flex shrink-0 snap-start items-center gap-3 rounded-2xl px-4 py-3 text-left ring-1 ring-ink-200/70 transition bg-white hover:ring-brand-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 aria-selected:bg-ink-950 aria-selected:ring-ink-950 forced-colors:aria-selected:outline-3 forced-colors:aria-selected:-outline-offset-3 lg:w-full lg:py-4"
+        >
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 transition group-aria-selected:bg-white/10 group-aria-selected:text-saffron-400 group-aria-selected:ring-white/15" aria-hidden="true">
+            <p.icon size={18} stroke-width={1.9} />
+          </span>
+          <span class="min-w-0">
+            <span id={`ptab-${p.slug}-name`} class="block text-sm font-semibold whitespace-nowrap text-ink-900 group-aria-selected:text-white">
+              <span class="lg:hidden">{details[p.slug].label}</span><span class="hidden lg:inline">{p.short ?? p.title}</span>
+            </span>
+            <span id={`ptab-${p.slug}-blurb`} class="hidden text-xs leading-snug text-ink-600 group-aria-selected:text-ink-300 lg:block">{p.blurb}</span>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Panels: all rendered; without JS they stack (the tablist is hidden), with JS only the selected one shows -->
+    <div class="grid min-w-0 grid-cols-1 gap-6">
+      {products.map((p, i) => {
+        const Mock = mocks[p.slug];
+        const d = details[p.slug];
+        return (
+          <div
+            role="tabpanel"
+            id={`ppanel-${p.slug}`}
+            aria-labelledby={`ptab-${p.slug}`}
+            tabindex="0"
+            data-prehide={i !== 0 ? '' : undefined}
+            class="overflow-hidden rounded-3xl bg-white ring-1 ring-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500"
+          >
+            <div class="grid xl:grid-cols-[1.15fr_1fr]">
+              <div class="relative flex items-center overflow-hidden bg-ink-950 p-5 sm:p-8">
+                <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
+                <div class="pointer-events-none absolute -right-20 -bottom-24 h-72 w-72 rounded-full bg-brand-600/40 blur-3xl"></div>
+                <div class="relative mx-auto w-full max-w-md xl:max-w-none">
+                  <Mock full />
+                </div>
+              </div>
+              <div class="order-first flex flex-col p-6 sm:p-8 xl:order-none">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <p class="text-xs font-semibold tracking-wider text-brand-700 uppercase">{p.title}</p>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 ring-1 ring-emerald-100"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true"></span>{productStatus}</span>
+                </div>
+                <h3 class="mt-3 text-2xl leading-snug font-extrabold">{d.headline}</h3>
+                <ul class="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
+                  {d.points.map((pt) => (
+                    <li class="flex gap-3 text-sm leading-relaxed text-ink-600">
+                      <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600 text-white" aria-hidden="true"><Check size={12} stroke-width={3} /></span>
+                      {pt}
+                    </li>
+                  ))}
+                </ul>
+                <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 pt-6 sm:pt-8">
+                  <a href={contactHref(p.slug)} class="btn btn-primary group">
+                    {cta.demo}<span class="sr-only">: {p.short ?? p.title}</span><ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+                  </a>
+                  <a href={href(`/products/${p.slug}/`)} class="group inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+                    {cta.explore(p.short ?? p.title)}<ArrowRight size={15} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</Section>
+
+<style is:global>
+  /* panels 2–5 stay hidden while the tabs script loads; without JS they all show */
+  html.js [data-prehide] { display: none; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const list = root.querySelector<HTMLElement>('[role="tablist"]');
+    const mq = window.matchMedia('(min-width: 64rem)');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncOrientation = () => list?.setAttribute('aria-orientation', mq.matches ? 'vertical' : 'horizontal');
+    syncOrientation();
+    mq.addEventListener('change', syncOrientation);
+
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls') || '');
+        if (panel) {
+          panel.hidden = !on;
+          panel.removeAttribute('data-prehide');
+        }
+      });
+      if (focus) tab.focus();
+      // keep the active pill in view on the mobile scroller, without scrolling the page
+      if (list && list.scrollWidth > list.clientWidth) {
+        const delta = tab.getBoundingClientRect().left - list.getBoundingClientRect().left - 16;
+        list.scrollTo({ left: list.scrollLeft + delta, behavior: reduce.matches ? 'auto' : 'smooth' });
+      }
+    };
+
+    tabs.forEach((t) => {
+      const panel = document.getElementById(t.getAttribute('aria-controls') || '');
+      if (panel) {
+        panel.hidden = t.getAttribute('aria-selected') !== 'true';
+        panel.removeAttribute('data-prehide');
+      }
+    });
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (e) => {
+        const keys: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+        let next = -1;
+        if (e.key in keys) next = (i + keys[e.key] + tabs.length) % tabs.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabs.length - 1;
+        if (next < 0) return;
+        e.preventDefault();
+        select(tabs[next], true);
+      });
+    });
+  });
+</script>

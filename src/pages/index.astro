@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/ui/Section.astro';
+import Steps from '../components/ui/Steps.astro';
+import Faq from '../components/ui/Faq.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import Hero from '../components/home/Hero.astro';
+import ServicesBento from '../components/home/ServicesBento.astro';
+import ProductsTabs from '../components/home/ProductsTabs.astro';
+import Industries from '../components/home/Industries.astro';
+import WhyManka from '../components/home/WhyManka.astro';
+import TechStack from '../components/home/TechStack.astro';
+import { howWeWork } from '../data/site';
+
+const description =
+  'Manka builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip checks for Indian businesses. Book a free call.';
+
+const faqs = [
+  {
+    q: 'How much does a project cost?',
+    a: 'It depends on scope: a company website costs a fraction of a CRM with bank and bureau integrations. After a free call we send a written scope. Project work gets one fixed price in ₹, GST shown separately; ongoing teams get a monthly rate agreed in writing. Changes are quoted before they’re done.',
+  },
+  {
+    q: 'How long will it take?',
+    a: 'A company website is usually a few weeks of work. A CRM, HR system or lending workflow is a few months, depending on integrations and data migration. The written scope breaks the timeline into milestones, and you see working software at each one.',
+  },
+  {
+    q: 'Who owns the code, and where does it run?',
+    a: 'For custom builds, you own the code and IP once the project is paid for: source, designs and docs in a repository you control, running in accounts in your name. Products are licensed and run on our hosted setup or on your servers. Your data is always yours.',
+  },
+  {
+    q: 'What happens after go-live? Do you offer an AMC?',
+    a: 'Bug-fix support after launch is part of every project scope, with the length agreed up front. After that, an annual maintenance contract (AMC) is available for fixes, small changes and updates, or your own team can take over. Support runs during Indian working hours (IST), by email.',
+  },
+  {
+    q: 'Can you work with our existing software?',
+    a: 'Usually, yes. Most businesses already have something: Tally, an old CRM, a loan management system or a lot of Excel. We connect through APIs, database access or file imports, and move data out of older systems when you’re ready to switch.',
+  },
+  {
+    q: 'Will you sign an NDA?',
+    a: 'Yes. We’ll sign your NDA, or share ours, before you send any documents, statements or data. For lending work we also agree in writing how customer data is stored and who can access it.',
+  },
+];
+---
+
+<Base description={description}>
+  <Hero />
+  <ServicesBento />
+  <ProductsTabs />
+  <Industries />
+  <Section
+    tone="muted"
+    eyebrow="How we work"
+    title="Five steps. No surprises in between."
+    intro="You see the work at every stage and know what it costs before we start."
+    class="max-sm:py-14"
+  >
+    <Steps steps={howWeWork} />
+  </Section>
+  <WhyManka />
+  <TechStack />
+  <Section tone="muted" class="max-sm:py-14">
+    <Faq
+      title="Questions to ask before you hire anyone."
+      intro="The short answers. Your written scope has the details for your project."
+      items={faqs}
+    />
+  </Section>
+  <CtaBand />
+</Base>

@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+import { Font } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, href } from '../data/site';
+import { organization, website } from '../data/schema';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  /** Path under public/, 1200x630. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  published?: Date;
+  /** Extra JSON-LD nodes from src/data/schema.ts, merged into one @graph with Organization + WebSite. */
+  schema?: object | object[];
+}
+const {
+  title,
+  description = site.description,
+  noindex = false,
+  image = '/og/default.png',
+  imageAlt,
+  type = 'website',
+  published,
+  schema,
+} = Astro.props;
+
+// " | Manka" only while the whole title still fits in 60 characters.
+const SUFFIX = ' | Manka';
+const fullTitle = !title
+  ? 'Manka Commerce & Consultancy: CRM, HRMS & Lending Software'
+  : (title + SUFFIX).length <= 60 ? title + SUFFIX : title;
+const hideFromIndex = noindex || import.meta.env.PUBLIC_SITE_NOINDEX === 'true';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(href(image), Astro.site).href;
+const graph = [organization(), website(), ...(schema ? [schema].flat() : [])];
+const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {hideFromIndex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
+    <meta name="theme-color" content="#0b1530" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt ?? fullTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {type === 'article' && published && <meta property="article:published_time" content={published.toISOString()} />}
+
+    <Font cssVariable="--font-jakarta" preload={[{ subset: 'latin', weight: 400 }, { subset: 'latin', weight: 800 }]} />
+    <script type="application/ld+json" set:html={ld} />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60]">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1" class="flex-1 focus:outline-hidden"><slot /></main>
+    <Footer />
+
+    <script>
+      // Scroll reveal for any element with class="reveal"
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+        }),
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.1 },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

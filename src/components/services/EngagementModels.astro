@@ -1,0 +1,63 @@
+---
+// Three ways to work with us. No prices; every card goes to the form, pre-filled with `interest`.
+// Below sm the cards sit in a snap rail instead of a tall stack.
+import { ClipboardList, Users, LifeBuoy, Check, ArrowRight, Info } from '@lucide/astro';
+import { contactHref, cta } from '../../data/site';
+import IconBadge from '../ui/IconBadge.astro';
+
+interface Props { note?: string; interest?: string }
+const { note, interest } = Astro.props;
+
+const models = [
+  {
+    icon: ClipboardList,
+    name: 'Fixed-scope project',
+    best: 'Best when you know what you need',
+    points: ['Written scope, timeline and one fixed price in ₹', 'Milestone-based billing', 'Demos at every milestone', 'Handover with docs and training'],
+  },
+  {
+    icon: Users,
+    name: 'Dedicated team',
+    best: 'Best for ongoing products and roadmaps',
+    points: ['Engineers who know your system, with QA built in', 'Monthly billing, sized to your roadmap', 'Your backlog, your priorities', 'Weekly planning and demos'],
+    featured: true,
+  },
+  {
+    icon: LifeBuoy,
+    name: 'Support & AMC',
+    best: 'Best after go-live',
+    points: ['Bug fixes and security updates', 'Small changes from a monthly bank of hours', 'Uptime and backup checks', 'Agreed response times'],
+  },
+];
+---
+
+<div>
+  <ul class="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+    {models.map((m, i) => (
+      <li
+        class={`reveal flex w-[85%] shrink-0 snap-start flex-col rounded-2xl p-6 ring-1 sm:w-auto sm:p-7 ${m.featured ? 'bg-ink-950 text-ink-300 ring-ink-800' : 'bg-white ring-ink-100'}`}
+        style={`--d: ${i * 100}ms`}
+      >
+        <IconBadge icon={m.icon} tone={m.featured ? 'dark' : 'brand'} />
+        <h3 class={`mt-5 text-xl font-bold ${m.featured ? 'text-white' : ''}`}>{m.name}</h3>
+        <p class={`mt-1 text-sm ${m.featured ? 'text-ink-300' : 'text-ink-600'}`}>{m.best}</p>
+        <ul class="mt-6 flex-1 space-y-3">
+          {m.points.map((p) => (
+            <li class="flex gap-3 text-[0.95rem]">
+              <Check size={18} class={`mt-0.5 shrink-0 ${m.featured ? 'text-saffron-400' : 'text-brand-600'}`} aria-hidden="true" />
+              <span class={m.featured ? 'text-ink-200' : 'text-ink-600'}>{p}</span>
+            </li>
+          ))}
+        </ul>
+        <a href={contactHref(interest)} class={`btn group mt-8 w-full ${m.featured ? 'btn-primary' : 'btn-ghost'}`}>
+          {cta.model}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+        </a>
+      </li>
+    ))}
+  </ul>
+  {note && (
+    <p class="reveal mt-6 flex items-start gap-2 text-sm text-ink-600">
+      <Info size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{note}
+    </p>
+  )}
+</div>

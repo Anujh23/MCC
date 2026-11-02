@@ -1,0 +1,26 @@
+---
+// Dashed "fill me in" block for content the owner still has to supply.
+// Only use it behind a site.flags switch. It renders in dev only, so a flag flipped
+// before the real content arrives still can't ship a dashed box to production.
+import { Plus } from '@lucide/astro';
+
+interface Props {
+  title: string;
+  text?: string;
+  icon?: any;
+  class?: string;
+}
+const { title, text, icon: Icon = Plus, class: className = '' } = Astro.props;
+const show = import.meta.env.DEV;
+---
+
+{show && (
+  <div class={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-ink-200 bg-white/60 p-8 text-center ${className}`}>
+    <span class="grid h-12 w-12 place-items-center rounded-full bg-ink-50 text-ink-500 ring-1 ring-ink-100">
+      <Icon size={22} stroke-width={1.75} />
+    </span>
+    <p class="mt-4 font-semibold text-ink-700">{title}</p>
+    {text && <p class="mt-1.5 max-w-xs text-sm leading-relaxed text-ink-500">{text}</p>}
+    <slot />
+  </div>
+)}

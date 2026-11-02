@@ -1,0 +1,179 @@
+---
+import Logo from './Logo.astro';
+import { nav, href, contactHref, cta } from '../data/site';
+
+const itemHref = (base: string, slug: string) => href(`${base}/${slug}`);
+const norm = (p: string) => p.replace(/\/+$/, '') || '/';
+const here = norm(Astro.url.pathname);
+const isCurrent = (path: string) => norm(path) === here;
+const within = (path: string) => isCurrent(path) || here.startsWith(`${norm(path)}/`);
+const groupActive = (group: (typeof nav)[number]) =>
+  group.base ? within(href(group.base)) : group.items.some((i) => within(itemHref(group.base, i.slug)));
+const panelId = (label: string) => `dd-${label.toLowerCase()}`;
+---
+
+<header data-site-header class="sticky top-0 z-50 border-b border-ink-900/5 bg-white/85 backdrop-blur-md">
+  <div class="container-page flex h-16 items-center justify-between gap-4 sm:gap-6">
+    <a href={href('/')} aria-label="Manka Commerce & Consultancy, home" class="shrink-0 rounded-lg">
+      <Logo compactSub />
+    </a>
+
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="Main">
+      {nav.map((group) => {
+        const active = groupActive(group);
+        return (
+          <div class="group relative" data-dropdown>
+            <button
+              type="button"
+              aria-expanded="false"
+              aria-controls={panelId(group.label)}
+              class={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-sm transition hover:bg-ink-50 hover:text-ink-900 ${active ? 'font-semibold text-ink-900' : 'font-medium text-ink-700'}`}
+            >
+              {group.label}
+              <svg class="h-4 w-4 transition group-data-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.2 7.2a.75.75 0 0 1 1.06 0L10 10.94l3.74-3.74a.75.75 0 1 1 1.06 1.06l-4.27 4.27a.75.75 0 0 1-1.06 0L5.2 8.26a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+              </svg>
+              {active && <span class="absolute bottom-0.5 left-[calc(50%-0.5rem)] h-1 w-1 rounded-full bg-saffron-500" aria-hidden="true"></span>}
+            </button>
+            <div id={panelId(group.label)} class="invisible absolute top-full left-0 pt-3 opacity-0 transition duration-150 group-data-open:visible group-data-open:opacity-100">
+              <div class="w-[22rem] rounded-2xl border border-ink-100 bg-white p-2 shadow-xl shadow-ink-900/10">
+                {group.items.map((item) => (
+                  <a
+                    href={itemHref(group.base, item.slug)}
+                    aria-current={isCurrent(itemHref(group.base, item.slug)) ? 'page' : undefined}
+                    class="group/item flex gap-3 rounded-xl px-3 py-2.5 transition hover:bg-brand-50 aria-[current=page]:bg-brand-50"
+                  >
+                    <span class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink-50 text-ink-500 ring-1 ring-ink-100 transition group-hover/item:bg-white group-hover/item:text-brand-600">
+                      <item.icon size={18} stroke-width={1.75} />
+                    </span>
+                    <span>
+                      <span class="block text-sm font-semibold text-ink-900">{item.title}</span>
+                      <span class="mt-0.5 block text-xs text-ink-500">{item.blurb}</span>
+                    </span>
+                  </a>
+                ))}
+                {group.all && (
+                  <a href={href(group.base)} class="mt-1 flex items-center justify-between rounded-xl border-t border-ink-100 px-3 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50">
+                    {group.all} <span aria-hidden="true">→</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={contactHref()} class="btn btn-primary max-sm:px-3.5 max-sm:text-[0.8125rem]">{cta.call}</a>
+      <button
+        id="menu-toggle"
+        type="button"
+        class="group inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-900 ring-1 ring-ink-200 lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Menu"
+      >
+        <svg class="h-5 w-5 group-aria-expanded:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+        <svg class="hidden h-5 w-5 group-aria-expanded:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- data-closed (not `hidden`): without JS the menu simply shows, see the no-JS rules in global.css -->
+  <div id="mobile-menu" data-closed class="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-ink-100 bg-white lg:hidden">
+    <nav aria-label="Main" class="container-page py-3">
+      {nav.map((group) => (
+        <details class="group border-b border-ink-100" open={groupActive(group) || undefined}>
+          <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between py-3 text-base font-semibold text-ink-900 [&::-webkit-details-marker]:hidden">
+            {group.label}
+            <span class="text-lg text-ink-500 transition group-open:rotate-45" aria-hidden="true">+</span>
+          </summary>
+          <ul class="pb-3">
+            {group.all && (
+              <li><a href={href(group.base)} aria-current={isCurrent(href(group.base)) ? 'page' : undefined} class="block rounded-lg px-2 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50">{group.all} <span aria-hidden="true">→</span></a></li>
+            )}
+            {group.items.map((item) => (
+              <li>
+                <a
+                  href={itemHref(group.base, item.slug)}
+                  aria-current={isCurrent(itemHref(group.base, item.slug)) ? 'page' : undefined}
+                  class="block rounded-lg px-2 py-3 text-sm text-ink-700 hover:bg-ink-50 aria-[current=page]:bg-brand-50 aria-[current=page]:font-semibold aria-[current=page]:text-ink-900"
+                >{item.title}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))}
+      <a href={contactHref()} class="btn btn-primary mt-4 w-full">{cta.call}</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Desktop dropdowns: exactly one open at a time (hover for mouse, click/Enter for keyboard, Esc closes).
+  const dropdowns = [...document.querySelectorAll<HTMLElement>('[data-dropdown]')];
+  let closeTimer: number | undefined;
+  const setOpen = (dd: HTMLElement | null) => {
+    dropdowns.forEach((d) => {
+      const open = d === dd;
+      d.toggleAttribute('data-open', open);
+      d.querySelector('button')?.setAttribute('aria-expanded', String(open));
+    });
+  };
+  dropdowns.forEach((dd) => {
+    const trigger = dd.querySelector('button');
+    dd.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      clearTimeout(closeTimer);
+      setOpen(dd);
+    });
+    dd.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      closeTimer = window.setTimeout(() => setOpen(null), 120);
+    });
+    // Mouse already opened it on hover, so a mouse click shouldn't close it; keyboard/touch toggle.
+    let lastPointer = '';
+    trigger?.addEventListener('pointerdown', (e) => (lastPointer = e.pointerType));
+    trigger?.addEventListener('click', (e) => {
+      const isMouse = e.detail > 0 && lastPointer === 'mouse';
+      setOpen(!isMouse && dd.hasAttribute('data-open') ? null : dd);
+    });
+    dd.addEventListener('focusout', (e) => {
+      if (dd.hasAttribute('data-open') && !dd.contains(e.relatedTarget as Node)) setOpen(null);
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if (!dropdowns.some((d) => d.contains(e.target as Node))) setOpen(null);
+  });
+
+  // Mobile menu: toggle, scroll lock, closes on Esc and when the viewport reaches the desktop nav.
+  const btn = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const menuOpen = () => btn?.getAttribute('aria-expanded') === 'true';
+  const setMenu = (open: boolean) => {
+    btn?.setAttribute('aria-expanded', String(open));
+    menu?.toggleAttribute('data-closed', !open);
+    document.documentElement.classList.toggle('overflow-hidden', open);
+  };
+  btn?.addEventListener('click', () => setMenu(!menuOpen()));
+  matchMedia('(min-width: 64rem)').addEventListener('change', (e) => e.matches && setMenu(false));
+
+  // One Esc handler for both, so a hover-opened panel closes even when focus is elsewhere.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = dropdowns.find((d) => d.hasAttribute('data-open'));
+    if (open) {
+      const hadFocus = open.contains(document.activeElement);
+      setOpen(null);
+      if (hadFocus) open.querySelector('button')?.focus();
+    } else if (menuOpen()) {
+      setMenu(false);
+      btn?.focus();
+    }
+  });
+</script>

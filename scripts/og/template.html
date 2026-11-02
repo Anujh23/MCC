@@ -1,0 +1,49 @@
+<!doctype html>
+<!--
+  Default social card (public/og/default.png, 1200x630). Not shipped: render it with headless Edge:
+  bash scripts/og/render.sh
+  Rules: ink-950 background, saffron accent only, no metrics, no client names. Keep text inside the
+  central ~1080x560 safe zone (LinkedIn and WhatsApp crop the edges).
+-->
+<html lang="en-IN">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: Jakarta; font-weight: 800; src: url("https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-800-normal.woff2") format("woff2"); }
+  @font-face { font-family: Jakarta; font-weight: 600; src: url("https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-600-normal.woff2") format("woff2"); }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #060c1e; }
+  body { position: relative; font-family: Jakarta, system-ui, sans-serif; color: #fff; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgb(255 255 255 / .05) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .05) 1px, transparent 1px); background-size: 48px 48px; mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent); }
+  .glow { position: absolute; top: -260px; right: -200px; width: 720px; height: 720px; border-radius: 50%; background: radial-gradient(closest-side, rgb(36 72 240 / .45), transparent); }
+  .glow2 { position: absolute; bottom: -320px; left: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(closest-side, rgb(255 138 31 / .16), transparent); }
+  .wrap { position: absolute; inset: 64px 84px; display: flex; flex-direction: column; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 18px; }
+  .logo svg { width: 64px; height: 64px; }
+  .word { display: flex; flex-direction: column; line-height: 1; }
+  .word b { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; }
+  .word span { margin-top: 8px; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #a9b4cc; }
+  h1 { max-width: 980px; font-size: 76px; line-height: 1.06; font-weight: 800; letter-spacing: -0.03em; }
+  h1 em { font-style: normal; background: linear-gradient(100deg, #ffa24d, #ffd29e 60%, #ffa24d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .foot { display: flex; align-items: center; gap: 18px; font-size: 24px; font-weight: 600; color: #a9b4cc; }
+  .bar { width: 56px; height: 6px; border-radius: 3px; background: #ff8a1f; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="glow2"></div>
+  <div class="wrap">
+    <div class="logo">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <rect width="48" height="48" rx="12" fill="#2448F0" />
+        <path d="M13.5 34V16l10.5 10.5L34.5 16v18" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="24" cy="11" r="3.25" fill="#FF8A1F" />
+      </svg>
+      <div class="word"><b>Manka</b><span>Commerce &amp; Consultancy</span></div>
+    </div>
+    <h1>We build the software your business <em>runs on.</em></h1>
+    <div class="foot"><span class="bar"></span>CRM · HRMS · Lending tools · Websites · Custom software</div>
+  </div>
+</body>
+</html>

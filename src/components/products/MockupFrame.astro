@@ -1,0 +1,26 @@
+---
+// App-window chrome for product UI mockups. Content inside is a @container,
+// so mockups adapt to the frame width (hero aside, index card, phone).
+interface Props {
+  title: string;
+  class?: string;
+}
+import SampleBadge from '../ui/SampleBadge.astro';
+
+const { title, class: className = '' } = Astro.props;
+---
+
+<div class={`relative overflow-hidden rounded-2xl bg-white text-left text-ink-700 shadow-2xl shadow-ink-950/40 ring-1 ring-ink-900/10 ${className}`}>
+  <div class="flex items-center gap-3 border-b border-ink-100 bg-ink-50/80 px-3.5 py-2.5" aria-hidden="true">
+    <span class="hidden shrink-0 gap-1.5 sm:flex">
+      <span class="h-2.5 w-2.5 rounded-full bg-ink-200"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-ink-200"></span>
+      <span class="h-2.5 w-2.5 rounded-full bg-ink-200"></span>
+    </span>
+    <span class="min-w-0 flex-1 text-left text-[11px] leading-tight font-medium text-ink-500 sm:text-center">{title}</span>
+    <SampleBadge />
+  </div>
+  <div class="@container" aria-label={`${title} (illustrative mockup with sample data)`} role="img">
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,194 @@
+---
+// ~120px mini-visual for a featured product feature, built from the full mockups' parts (sample data).
+// Decorative: the feature text beside it says the same thing, so it's aria-hidden.
+import { Check, ArrowRight, MapPin } from '@lucide/astro';
+import StatusPill from './StatusPill.astro';
+import SampleBadge from '../ui/SampleBadge.astro';
+
+interface Props { kind: string }
+const { kind } = Astro.props;
+
+const months = [
+  { m: 'Apr', in: 58, out: 55 }, { m: 'May', in: 61, out: 57 }, { m: 'Jun', in: 59, out: 60 },
+  { m: 'Jul', in: 64, out: 62 }, { m: 'Aug', in: 60, out: 56 }, { m: 'Sep', in: 108, out: 61, spike: true },
+];
+const flags = [
+  { date: '22 Sep', narr: 'CASH DEP SELF', amt: '+50,000', flag: 'Round figure', tone: 'warn' },
+  { date: '14 Jul', narr: 'IMPS IN-OUT', amt: '+25,000', flag: 'Circular', tone: 'fail' },
+  { date: '05 Sep', narr: 'ACH RTN EMI', amt: '−14,300', flag: 'EMI bounce', tone: 'fail' },
+] as const;
+const stages = [
+  { s: 'New lead', n: 12, dot: 'bg-ink-400', cards: 3 },
+  { s: 'Login', n: 8, dot: 'bg-brand-500', cards: 2 },
+  { s: 'Sanction', n: 5, dot: 'bg-amber-500', cards: 2 },
+  { s: 'Disbursed', n: 3, dot: 'bg-emerald-500', cards: 1 },
+];
+const label = 'text-[11px] font-bold text-ink-900';
+---
+
+<div class="rounded-xl bg-ink-50 p-3 ring-1 ring-ink-100" aria-hidden="true">
+  <div class="mb-2 flex items-center justify-between gap-2">
+    <p class={label}>
+      {{
+        'bsa-flow': 'Monthly inflow vs outflow',
+        'bsa-flags': 'Flagged transactions',
+        'ps-math': 'Payslip · Sep 2026',
+        'ps-tamper': 'Edited region found',
+        'maps-geo': 'Geocode',
+        'maps-match': 'Field visit check',
+        'crm-stages': 'Lending pipeline',
+        'crm-assign': 'New lead · DSA portal',
+        'hr-attend': 'Today’s check-ins',
+        'hr-payroll': 'Payroll · Sep 2026',
+      }[kind]}
+    </p>
+    <SampleBadge />
+  </div>
+
+  {kind === 'bsa-flow' && (
+    <div class="rounded-lg bg-white p-2.5 ring-1 ring-ink-100">
+      <div class="relative flex h-14 items-end justify-between gap-2">
+        {months.map((d) => (
+          <div class="flex h-full flex-1 items-end justify-center gap-[3px]">
+            <span class={`w-full max-w-3 rounded-t-[3px] ${d.spike ? 'bg-amber-500' : 'bg-brand-500'}`} style={`height: ${(d.in / 112) * 100}%`}></span>
+            <span class="w-full max-w-3 rounded-t-[3px] bg-ink-200" style={`height: ${(d.out / 112) * 100}%`}></span>
+          </div>
+        ))}
+        <span class="absolute top-0 right-0 rounded bg-amber-50 px-1 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">Spike before applying</span>
+      </div>
+      <div class="mt-1 flex justify-between text-[10px] text-ink-500">
+        {months.map((d) => <span class="flex-1 text-center">{d.m}</span>)}
+      </div>
+    </div>
+  )}
+
+  {kind === 'bsa-flags' && (
+    <ul class="divide-y divide-ink-100 rounded-lg bg-white ring-1 ring-ink-100">
+      {flags.map((r) => (
+        <li class="flex items-center gap-2 px-2.5 py-1.5 text-[10px]">
+          <span class="w-11 shrink-0 text-ink-500">{r.date}</span>
+          <span class="min-w-0 flex-1 font-mono whitespace-nowrap text-ink-700">{r.narr}</span>
+          <span class={`hidden font-semibold tabular-nums sm:inline ${r.amt.startsWith('+') ? 'text-ink-900' : 'text-rose-600'}`}>{r.amt}</span>
+          <StatusPill tone={r.tone}>{r.flag}</StatusPill>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {kind === 'ps-math' && (
+    <ul class="divide-y divide-ink-100 rounded-lg bg-white text-[10px] ring-1 ring-ink-100">
+      {[
+        { k: 'Gross = sum of earnings', v: '₹60,100' },
+        { k: 'Net = gross − deductions', v: '₹56,300' },
+        { k: 'PF ≈ 12% of basic', v: '₹3,600' },
+      ].map((r) => (
+        <li class="flex items-center gap-2 px-2.5 py-1.5">
+          <span class="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-600"><Check size={10} stroke-width={3} /></span>
+          <span class="min-w-0 flex-1 text-ink-700">{r.k}</span>
+          <span class="font-semibold text-ink-900 tabular-nums">{r.v}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {kind === 'ps-tamper' && (
+    <div class="rounded-lg bg-white p-2.5 font-mono text-[10px] ring-1 ring-ink-100">
+      <p class="flex justify-between px-1 text-ink-600"><span>HRA</span><span class="text-ink-800 tabular-nums">12,000</span></p>
+      <p class="mt-1 flex justify-between rounded bg-amber-50 px-1 outline outline-1 outline-dashed outline-amber-500"><span class="text-ink-600">Special allowance</span><span class="font-sans font-semibold text-ink-900 tabular-nums">16,500</span></p>
+      <p class="mt-1 flex justify-between px-1 text-ink-600"><span>Conveyance</span><span class="text-ink-800 tabular-nums">1,600</span></p>
+      <p class="mt-2 flex items-center gap-1.5 font-sans"><StatusPill tone="warn">Warn</StatusPill><span class="text-ink-600">Font differs from other fields</span></p>
+    </div>
+  )}
+
+  {kind === 'maps-geo' && (
+    <div class="space-y-2 text-[10px]">
+      <p class="rounded-md bg-white px-2 py-1.5 text-ink-700 ring-1 ring-ink-100">nr Hanuman mandir, Kothrud, Pune</p>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <ArrowRight size={12} class="text-ink-400" />
+        <span class="rounded-md bg-white px-1.5 py-0.5 font-semibold text-ink-800 ring-1 ring-ink-100">411038</span>
+        <span class="rounded-md bg-white px-1.5 py-0.5 text-ink-700 ring-1 ring-ink-100">Pune · Maharashtra</span>
+        <span class="rounded-md bg-white px-1.5 py-0.5 font-mono text-ink-700 tabular-nums ring-1 ring-ink-100">18.5074, 73.8077</span>
+        <StatusPill tone="pass">High confidence</StatusPill>
+      </div>
+    </div>
+  )}
+
+  {kind === 'maps-match' && (
+    <div class="rounded-lg bg-white p-2.5 text-[10px] ring-1 ring-ink-100">
+      <div class="flex items-center gap-2">
+        <span class="flex items-center gap-1 text-ink-700"><MapPin size={12} class="text-ink-900" />KYC address</span>
+        <span class="h-px flex-1 border-t border-dashed border-ink-300"></span>
+        <span class="font-semibold text-ink-900">120 m</span>
+        <span class="h-px flex-1 border-t border-dashed border-ink-300"></span>
+        <span class="flex items-center gap-1 text-ink-700"><span class="h-2.5 w-2.5 rounded-full bg-saffron-500 ring-2 ring-saffron-100"></span>Visit</span>
+      </div>
+      <div class="mt-2.5 flex items-center justify-between">
+        <span class="text-ink-500">Address match score</span>
+        <span class="flex items-center gap-1.5"><span class="font-bold text-emerald-700">92 / 100</span><StatusPill tone="pass">Match</StatusPill></span>
+      </div>
+      <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-100"><div class="h-full w-[92%] rounded-full bg-emerald-500"></div></div>
+    </div>
+  )}
+
+  {kind === 'crm-stages' && (
+    <div class="grid grid-cols-4 gap-1.5">
+      {stages.map((c) => (
+        <div class="rounded-md bg-ink-100/70 p-1.5">
+          <p class="flex items-center gap-1 text-[10px] font-bold whitespace-nowrap text-ink-800"><span class={`h-1.5 w-1.5 shrink-0 rounded-full ${c.dot}`}></span>{c.s}</p>
+          <p class="mt-0.5 text-[10px] text-ink-500">{c.n} files</p>
+          <div class="mt-1.5 space-y-1">
+            {Array.from({ length: c.cards }).map(() => <span class="block h-3 rounded-sm bg-white ring-1 ring-ink-100"></span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {kind === 'crm-assign' && (
+    <div class="flex flex-wrap items-center gap-2 text-[10px]">
+      <div class="rounded-lg bg-white px-2.5 py-1.5 ring-1 ring-ink-100">
+        <p class="font-bold text-ink-900">Amit Kulkarni</p>
+        <p class="text-ink-500">Business loan · 411038</p>
+      </div>
+      <ArrowRight size={14} class="text-ink-400" />
+      <div class="flex items-center gap-2 rounded-lg bg-white px-2.5 py-1.5 ring-1 ring-ink-100">
+        <span class="grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">N</span>
+        <span><span class="block font-bold text-ink-900">Neha P</span><span class="block text-ink-500">Kothrud branch</span></span>
+      </div>
+      <div class="flex basis-full flex-wrap gap-1.5">
+        <StatusPill tone="info">Rule: pincode</StatusPill>
+        <StatusPill tone="pass">No duplicate</StatusPill>
+      </div>
+    </div>
+  )}
+
+  {kind === 'hr-attend' && (
+    <ul class="divide-y divide-ink-100 rounded-lg bg-white ring-1 ring-ink-100">
+      {[
+        { who: 'PN', name: 'Priya Nair', t: '9:04 am', tag: 'On time', tone: 'pass' as const },
+        { who: 'RK', name: 'Rohit Kale', t: '9:41 am', tag: 'Late', tone: 'warn' as const },
+        { who: 'SA', name: 'Sameer A', t: '9:12 am', tag: 'Geo-fence', tone: 'info' as const },
+      ].map((f) => (
+        <li class="flex items-center gap-2 px-2.5 py-1.5 text-[10px]">
+          <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink-800 text-[10px] font-bold text-white">{f.who[0]}</span>
+          <span class="min-w-0 flex-1 whitespace-nowrap text-ink-700">{f.name} <span class="text-ink-500">· {f.t}</span></span>
+          <StatusPill tone={f.tone}>{f.tag}</StatusPill>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {kind === 'hr-payroll' && (
+    <div class="rounded-lg bg-white p-2.5 text-[10px] ring-1 ring-ink-100">
+      <ul class="grid grid-cols-2 gap-x-4 gap-y-0.5">
+        {[['PF', '4,12,600'], ['ESI', '38,900'], ['Prof. tax', '29,400'], ['TDS', '2,86,500']].map(([k, v]) => (
+          <li class="flex justify-between gap-2"><span class="text-ink-500">{k}</span><span class="text-ink-800 tabular-nums">₹{v}</span></li>
+        ))}
+      </ul>
+      <p class="mt-2 flex items-center justify-between border-t border-ink-100 pt-1.5">
+        <span class="font-semibold text-ink-700">Net payable</span>
+        <span class="flex items-center gap-1.5"><span class="text-[12px] font-extrabold text-ink-900 tabular-nums">₹60,74,600</span><StatusPill tone="pass"><Check size={10} stroke-width={3} />Approved</StatusPill></span>
+      </p>
+    </div>
+  )}
+</div>

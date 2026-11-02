@@ -1,0 +1,70 @@
+---
+// Dark API panel: raw HTTP request on top, highlighted JSON response below (sample data).
+import SampleBadge from '../ui/SampleBadge.astro';
+
+interface Props {
+  method: string;
+  endpoint: string;
+  request: string;
+  response: unknown;
+}
+const { method, endpoint, request, response } = Astro.props;
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Minimal JSON colouring: keys, strings, numbers, literals.
+const highlightJson = (src: string) =>
+  esc(src).replace(
+    /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)/g,
+    (m, str, colon, lit, num) => {
+      if (str) return colon ? `<span class="text-brand-300">${str}</span>${colon}` : `<span class="text-ink-100">${str}</span>`;
+      if (lit) return `<span class="text-saffron-400">${lit}</span>`;
+      if (num) return `<span class="text-saffron-400">${num}</span>`;
+      return m;
+    },
+  );
+
+// Request: colour the request line and header names, JSON body if present.
+const [head, ...bodyParts] = request.split('\n\n');
+const body = bodyParts.join('\n\n');
+const headHtml = head
+  .split('\n')
+  .map((line, i) => {
+    if (i === 0) {
+      const [m, ...rest] = line.split(' ');
+      return `<span class="font-semibold text-saffron-400">${esc(m)}</span> <span class="text-white">${esc(rest.join(' '))}</span>`;
+    }
+    const idx = line.indexOf(':');
+    return idx > 0 ? `<span class="text-brand-300">${esc(line.slice(0, idx))}</span>:${esc(line.slice(idx + 1))}` : esc(line);
+  })
+  .join('\n');
+const bodyHtml = body.trim().startsWith('{')
+  ? highlightJson(body)
+  : body
+      .split('\n')
+      .map((line) => {
+        const idx = line.indexOf('=');
+        return idx > 0 ? `<span class="text-brand-300">${esc(line.slice(0, idx))}</span>=<span class="text-ink-100">${esc(line.slice(idx + 1))}</span>` : esc(line);
+      })
+      .join('\n');
+const requestHtml = body ? `${headHtml}\n\n${bodyHtml}` : headHtml;
+const responseHtml = highlightJson(JSON.stringify(response, null, 2));
+---
+
+<div class="overflow-hidden rounded-2xl bg-ink-900 shadow-2xl shadow-black/40 ring-1 ring-white/10">
+  <div class="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+    <span class="rounded-md bg-saffron-500/15 px-2 py-0.5 font-mono text-[11px] font-bold text-saffron-400 ring-1 ring-saffron-500/30">{method}</span>
+    <span class="min-w-0 font-mono text-xs break-all text-ink-200">{endpoint}</span>
+    <SampleBadge tone="dark" class="ml-auto" />
+  </div>
+  <pre class="overflow-x-auto px-4 py-4 font-mono text-[12px] leading-relaxed text-ink-300" tabindex="0" aria-label="Sample request"><code set:html={requestHtml} /></pre>
+  <div class="flex items-center gap-2 border-y border-white/10 bg-white/[0.03] px-4 py-2.5">
+    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+    <span class="font-mono text-[11px] font-semibold text-emerald-300">200 OK</span>
+    <span class="font-mono text-[11px] text-ink-400">application/json</span>
+  </div>
+  <div class="relative">
+    <pre class="max-h-60 overflow-auto px-4 pt-4 pb-10 font-mono text-[12px] leading-relaxed text-ink-300 sm:max-h-[26rem]" tabindex="0" aria-label="Sample JSON response"><code set:html={responseHtml} /></pre>
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ink-900 to-transparent" aria-hidden="true"></div>
+  </div>
+</div>

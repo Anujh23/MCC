@@ -1,0 +1,101 @@
+---
+import { ArrowRight } from '@lucide/astro';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/ui/PageHero.astro';
+import Section from '../../components/ui/Section.astro';
+import CtaBand from '../../components/ui/CtaBand.astro';
+import Steps from '../../components/ui/Steps.astro';
+import Faq from '../../components/ui/Faq.astro';
+import RelatedCards from '../../components/ui/RelatedCards.astro';
+import IndustryVisual from '../../components/industries/IndustryVisual.astro';
+import ChallengePairs from '../../components/industries/ChallengePairs.astro';
+import DeepDive from '../../components/industries/DeepDive.astro';
+import { industries, contactHref, cta, relatedFrom } from '../../data/site';
+import { serviceLd, breadcrumbList } from '../../data/schema';
+import { industriesContent } from '../../data/industries-content';
+
+export function getStaticPaths() {
+  return industries.map((i) => ({ params: { slug: i.slug }, props: { industry: i } }));
+}
+
+const { industry } = Astro.props;
+const c = industriesContent[industry.slug];
+const topic = /^[A-Z]{2}/.test(c.eyebrow) ? c.eyebrow : c.eyebrow.charAt(0).toLowerCase() + c.eyebrow.slice(1);
+const crumbs = [{ label: 'Industries', path: '/industries/' }, { label: industry.title }];
+const path = `/industries/${industry.slug}/`;
+---
+
+<Base
+  title={c.metaTitle}
+  description={c.metaDescription}
+  schema={[
+    serviceLd({ name: `Software for ${industry.title}`, description: c.metaDescription, path, audience: industry.title }),
+    breadcrumbList(crumbs, path),
+  ]}
+>
+  <PageHero title={c.headline} highlight={c.highlight} intro={c.intro} breadcrumbs={crumbs}>
+    <Fragment slot="actions">
+      <a href={contactHref(industry.slug)} class="btn btn-primary group px-6 py-3 text-base">
+        {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      </a>
+      <a href="#workflow" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">See how it works</a>
+    </Fragment>
+    <Fragment slot="aside"><IndustryVisual card={c.heroCard} icon={industry.icon} /></Fragment>
+  </PageHero>
+
+  <Section
+    eyebrow="Challenges and answers"
+    title="Common problems, and what we build for them"
+    highlight="what we build for them"
+    intro={`Day-to-day problems common in ${topic}, each paired with the software that fixes it.`}
+  >
+    <ChallengePairs pairs={c.pairs} />
+  </Section>
+
+  {c.deepDive && (
+    <Section tone="muted" eyebrow={c.deepDive.eyebrow} title={c.deepDive.title} intro={c.deepDive.intro}>
+      <DeepDive items={c.deepDive.items} />
+      <p class="reveal mt-6 text-sm text-ink-600">Sample values are for illustration only.</p>
+    </Section>
+  )}
+
+  <Section id="workflow" tone="dark" eyebrow="Example workflow" title={c.workflow.title} intro={c.workflow.intro}>
+    <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 opacity-60"></div>
+    <div class="relative">
+      <ul class="reveal mb-10 flex flex-wrap gap-4 text-xs text-ink-300">
+        <li class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Manka product</li>
+        <li class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true"></span>Built or integrated as a service</li>
+      </ul>
+      <Steps tone="dark" steps={c.workflow.steps.map((s) => ({ ...s, tags: s.tools }))} />
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Relevant products and services"
+    title={`What we’d use for ${topic}`}
+    intro="Start with a product where one fits and customise from there, or have us build exactly what your process needs."
+  >
+    <RelatedCards
+      groups={[
+        { label: 'Products', items: relatedFrom(c.products) },
+        { label: 'Services', items: relatedFrom([], c.services) },
+      ]}
+    />
+  </Section>
+
+  <Section tone="muted">
+    <Faq
+      title={`Questions about ${topic}`}
+      intro="Straight answers to the questions worth asking before you start."
+      items={c.faqs}
+      askInterest={industry.slug}
+    />
+  </Section>
+
+  <CtaBand
+    title="Tell us how your team works today."
+    text="Thirty minutes with an engineer. We’ll map your current process and point out which parts are worth automating first."
+    interest={industry.slug}
+    secondary={{ label: cta.allIndustries, path: '/industries/' }}
+  />
+</Base>

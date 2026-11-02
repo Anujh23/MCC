@@ -1,0 +1,337 @@
+---
+// Contact form ("Book a free call"). Posts JSON to Web3Forms (works on static hosting like GitHub Pages).
+// Three modes, picked from contact.*: 'live' (form key set) posts to Web3Forms; 'mailto' (no key, real email)
+// opens the visitor's email app with the message filled in; 'offline' (neither, staging only) validates
+// but sends nothing. ?interest=<slug> preselects the topic and retitles the element marked [data-cf-title].
+import { Send, LoaderCircle, CircleCheck, CircleAlert, Mail, ArrowRight } from '@lucide/astro';
+import { site, contact, interests, products, industryInterest, href, cta } from '../../data/site';
+
+const mode = contact.formKey ? 'live' : contact.email ? 'mailto' : 'offline';
+
+const groups = [
+  { label: 'Services', kind: 'service' },
+  { label: 'Products', kind: 'product' },
+  { label: 'Other', kind: 'other' },
+] as const;
+const shortName = (slug: string) => products.find((p) => p.slug === slug)?.short;
+
+const times = ['Any time', 'Weekday morning (10 am–1 pm IST)', 'Weekday afternoon (1–4 pm IST)', 'Weekday evening (4–7 pm IST)'];
+
+const budgets = [
+  'Under ₹1 lakh',
+  '₹1 lakh to ₹3 lakh',
+  '₹3 lakh to ₹10 lakh',
+  '₹10 lakh to ₹25 lakh',
+  'Above ₹25 lakh',
+  'Not sure yet',
+];
+
+const notice = {
+  live: null,
+  mailto: 'Sending opens your email app with your message filled in.',
+  offline: 'This form goes live at launch.',
+}[mode];
+
+const field =
+  'mt-2 block w-full rounded-xl border border-ink-400 bg-white px-4 py-3 text-[0.95rem] text-ink-900 transition placeholder:text-ink-500 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/30 focus:outline-hidden aria-[invalid=true]:border-rose-600 aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-rose-600/20';
+const label = 'block text-sm font-semibold text-ink-900';
+const optional = 'font-normal text-ink-500';
+// Empty until the field is invalid, so aria-describedby reads nothing on a fresh form. Text lives in data-msg.
+const errorCls = 'mt-1.5 text-sm font-medium text-rose-700 empty:hidden';
+const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -translate-y-1/2 text-ink-500';
+---
+
+<form
+  id="contact-form"
+  class="relative"
+  action="https://api.web3forms.com/submit"
+  method="POST"
+  novalidate
+  data-mode={mode}
+  data-email={contact.email ?? undefined}
+  data-aliases={JSON.stringify(industryInterest)}
+  data-cta-call={cta.call}
+  data-cta-demo={cta.demo}
+  data-cta-introduce={cta.introduce}
+>
+  {contact.formKey && <input type="hidden" name="access_key" value={contact.formKey} />}
+  <input type="hidden" name="subject" value={`New enquiry from ${site.shortName} website`} />
+  <input type="hidden" name="from_name" value={`${site.shortName} website`} />
+  <!-- Honeypot: humans never see or tick this. Web3Forms drops submissions where it is checked. -->
+  <input type="checkbox" name="botcheck" class="hidden" style="display: none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="cf-name" class={label}>Full name <span class="text-rose-600" aria-hidden="true">*</span></label>
+      <input id="cf-name" name="name" type="text" autocomplete="name" required class={field} placeholder="Priya Sharma" aria-describedby="cf-name-error" data-field="Full name" />
+      <p id="cf-name-error" class={errorCls} data-msg="Please tell us your name."></p>
+    </div>
+    <div>
+      <label for="cf-email" class={label}>Work email <span class="text-rose-600" aria-hidden="true">*</span></label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email" required class={field} placeholder="priya@company.in" aria-describedby="cf-email-error" data-field="Work email" />
+      <p id="cf-email-error" class={errorCls} data-msg="Please enter a valid email address."></p>
+    </div>
+    <div>
+      <label for="cf-phone" class={label}>Phone <span class={optional}>(optional)</span></label>
+      <input id="cf-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" class={field} placeholder="+91 98765 43210" aria-describedby="cf-phone-error" data-field="Phone" />
+      <p id="cf-phone-error" class={errorCls} data-msg="Please enter a valid phone number, or leave it blank."></p>
+    </div>
+    <div>
+      <label for="cf-company" class={label}>Company <span class={optional}>(optional)</span></label>
+      <input id="cf-company" name="company" type="text" autocomplete="organization" class={field} placeholder="Company name" />
+    </div>
+    <div>
+      <label for="cf-interest" class={label}>What can we help with? <span class="text-rose-600" aria-hidden="true">*</span></label>
+      <div class="relative">
+        <select id="cf-interest" name="interest" required class={`${field} appearance-none pr-10`} aria-describedby="cf-interest-error" data-field="What can we help with">
+          <option value="">Choose one</option>
+          {groups.map((g) => (
+            <optgroup label={g.label}>
+              {interests.filter((i) => i.kind === g.kind).map((i) => (
+                <option value={i.label} data-slug={i.value} data-kind={i.kind} data-short={shortName(i.value)}>{i.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <svg class={chevron} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </div>
+      <p id="cf-interest-error" class={errorCls} data-msg="Please choose what you’d like to talk about."></p>
+    </div>
+    <div>
+      <label for="cf-time" class={label}>Preferred time to talk <span class={optional}>(optional)</span></label>
+      <div class="relative">
+        <select id="cf-time" name="preferred_time" class={`${field} appearance-none pr-10`}>
+          {times.map((t) => <option value={t}>{t}</option>)}
+        </select>
+        <svg class={chevron} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </div>
+    </div>
+    <div class="sm:col-span-2">
+      <label for="cf-budget" class={label}>Budget range <span class={optional}>(optional)</span></label>
+      <div class="relative">
+        <select id="cf-budget" name="budget" class={`${field} appearance-none pr-10`}>
+          <option value="">Prefer not to say</option>
+          {budgets.map((b) => <option value={b}>{b}</option>)}
+        </select>
+        <svg class={chevron} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </div>
+    </div>
+    <div class="sm:col-span-2">
+      <label for="cf-message" class={label}>What do you need? <span class="text-rose-600" aria-hidden="true">*</span></label>
+      <textarea id="cf-message" name="message" rows="5" required minlength="20" class={`${field} resize-y`} placeholder="A few lines on the problem, the team using it, and any deadline." aria-describedby="cf-message-hint cf-message-error" data-field="What do you need"></textarea>
+      <p id="cf-message-hint" class="mt-1.5 text-xs text-ink-500">At least 20 characters. No need for a formal brief.</p>
+      <p id="cf-message-error" class={errorCls} data-msg="Please add a little more detail (at least 20 characters)."></p>
+    </div>
+    <div class="sm:col-span-2">
+      <div class="flex gap-3">
+        <input id="cf-consent" name="consent" type="checkbox" value="yes" required class="mt-1 h-4 w-4 shrink-0 rounded border-ink-400 accent-brand-600" aria-describedby="cf-consent-error" data-field="Privacy consent" />
+        <label for="cf-consent" class="text-sm leading-relaxed text-ink-600">
+          I agree to Manka using these details to respond to my enquiry, as described in the <a href={href('/privacy/')} class="font-semibold text-brand-700 underline underline-offset-2">privacy policy</a>. <span class="text-rose-600" aria-hidden="true">*</span>
+        </label>
+      </div>
+      <p id="cf-consent-error" class={errorCls} data-msg="Please confirm so we can reply to you."></p>
+    </div>
+  </div>
+
+  <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-xs text-ink-500"><span class="text-rose-600" aria-hidden="true">*</span> Required</p>
+    <button type="submit" class="btn btn-primary group w-full px-7 py-3 text-base disabled:cursor-wait disabled:opacity-70 sm:w-auto" aria-describedby={notice ? 'cf-notice' : undefined}>
+      <span data-label>{cta.call}</span>
+      <Send size={17} data-icon class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      <LoaderCircle size={17} data-spinner class="hidden animate-spin" aria-hidden="true" />
+    </button>
+  </div>
+  {notice && <p id="cf-notice" class="mt-3 text-xs text-ink-500 sm:text-right">{notice}</p>}
+
+  <p class="sr-only" aria-live="polite" data-summary></p>
+
+  <div id="cf-status" class="mt-6" role="status" aria-live="polite">
+    <div data-state="success" class="hidden gap-3 rounded-xl bg-emerald-50 p-4 text-sm leading-relaxed text-emerald-900 ring-1 ring-emerald-200">
+      <CircleCheck size={20} class="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
+      <div>
+        <p><strong class="font-semibold">Request received.</strong> An engineer will email you within one working day with times for your call.</p>
+        <a href={href('/about/#how-we-work')} class="group mt-2 inline-flex items-center gap-1 py-1 font-semibold text-emerald-900 underline underline-offset-2">
+          While you wait: how we work<ArrowRight size={15} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+    <div data-state="error" class="hidden gap-3 rounded-xl bg-rose-50 p-4 text-sm leading-relaxed text-rose-900 ring-1 ring-rose-200">
+      <CircleAlert size={20} class="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" />
+      <p>
+        <strong class="font-semibold">That didn’t go through.</strong> <span data-error-text>Please try again in a moment</span>{contact.email
+          ? <>, or email us at <a href={`mailto:${contact.email}`} class="font-semibold underline underline-offset-2">{contact.email}</a>.</>
+          : '.'}
+      </p>
+    </div>
+    {contact.email && (
+      <div data-state="fallback" class="hidden gap-3 rounded-xl bg-brand-50 p-4 text-sm leading-relaxed text-ink-800 ring-1 ring-brand-100">
+        <Mail size={20} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />
+        <p>
+          <strong class="font-semibold">Almost there.</strong> We’ve opened your email app with your request. Send it and an engineer will reply within one working day with times for your call.
+          If nothing opened, <a data-mailto href={`mailto:${contact.email}`} class="font-semibold text-brand-700 underline underline-offset-2">email {contact.email}</a>.
+        </p>
+      </div>
+    )}
+    <div data-state="offline" class="hidden gap-3 rounded-xl bg-ink-50 p-4 text-sm leading-relaxed text-ink-800 ring-1 ring-ink-200">
+      <CircleAlert size={20} class="mt-0.5 shrink-0 text-ink-600" aria-hidden="true" />
+      <p><strong class="font-semibold">This form goes live at launch.</strong> Your details look fine, but nothing was sent.</p>
+    </div>
+  </div>
+</form>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  if (form) {
+    const status = form.querySelector<HTMLElement>('#cf-status')!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const buttonLabel = button.querySelector<HTMLElement>('[data-label]')!;
+    const select = form.querySelector<HTMLSelectElement>('#cf-interest')!;
+    const title = document.querySelector<HTMLElement>('[data-cf-title]');
+    const { mode, email = '', ctaCall = '', ctaDemo = '', ctaIntroduce = '' } = form.dataset;
+    const aliases: Record<string, string> = JSON.parse(form.dataset.aliases || '{}');
+    const defaultTitle = title?.textContent ?? '';
+
+    // Heading and submit label follow the chosen topic: products ask for a demo, careers for an intro.
+    let submitLabel = ctaCall;
+    const updateIntent = () => {
+      const opt = select.selectedOptions[0];
+      const kind = opt?.dataset.kind;
+      const slug = opt?.dataset.slug;
+      let heading = defaultTitle;
+      submitLabel = ctaCall;
+      if (kind === 'product') {
+        heading = `Request a ${opt.dataset.short ?? opt.textContent} demo`;
+        submitLabel = ctaDemo;
+      } else if (slug === 'careers') {
+        heading = submitLabel = ctaIntroduce;
+      }
+      if (title) title.textContent = heading;
+      buttonLabel.textContent = submitLabel;
+    };
+
+    const wanted = new URLSearchParams(location.search).get('interest');
+    if (wanted) {
+      const key = aliases[wanted] ?? wanted;
+      const opt = select.querySelector<HTMLOptionElement>(`option[data-slug="${CSS.escape(key)}"]`);
+      if (opt) opt.selected = true;
+    }
+    updateIntent();
+    select.addEventListener('change', updateIntent);
+
+    const rules: Record<string, (el: HTMLInputElement) => boolean> = {
+      name: (el) => el.value.trim().length >= 2,
+      email: (el) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim()),
+      phone: (el) => el.value.trim() === '' || /^[+\d][\d\s()-]{7,17}$/.test(el.value.trim()),
+      interest: (el) => el.value !== '',
+      message: (el) => el.value.trim().length >= 20,
+      consent: (el) => el.checked,
+    };
+
+    const setError = (el: HTMLInputElement, bad: boolean) => {
+      el.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      const err = document.getElementById(`${el.id}-error`);
+      if (err) err.textContent = bad ? (err.dataset.msg ?? '') : '';
+    };
+
+    const validate = () => {
+      const bad: HTMLInputElement[] = [];
+      for (const [name, ok] of Object.entries(rules)) {
+        const el = form.elements.namedItem(name) as HTMLInputElement | null;
+        if (!el) continue;
+        const isBad = !ok(el);
+        setError(el, isBad);
+        if (isBad) bad.push(el);
+      }
+      return bad;
+    };
+
+    // Re-validate a field once the user has been told it's wrong
+    const recheck = (e: Event) => {
+      const el = e.target as HTMLInputElement;
+      if (el.getAttribute('aria-invalid') === 'true' && rules[el.name]) setError(el, !rules[el.name](el));
+    };
+    form.addEventListener('input', recheck);
+    form.addEventListener('change', recheck);
+
+    const show = (state: 'success' | 'error' | 'fallback' | 'offline' | null) => {
+      status.querySelectorAll<HTMLElement>('[data-state]').forEach((s) => {
+        const on = s.dataset.state === state;
+        s.classList.toggle('hidden', !on);
+        s.classList.toggle('flex', on);
+      });
+    };
+
+    const setLoading = (on: boolean) => {
+      button.disabled = on;
+      button.setAttribute('aria-busy', String(on));
+      buttonLabel.textContent = on ? 'Sending…' : submitLabel;
+      button.querySelector('[data-icon]')?.classList.toggle('hidden', on);
+      button.querySelector('[data-spinner]')?.classList.toggle('hidden', !on);
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      show(null);
+      const bad = validate();
+      if (bad.length) {
+        const names = bad.map((el) => el.dataset.field).join(', ');
+        summary.textContent = `${bad.length} ${bad.length === 1 ? 'field needs' : 'fields need'} attention: ${names}.`;
+        bad[0].focus();
+        return;
+      }
+      summary.textContent = '';
+
+      const data = new FormData(form);
+
+      if (mode === 'offline') {
+        show('offline');
+        return;
+      }
+
+      if (mode === 'mailto') {
+        const lines = [
+          `Name: ${data.get('name')}`,
+          `Email: ${data.get('email')}`,
+          `Phone: ${data.get('phone') || '-'}`,
+          `Company: ${data.get('company') || '-'}`,
+          `Interested in: ${data.get('interest')}`,
+          `Preferred time: ${data.get('preferred_time') || '-'}`,
+          `Budget: ${data.get('budget') || '-'}`,
+          '',
+          String(data.get('message') ?? ''),
+        ];
+        const mailto = `mailto:${email}?subject=${encodeURIComponent(`Free call request: ${data.get('interest')}`)}&body=${encodeURIComponent(lines.join('\n'))}`;
+        const link = status.querySelector<HTMLAnchorElement>('[data-mailto]');
+        if (link) link.href = mailto;
+        show('fallback');
+        window.location.href = mailto;
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.fromEntries(data)),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.success) {
+          form.reset();
+          form.querySelectorAll('[aria-invalid]').forEach((el) => el.setAttribute('aria-invalid', 'false'));
+          updateIntent();
+          show('success');
+        } else {
+          const msg = status.querySelector('[data-error-text]');
+          if (msg && json.message) msg.textContent = json.message;
+          show('error');
+        }
+      } catch {
+        show('error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+</script>

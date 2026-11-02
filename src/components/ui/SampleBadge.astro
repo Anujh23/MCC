@@ -1,0 +1,14 @@
+---
+// The one "Sample data" label. Put it on every mockup that shows a number.
+// Usage: <SampleBadge /> on light surfaces, <SampleBadge tone="dark" /> on ink-900/950.
+interface Props {
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+const { tone = 'light', class: className = '' } = Astro.props;
+const toneClass = tone === 'dark' ? 'bg-white/10 text-white/70 ring-white/15' : 'bg-ink-50 text-ink-600 ring-ink-100';
+---
+
+<span class={`inline-flex h-fit shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] leading-4 font-semibold whitespace-nowrap ring-1 ${toneClass} ${className}`}>
+  <span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Sample data
+</span>

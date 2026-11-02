@@ -1,0 +1,169 @@
+---
+import { ArrowRight, Check, IndianRupee, MessageCircle, MapPin, Plug } from '@lucide/astro';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/ui/PageHero.astro';
+import Section from '../../components/ui/Section.astro';
+import CtaBand from '../../components/ui/CtaBand.astro';
+import IconBadge from '../../components/ui/IconBadge.astro';
+import SampleBadge from '../../components/ui/SampleBadge.astro';
+import { industries, href, contactHref, cta } from '../../data/site';
+import { collectionLd, breadcrumbList } from '../../data/schema';
+import { industriesContent } from '../../data/industries-content';
+
+const title = 'Industries: Lending, Retail, Real Estate, Healthcare';
+const description =
+  'Software for NBFCs and lenders, retail, real estate, healthcare and growing SMEs in India: CRMs, underwriting tools, field apps and dashboards.';
+const crumbs = [{ label: 'Industries' }];
+const path = '/industries/';
+
+const items = industries.map((i) => ({ ...i, c: industriesContent[i.slug] }));
+const [feature, ...rest] = items;
+const focus = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
+
+const common = [
+  { icon: IndianRupee, title: 'Indian money rails', text: 'UPI, NACH, GST invoices, PF and ESI are part of the design from day one, not bolted on later.' },
+  { icon: MessageCircle, title: 'WhatsApp-first teams', text: 'Alerts, reminders and confirmations go where your staff and customers already are.' },
+  { icon: MapPin, title: 'Field teams on the map', text: 'Geo-tagged visits, routes and territories for sales, verification and collections staff.' },
+  { icon: Plug, title: 'Works next to what you have', text: 'We integrate with your LMS, ERP, accounting or billing software before suggesting a replacement.' },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  schema={[collectionLd({ name: 'Industries', description, path }), breadcrumbList(crumbs, path)]}
+>
+  <PageHero
+    title="Software shaped by how your industry works"
+    highlight="your industry"
+    intro="Lending has FOIR and bounce checks. Real estate has site visits. Clinics have token queues. We build around the specifics of your trade, starting with the work your team does every day."
+    breadcrumbs={crumbs}
+  >
+    <Fragment slot="actions">
+      <a href={contactHref()} class="btn btn-primary group px-6 py-3 text-base">
+        {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      </a>
+      <a href="#all-industries" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">Find your industry</a>
+    </Fragment>
+    <Fragment slot="aside">
+      <div class="mx-auto w-full max-w-md" aria-hidden="true">
+        <SampleBadge tone="dark" class="mb-3" />
+        <div class="grid grid-cols-2 gap-3">
+          {items.map((it, i) => {
+            const row = it.c.heroCard.rows[0];
+            return (
+              <div class={`rounded-2xl bg-ink-900/80 p-4 ring-1 ring-white/10 backdrop-blur ${i === 0 ? 'col-span-2' : ''}`}>
+                <div class="flex items-center gap-2.5">
+                  <span class={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ring-1 ${i === 0 ? 'bg-saffron-500/15 text-saffron-400 ring-saffron-400/30' : 'bg-white/10 text-brand-200 ring-white/15'}`}><it.icon size={16} stroke-width={1.75} /></span>
+                  <span class="text-sm leading-tight font-semibold text-white">{i === 0 ? it.title : it.c.short}</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 rounded-lg bg-white/[0.05] px-2.5 py-2">
+                  <span class="text-[11px] leading-tight whitespace-nowrap text-ink-400">{row.short ?? row.label}</span>
+                  <span class="shrink-0 text-[11px] font-semibold whitespace-nowrap text-emerald-300">{row.value}</span>
+                </div>
+                {i === 0 && (
+                  <div class="mt-2 grid grid-cols-3 gap-2">
+                    {it.c.heroCard.rows.slice(1, 4).map((r) => (
+                      <div class="min-w-0 rounded-lg bg-white/[0.05] px-2.5 py-2">
+                        <p class="text-[10px] text-ink-400">{r.short ?? r.label}</p>
+                        <p class="text-xs font-semibold whitespace-nowrap text-white">{r.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </Fragment>
+  </PageHero>
+
+  <Section
+    id="all-industries"
+    eyebrow="Who we build for"
+    title="Five industries, each with its own workflow"
+    highlight="its own workflow"
+    intro="Each page shows the problems common in each sector, the workflow we build around, and the products and services that fit."
+  >
+    <div class="grid gap-4 lg:grid-cols-6">
+      <a
+        href={href(`/industries/${feature.slug}/`)}
+        class={`reveal group relative overflow-hidden rounded-3xl bg-ink-950 p-6 text-ink-300 ring-1 ring-ink-800 transition duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-900/30 sm:p-9 lg:col-span-6 ${focus}`}
+      >
+        <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
+        <div class="animate-glow pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-brand-600/40 blur-3xl"></div>
+        <div class="relative grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div>
+            <div class="flex flex-wrap items-center gap-3">
+              <IconBadge icon={feature.icon} tone="dark" size="lg" />
+              <span class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-saffron-400 ring-1 ring-white/15">Where we go deepest</span>
+            </div>
+            <h3 class="mt-6 text-2xl font-extrabold text-white sm:text-3xl">{feature.title}</h3>
+            <p class="mt-3 max-w-xl leading-relaxed text-ink-300">{feature.c.intro}</p>
+            <span class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-8">
+              {cta.explore(feature.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+            </span>
+          </div>
+          <ul class="hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3">
+            {feature.c.deepDive!.items.map((d) => (
+              <li class="min-w-0 rounded-xl bg-white/[0.05] p-3 ring-1 ring-white/10">
+                <d.icon size={16} class="text-saffron-400" aria-hidden="true" />
+                <p class="mt-2 text-sm font-bold text-white">{d.term}</p>
+                <p class="mt-0.5 text-[11px] leading-snug text-ink-400">{d.title}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </a>
+
+      {rest.map((item, i) => (
+        <a
+          href={href(`/industries/${item.slug}/`)}
+          class={`reveal group flex flex-col rounded-3xl bg-white p-6 ring-1 ring-ink-100 transition duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-xl hover:shadow-ink-900/[0.07] hover:ring-brand-200 sm:p-7 lg:col-span-3 ${focus}`}
+          style={`--d: ${(i % 2) * 90}ms`}
+        >
+          <div class="flex items-start justify-between gap-3">
+            <IconBadge icon={item.icon} size="lg" tone={i % 2 ? 'saffron' : 'brand'} />
+            <span class="hidden rounded-full bg-ink-50 px-2.5 py-1 text-[11px] font-semibold text-ink-600 ring-1 ring-ink-100 sm:inline">{item.c.pairs.length} problems mapped</span>
+          </div>
+          <h3 class="mt-6 text-xl font-bold">{item.title}</h3>
+          <p class="mt-2 leading-relaxed text-ink-600">{item.c.intro}</p>
+          <ul class="mt-5 hidden flex-1 content-start gap-2 sm:grid sm:grid-cols-2">
+            {item.c.focus.map((f) => (
+              <li class="flex gap-2 text-sm text-ink-600"><Check size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{f}</li>
+            ))}
+          </ul>
+          <span class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 sm:mt-6">
+            {cta.explore(item.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+          </span>
+        </a>
+      ))}
+    </div>
+  </Section>
+
+  <Section
+    tone="muted"
+    eyebrow="Across every industry"
+    title="What carries over, whatever you do"
+    intro="Different trades, same Indian business realities. These show up in almost everything we build."
+  >
+    <ul class="grid gap-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      {common.map((p, i) => (
+        <li class="reveal flex gap-4 sm:block sm:rounded-2xl sm:bg-white sm:p-6 sm:ring-1 sm:ring-ink-100" style={`--d: ${i * 80}ms`}>
+          <IconBadge icon={p.icon} />
+          <div class="min-w-0">
+            <h3 class="text-lg font-bold sm:mt-5">{p.title}</h3>
+            <p class="mt-1.5 text-[0.95rem] leading-relaxed text-ink-600 sm:mt-2">{p.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="reveal mt-10 text-ink-600">
+      Don’t see your industry? Most of what we build (CRMs, HR, dashboards, integrations) works anywhere.
+      <a href={href('/services/')} class="inline-flex items-center gap-1 py-2 font-semibold text-brand-700 hover:underline">{cta.allServices}<ArrowRight size={15} aria-hidden="true" /></a>
+    </p>
+  </Section>
+
+  <CtaBand secondary={{ label: cta.allServices, path: '/services/' }} />
+</Base>

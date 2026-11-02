@@ -1,0 +1,187 @@
+---
+import {
+  CodeXml, Database, PenTool, ClipboardList, Handshake, Mail, ArrowRight, ArrowUpRight, Inbox,
+  MessagesSquare, Rocket, GraduationCap, KeyRound, Laptop, HeartHandshake, Sprout, Users,
+  FileText, PhoneCall, Hammer, CircleCheck,
+} from '@lucide/astro';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Section from '../components/ui/Section.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import IconBadge from '../components/ui/IconBadge.astro';
+import Steps from '../components/ui/Steps.astro';
+import { contact, contactHref, contactPath, cta } from '../data/site';
+import { breadcrumbList } from '../data/schema';
+
+const crumbs = [{ label: 'Careers' }];
+
+// With a real email, applications go by mailto with a template body. Until then, the contact form (Careers).
+const byEmail = Boolean(contact.email);
+const apply = (role: string) =>
+  byEmail
+    ? `mailto:${contact.email}?subject=${encodeURIComponent(`Application: ${role}`)}&body=${encodeURIComponent(
+        `Hi Manka team,\n\nI'd like to be considered for the ${role} role.\n\nCV: (attached)\nLinkedIn / portfolio / GitHub:\nWhere I'm based:\nNotice period:\n\nA few lines about something I've built or worked on:\n`,
+      )}`
+    : contactHref('careers');
+const applyLabel = byEmail ? cta.cv : cta.introduce;
+const ApplyIcon = byEmail ? ArrowUpRight : ArrowRight;
+
+const reasons = [
+  { icon: Rocket, title: 'Your work ships', text: 'Finished products and custom builds that go live, not demo folders.' },
+  { icon: MessagesSquare, title: 'You talk to the people who use it', text: 'Engineers talk to the people who’ll use the software. You hear the problem first-hand instead of reading it in a ticket.' },
+  { icon: Hammer, title: 'Broad, practical work', text: 'CRMs, HR systems, data pipelines, document checks. You will see more of how software meets business than in a single-product role.' },
+  { icon: GraduationCap, title: 'Learn the domain', text: 'Lending, payroll and operations are full of interesting problems. We explain the business, not just the spec.' },
+];
+
+const steps = [
+  byEmail
+    ? { icon: FileText, title: cta.cv, text: 'Email your CV and a few lines about something you have built or worked on. Links beat long cover letters.' }
+    : { icon: FileText, title: cta.introduce, text: 'Use the contact form, choose Careers, and share a link to your CV or portfolio with a few lines about something you have built.' },
+  { icon: PhoneCall, title: 'Intro call', text: 'A 30-minute conversation about your experience, what you want next and how we work.' },
+  { icon: Laptop, title: 'Practical round', text: 'A short task close to the real job, or a walk-through of work you have already done. No trick puzzles.' },
+  { icon: CircleCheck, title: 'Decision', text: 'A final chat with the people you would work with, then a clear yes or no. We tell everyone the outcome.' },
+];
+
+const roles = [
+  { icon: CodeXml, title: 'Full-stack developer', text: 'Build web apps and APIs end to end: data model, backend, front end and deployment.', skills: ['JavaScript / TypeScript', 'SQL', 'REST APIs'] },
+  { icon: Database, title: 'Python / data engineer', text: 'Pipelines, document parsing, dashboards and the data side of our lending products.', skills: ['Python', 'SQL', 'Data modelling'] },
+  { icon: PenTool, title: 'UI/UX designer', text: 'Design screens people use for hours a day: forms, dashboards, mobile flows for field teams.', skills: ['Figma', 'Design systems', 'User research'] },
+  { icon: ClipboardList, title: 'Business analyst', text: 'Sit with the people who’ll use the software, map their process, write clear requirements and test that what we build matches them.', skills: ['Process mapping', 'Documentation', 'Excel / SQL'] },
+  { icon: Handshake, title: 'Sales / business development', text: 'Find businesses with real problems we can solve, and be straight with them about fit.', skills: ['B2B sales', 'Consultative selling', 'Lending / SaaS'] },
+];
+
+const intentions = [
+  { icon: KeyRound, title: 'Ownership', text: 'We want people to own a piece of work from start to finish, not hand off fragments.' },
+  { icon: Sprout, title: 'Room to grow', text: 'We intend to support learning that makes the work better: courses, books and time to try new things.' },
+  { icon: HeartHandshake, title: 'Reasonable hours', text: 'We plan projects so that late nights are the exception, not the operating model.' },
+  { icon: Users, title: 'Straight feedback', text: 'Regular, direct conversations about your work and your growth, both ways.' },
+];
+---
+
+<Base
+  title="Careers"
+  description="Work at Manka Commerce & Consultancy: build CRMs, HR systems, data tools and lending software, and talk to the people who use them."
+  schema={breadcrumbList(crumbs, '/careers/')}
+>
+  <PageHero
+    title="Build lending and business software, end to end."
+    highlight="end to end."
+    intro="We are an engineering-led team building CRMs, HR systems, data tools and lending software. If you like shipping useful things and talking to the people who use them, we would like to hear from you."
+    breadcrumbs={crumbs}
+  >
+    <Fragment slot="actions">
+      <a href={apply('General application')} class="btn btn-primary px-6 py-3 text-base">{applyLabel}<ApplyIcon size={18} aria-hidden="true" /></a>
+      <a href="#roles" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">See the roles</a>
+    </Fragment>
+    <div slot="aside" class="relative mx-auto w-full max-w-md">
+      <div class="card-dark p-6 sm:p-7">
+        <div class="flex items-center justify-between gap-4">
+          <p class="text-xs font-semibold tracking-[0.14em] text-ink-400 uppercase">Hiring status</p>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-ink-200 ring-1 ring-white/15">
+            <span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Open to CVs
+          </span>
+        </div>
+        <p class="mt-5 text-2xl font-bold text-white">No fixed openings right now.</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-300">We still read every application and get in touch when a project needs your skills.</p>
+        <div class="mt-6 space-y-2.5">
+          {roles.slice(0, 3).map((r) => (
+            <div class="flex items-center gap-3 rounded-xl bg-white/[0.04] px-4 py-3 ring-1 ring-white/10">
+              <r.icon size={17} class="shrink-0 text-brand-300" aria-hidden="true" />
+              <span class="text-sm font-medium text-ink-100">{r.title}</span>
+            </div>
+          ))}
+          <p class="pt-1 text-xs text-ink-400">+ {roles.length - 3} more roles below</p>
+        </div>
+      </div>
+    </div>
+  </PageHero>
+
+  <!-- Why work here -->
+  <Section tone="light" eyebrow="Why Manka" title="Less ceremony. More shipping." highlight="More shipping.">
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      {reasons.map((r, i) => (
+        <div class={`reveal card ${i === 0 ? 'lg:col-span-2 lg:row-span-1' : ''}`} style={`--d: ${i * 80}ms`}>
+          <IconBadge icon={r.icon} tone={i % 2 ? 'saffron' : 'brand'} />
+          <h3 class="mt-5 text-lg">{r.title}</h3>
+          <p class="mt-2 text-[0.95rem] leading-relaxed text-ink-600">{r.text}</p>
+        </div>
+      ))}
+      <div class="reveal relative self-start overflow-hidden rounded-2xl bg-ink-950 p-6 text-white md:col-span-2 lg:col-span-3" style="--d: 320ms">
+        <div class="bg-grid pointer-events-none absolute inset-0 opacity-70"></div>
+        <div class="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-brand-600/40 blur-3xl"></div>
+        <div class="relative">
+          <h3 class="text-xs font-semibold tracking-[0.14em] text-saffron-400 uppercase">What we look for</h3>
+          <ul class="mt-4 grid gap-x-6 gap-y-2.5 text-sm text-ink-200 sm:grid-cols-2">
+            {['Clear written communication', 'Curiosity about how businesses work', 'Pride in finished, tested work', 'Honesty about what you don’t know'].map((x) => (
+              <li class="flex items-start gap-2"><CircleCheck size={16} class="mt-0.5 shrink-0 text-saffron-400" aria-hidden="true" />{x}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- How we hire -->
+  <Section tone="muted" eyebrow="How we hire" title="Four steps, and a clear answer." intro="We keep the process short and tell you where you stand at every step.">
+    <Steps steps={steps} />
+  </Section>
+
+  <!-- Roles -->
+  <Section tone="light" id="roles" eyebrow="Roles" title="Roles we expect to hire for.">
+    <div class="reveal mb-10 flex flex-col gap-4 rounded-2xl bg-saffron-50 p-5 ring-1 ring-saffron-100 sm:flex-row sm:items-center sm:p-6">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-saffron-700 ring-1 ring-saffron-100"><Inbox size={22} aria-hidden="true" /></span>
+      <p class="flex-1 leading-relaxed text-ink-800">
+        <strong class="font-semibold text-ink-900">No fixed openings are listed right now.</strong>{' '}
+        {byEmail
+          ? <>Send your CV to <a href={apply('General application')} class="font-semibold break-all text-brand-700 underline underline-offset-2">{contact.email}</a> and tell us which role fits.</>
+          : <><a href={apply('General application')} class="font-semibold text-brand-700 underline underline-offset-2">Introduce yourself</a> through the contact form and tell us which role fits.</>}
+        {' '}We keep every application on file and get in touch when a project needs your skills.
+      </p>
+    </div>
+    <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {roles.map((r, i) => (
+        <li class="reveal card group flex flex-col" style={`--d: ${i * 80}ms`}>
+          <div class="flex items-start justify-between gap-4">
+            <IconBadge icon={r.icon} />
+            <span class="rounded-full bg-ink-50 px-2.5 py-1 text-xs font-medium text-ink-600 ring-1 ring-ink-100">Open to CVs</span>
+          </div>
+          <h3 class="mt-5 text-xl">{r.title}</h3>
+          <p class="mt-2 flex-1 text-[0.95rem] leading-relaxed text-ink-600">{r.text}</p>
+          <ul class="mt-5 flex flex-wrap gap-2" aria-label="Useful skills">
+            {r.skills.map((s) => <li class="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">{s}</li>)}
+          </ul>
+          <a href={apply(r.title)} class="mt-6 inline-flex items-center gap-1.5 border-t border-ink-100 pt-5 pb-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+            {applyLabel}<span class="sr-only"> for {r.title}</span><ApplyIcon size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+          </a>
+        </li>
+      ))}
+      <li class="reveal flex flex-col justify-center rounded-2xl bg-ink-50 p-6 text-center ring-1 ring-ink-100" style="--d: 400ms">
+        <h3 class="text-lg">Something else?</h3>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">If you are good at something we haven’t listed and think we need it, tell us why.</p>
+        <a href={apply('Open application')} class="btn btn-ghost mx-auto mt-5">{byEmail ? <Mail size={16} aria-hidden="true" /> : null}{applyLabel}</a>
+      </li>
+    </ul>
+  </Section>
+
+  <!-- Intentions -->
+  <Section tone="dark" eyebrow="What we’re building towards" title="The workplace we intend to be." intro="These are commitments we are working towards, not a benefits brochure.">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {intentions.map((p, i) => (
+        <div class="reveal card-dark" style={`--d: ${i * 80}ms`}>
+          <IconBadge icon={p.icon} tone="dark" />
+          <h3 class="mt-5 text-lg text-white">{p.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-300">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <CtaBand
+    title={byEmail ? 'Think you’d fit? Send us your CV.' : 'Think you’d fit? Introduce yourself.'}
+    text={byEmail
+      ? 'A CV and a few lines about something you have built is all we need. We read every application and aim to reply to each one.'
+      : 'A link to your CV and a few lines about something you have built is all we need. We read every application and aim to reply to each one.'}
+    primary={{ label: applyLabel, path: byEmail ? apply('General application') : contactPath('careers') }}
+    secondary={{ label: 'How we work', path: '/about/#how-we-work' }}
+  />
+</Base>

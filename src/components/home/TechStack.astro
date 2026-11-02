@@ -1,0 +1,31 @@
+---
+import Section from '../ui/Section.astro';
+
+const groups = [
+  { title: 'Backend', items: ['Node.js', 'Python', 'Django', 'FastAPI', 'Docker'] },
+  { title: 'Data', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Metabase', 'Superset'] },
+  { title: 'Web & mobile', items: ['React', 'Next.js', 'Astro', 'Tailwind CSS', 'Flutter', 'React Native'] },
+  { title: 'Integrations', items: ['REST & webhooks', 'Bureau & eKYC', 'e-sign & e-NACH', 'Payment gateways', 'Tally imports'] },
+];
+---
+
+<Section
+  eyebrow="Tech we build with"
+  title="Boring, well-supported tools your next hire knows."
+  intro="The stack your team can hire for and maintain after handover, not whatever is new this month."
+  class="max-sm:py-14"
+>
+  <div class="-mt-4 grid grid-cols-2 gap-x-5 gap-y-6 sm:mt-0 sm:gap-x-8 lg:grid-cols-4">
+    {groups.map((g, i) => (
+      <div class="reveal border-t border-ink-100 pt-4 sm:pt-5" style={`--d: ${i * 80}ms`}>
+        <h3 class="text-sm font-semibold text-ink-900">{g.title}</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-ink-700 sm:hidden">{g.items.join(', ')}</p>
+        <ul class="mt-3 hidden flex-wrap gap-2 sm:flex">
+          {g.items.map((t) => (
+            <li class="rounded-full bg-ink-50 px-3 py-1.5 text-sm font-medium text-ink-700 ring-1 ring-ink-100">{t}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>

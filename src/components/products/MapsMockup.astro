@@ -1,0 +1,127 @@
+---
+// Maps API mockup: map canvas with branch radius, KYC + visit pins, and an API response card (sample data).
+import { Search, Plus, Minus, Building, Camera, Check, MapPinned, Crosshair } from '@lucide/astro';
+import MockupFrame from './MockupFrame.astro';
+import StatusPill from './StatusPill.astro';
+import FloatChip from './FloatChip.astro';
+
+interface Props { float?: boolean }
+const { float = true } = Astro.props;
+
+const json: [string, string, 'str' | 'num' | 'lit'][] = [
+  ['pincode', '"411038"', 'str'],
+  ['district', '"Pune"', 'str'],
+  ['state', '"Maharashtra"', 'str'],
+  ['lat', '18.5074', 'num'],
+  ['lng', '73.8077', 'num'],
+  ['confidence', '"high"', 'str'],
+  ['serviceable', 'true', 'lit'],
+  ['branch', '"BR-014"', 'str'],
+  ['distance_km', '3.2', 'num'],
+];
+---
+
+<div class="relative">
+  {float && (
+    <>
+      <FloatChip icon={Check} tone="pass" title="Inside service area" text="Kothrud BR-014 · 3.2 km" class="-top-12 right-8" />
+      <FloatChip icon={Crosshair} tone="brand" title="Visit matched" text="120 m from KYC address" class="-bottom-10 left-6" />
+    </>
+  )}
+  <MockupFrame title="Maps API · Field verification">
+    <div class="space-y-3 bg-ink-50/70 p-3 @sm:p-4">
+      <!-- map canvas -->
+      <div class="relative aspect-[5/3] overflow-hidden rounded-lg ring-1 ring-ink-200">
+        <svg viewBox="0 0 500 300" class="absolute inset-0 h-full w-full" aria-hidden="true">
+          <rect width="500" height="300" fill="var(--color-ink-50)" />
+          <!-- city blocks -->
+          <g fill="var(--color-ink-100)">
+            <rect x="18" y="20" width="80" height="58" rx="4" /><rect x="118" y="20" width="96" height="58" rx="4" />
+            <rect x="18" y="100" width="80" height="70" rx="4" /><rect x="236" y="20" width="70" height="44" rx="4" />
+            <rect x="330" y="96" width="70" height="60" rx="4" /><rect x="420" y="96" width="70" height="60" rx="4" />
+            <rect x="18" y="196" width="120" height="84" rx="4" /><rect x="236" y="196" width="70" height="84" rx="4" />
+            <rect x="330" y="178" width="160" height="40" rx="4" /><rect x="330" y="238" width="80" height="50" rx="4" />
+          </g>
+          <!-- river -->
+          <path d="M-10 255 C 80 230, 150 290, 230 262 S 380 210, 520 250" fill="none" stroke="var(--color-brand-100)" stroke-width="16" stroke-linecap="round" />
+          <!-- major roads -->
+          <g fill="none" stroke-linecap="round">
+            <path d="M0 88 H500 M110 0 V300 M318 0 V300 M0 184 C 160 184, 230 176, 500 168" stroke="var(--color-ink-200)" stroke-width="12" />
+            <path d="M0 88 H500 M110 0 V300 M318 0 V300 M0 184 C 160 184, 230 176, 500 168" stroke="#fff" stroke-width="8" />
+            <path d="M226 0 V300 M412 0 V300 M0 40 H110 M318 72 H500 M110 132 H318 M318 226 H500" stroke="#fff" stroke-width="3.5" />
+            <path d="M140 300 L 300 96" stroke="#fff" stroke-width="3.5" />
+          </g>
+          <!-- service radius around branch -->
+          <circle cx="226" cy="160" r="172" fill="var(--color-brand-500)" fill-opacity="0.07" stroke="var(--color-brand-500)" stroke-width="1.5" stroke-dasharray="6 5" />
+          <!-- route branch -> visit -->
+          <path d="M226 160 L 226 132 L 318 132 L 318 104 L 352 100" fill="none" stroke="var(--color-brand-600)" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round" />
+        </svg>
+
+        <!-- branch marker -->
+        <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: 45.2%; top: 53.3%">
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-white shadow-lg shadow-brand-600/40 ring-2 ring-white"><Building size={14} /></span>
+          <span class="absolute top-full left-1/2 mt-1 -translate-x-1/2 rounded bg-white px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap text-ink-800 shadow ring-1 ring-ink-100">Kothrud BR-014</span>
+        </div>
+        <!-- KYC address pin -->
+        <div class="absolute -translate-x-1/2 -translate-y-full" style="left: 72%; top: 31%">
+          <svg viewBox="0 0 24 32" class="h-7 w-5 drop-shadow" aria-hidden="true"><path d="M12 0C5.4 0 0 5.2 0 11.7 0 20.4 12 32 12 32s12-11.6 12-20.3C24 5.2 18.6 0 12 0z" fill="var(--color-ink-900)" /><circle cx="12" cy="11.5" r="4.5" fill="#fff" /></svg>
+          <span class="absolute bottom-full left-1/2 mb-0.5 -translate-x-1/2 rounded bg-ink-900 px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap text-white">KYC address</span>
+        </div>
+        <!-- visit pin -->
+        <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: 70.4%; top: 33.5%">
+          <span class="absolute inset-0 animate-ping rounded-full bg-saffron-500/50 [animation-iteration-count:3]"></span>
+          <span class="relative block h-3.5 w-3.5 rounded-full bg-saffron-500 ring-2 ring-white"></span>
+        </div>
+        <span class="absolute rounded bg-white px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap text-ink-800 shadow ring-1 ring-ink-100" style="left: 74%; top: 36%">Visit · 14:32</span>
+
+        <!-- search + controls -->
+        <div class="absolute top-2 left-2 hidden w-[62%] items-center @md:flex gap-1.5 rounded-md bg-white px-2 py-1.5 text-[10px] text-ink-600 shadow ring-1 ring-ink-100">
+          <Search size={11} class="shrink-0 text-ink-400" />
+          <span class="whitespace-nowrap">nr Hanuman mandir, Kothrud</span>
+        </div>
+        <div class="absolute top-2 right-2 flex flex-col overflow-hidden rounded-md bg-white text-ink-600 shadow ring-1 ring-ink-100">
+          <span class="grid h-6 w-6 place-items-center border-b border-ink-100"><Plus size={12} /></span>
+          <span class="grid h-6 w-6 place-items-center"><Minus size={12} /></span>
+        </div>
+        <span class="absolute bottom-2 left-2 hidden items-center gap-1 rounded bg-white/90 px-1.5 py-0.5 text-[9px] text-ink-600 ring-1 ring-ink-100 @sm:flex">
+          <span class="h-2 w-2 rounded-full border border-dashed border-brand-500 bg-brand-500/10"></span>5 km service radius
+        </span>
+      </div>
+
+      <!-- visit card + API response -->
+      <div class="grid gap-3 @lg:grid-cols-[1fr_1.1fr]">
+        <div class="rounded-lg bg-white p-3 ring-1 ring-ink-100">
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] font-bold text-ink-900">Field visit check</p>
+            <StatusPill tone="pass"><Check size={10} stroke-width={3} />Match</StatusPill>
+          </div>
+          <div class="mt-2.5 flex gap-2.5">
+            <span class="grid h-14 w-14 shrink-0 place-items-center rounded-md bg-gradient-to-br from-ink-200 to-ink-300 text-ink-500"><Camera size={18} /></span>
+            <dl class="min-w-0 space-y-0.5 text-[9.5px] text-ink-500">
+              <div class="truncate"><dt class="inline">Agent:</dt> <dd class="inline text-ink-800">Neha P</dd></div>
+              <div class="truncate"><dt class="inline">At:</dt> <dd class="inline text-ink-800 tabular-nums">18.5081, 73.8069</dd></div>
+              <div class="truncate"><dt class="inline">Time:</dt> <dd class="inline text-ink-800">31 Oct 2026, 14:32</dd></div>
+            </dl>
+          </div>
+          <div class="mt-2.5">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="text-ink-500">Address match score</span><span class="font-bold text-emerald-600">92 / 100</span>
+            </div>
+            <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-100"><div class="h-full w-[92%] rounded-full bg-emerald-500"></div></div>
+            <p class="mt-1 text-[9.5px] text-ink-400">120 m from geocoded KYC address</p>
+          </div>
+        </div>
+        <div class="min-w-0 rounded-lg bg-ink-900 p-3 font-mono text-[10px] leading-[1.55] text-ink-400">
+          <p class="mb-1.5 flex items-center gap-1.5 font-sans text-[10px] text-ink-300"><MapPinned size={11} class="text-saffron-400" /><span class="font-semibold text-saffron-400">POST</span> /v1/geo/geocode <span class="ml-auto text-emerald-300">200</span></p>
+          <p>&#123;</p>
+          {json.map(([k, v, t], i) => (
+            <p class="truncate pl-3">
+              <span class="text-brand-300">"{k}"</span>: <span class={t === 'str' ? 'text-ink-100' : 'text-saffron-400'}>{v}</span>{i < json.length - 1 ? ',' : ''}
+            </p>
+          ))}
+          <p>&#125;</p>
+        </div>
+      </div>
+    </div>
+  </MockupFrame>
+</div>

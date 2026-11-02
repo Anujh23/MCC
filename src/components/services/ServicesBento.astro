@@ -1,0 +1,108 @@
+---
+// Bento grid of all services for /services. CRM is the large dark tile.
+// Below sm the "included" lists drop out so each tile is a short row, not a tall card.
+import { ArrowRight, Check } from '@lucide/astro';
+import { services, href, cta } from '../../data/site';
+import { servicesContent } from '../../data/services-content';
+import IconBadge from '../ui/IconBadge.astro';
+import SampleBadge from '../ui/SampleBadge.astro';
+
+const order = ['crm-development', 'website-development', 'hr-solutions', 'data-analytics', 'custom-software'];
+const items = order.map((slug) => {
+  const s = services.find((x) => x.slug === slug)!;
+  return { ...s, c: servicesContent[slug] };
+});
+const [feature, ...rest] = items;
+const bars = [38, 55, 47, 70, 62, 84];
+const focus = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
+---
+
+<div class="grid gap-4 lg:grid-cols-6">
+  <a
+    href={href(`/services/${feature.slug}/`)}
+    class={`reveal group relative overflow-hidden rounded-3xl bg-ink-950 p-6 text-ink-300 ring-1 ring-ink-800 transition duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-900/30 sm:p-9 lg:col-span-4 ${focus}`}
+  >
+    <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
+    <div class="animate-glow pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand-600/40 blur-3xl"></div>
+    <div class="relative grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-center">
+      <div>
+        <div class="flex items-center gap-3">
+          <IconBadge icon={feature.icon} tone="dark" size="lg" />
+          <span class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-saffron-400 ring-1 ring-white/15">Strongest in lending</span>
+        </div>
+        <h3 class="mt-6 text-2xl font-extrabold text-white sm:text-3xl">{feature.title}</h3>
+        <p class="mt-3 leading-relaxed text-ink-300">{feature.c.intro}</p>
+        <ul class="mt-6 hidden gap-2 sm:grid sm:grid-cols-2">
+          {feature.c.included.map((i) => (
+            <li class="flex gap-2 text-sm text-ink-200"><Check size={16} class="mt-0.5 shrink-0 text-saffron-400" aria-hidden="true" />{i}</li>
+          ))}
+        </ul>
+        <span class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-8">
+          {cta.explore(feature.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+        </span>
+      </div>
+      <div aria-hidden="true" class="hidden rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10 sm:block">
+        <div class="grid grid-cols-3 gap-2">
+          {[['New', 3, 'bg-ink-400'], ['Docs', 2, 'bg-amber-400'], ['Sanctioned', 2, 'bg-emerald-400']].map(([name, n, dot]) => (
+            <div class="min-w-0 rounded-lg bg-white/[0.04] p-1.5">
+              <p class="flex items-center gap-1 px-0.5 pb-1.5 text-[10px] font-semibold whitespace-nowrap text-ink-400 uppercase"><span class={`h-1.5 w-1.5 shrink-0 rounded-full ${dot}`}></span>{name}</p>
+              <div class="space-y-1.5">
+                {Array.from({ length: n as number }).map((_, j) => (
+                  <div class={`rounded-md p-2 ${name === 'Docs' && j === 0 ? 'bg-white' : 'bg-white/[0.07]'}`}>
+                    <span class={`block h-1.5 w-4/5 rounded-full ${name === 'Docs' && j === 0 ? 'bg-ink-800' : 'bg-white/40'}`}></span>
+                    <span class={`mt-1.5 block h-1 w-1/2 rounded-full ${name === 'Docs' && j === 0 ? 'bg-ink-200' : 'bg-white/15'}`}></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </a>
+
+  {rest.map((item, i) => (
+    <a
+      href={href(`/services/${item.slug}/`)}
+      class={`reveal group relative flex flex-col overflow-hidden rounded-3xl bg-white p-6 ring-1 ring-ink-100 transition duration-300 ease-out-expo hover:-translate-y-1 hover:shadow-xl hover:shadow-ink-900/[0.07] hover:ring-brand-200 sm:p-7 lg:col-span-2 ${focus}`}
+      style={`--d: ${(i + 1) * 90}ms`}
+    >
+      <div class="flex items-start justify-between gap-3">
+        <IconBadge icon={item.icon} tone={i === 2 ? 'saffron' : 'brand'} size="lg" />
+        {item.slug === 'data-analytics' && (
+          <div aria-hidden="true" class="flex h-12 items-end gap-1">
+            {bars.map((h, j) => <span class="animate-bar w-2 rounded-t bg-gradient-to-t from-brand-600 to-brand-300" style={`--h: ${h}%; animation-delay: ${j * 80}ms`}></span>)}
+          </div>
+        )}
+        {item.slug === 'website-development' && (
+          <div aria-hidden="true" class="flex items-center gap-2">
+            <span class="flex flex-col items-end gap-1">
+              <span class="text-[11px] font-semibold text-ink-600">Target score</span>
+              <SampleBadge />
+            </span>
+            <span class="relative grid h-12 w-12 shrink-0 place-items-center rounded-full" style="background: conic-gradient(var(--color-emerald-500) 98%, var(--color-ink-100) 0)">
+              <span class="absolute inset-[4px] rounded-full bg-white"></span>
+              <span class="relative text-xs font-bold text-emerald-700">98</span>
+            </span>
+          </div>
+        )}
+        {item.slug === 'custom-software' && (
+          <span aria-hidden="true" class="rounded-lg bg-ink-950 px-2.5 py-1.5 font-mono text-[11px] text-ink-300"><span class="text-emerald-400">200</span> POST /v1</span>
+        )}
+        {item.slug === 'hr-solutions' && (
+          <span aria-hidden="true" class="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700">Payroll ready</span>
+        )}
+      </div>
+      <h3 class="mt-6 text-xl font-bold">{item.title}</h3>
+      <p class="mt-2 leading-relaxed text-ink-600">{item.blurb}</p>
+      <ul class="mt-5 hidden flex-1 space-y-2 sm:block">
+        {item.c.included.map((x) => (
+          <li class="flex gap-2 text-sm text-ink-600"><Check size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{x}</li>
+        ))}
+      </ul>
+      <span class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 sm:mt-6">
+        {cta.explore(item.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      </span>
+    </a>
+  ))}
+</div>

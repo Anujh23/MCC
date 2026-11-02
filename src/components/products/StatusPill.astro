@@ -1,0 +1,17 @@
+---
+// Tiny status badge for mockups: pass / warn / fail / info / neutral.
+interface Props {
+  tone?: 'pass' | 'warn' | 'fail' | 'info' | 'neutral';
+  class?: string;
+}
+const { tone = 'neutral', class: className = '' } = Astro.props;
+const toneClass = {
+  pass: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  warn: 'bg-amber-50 text-amber-700 ring-amber-200',
+  fail: 'bg-rose-50 text-rose-700 ring-rose-200',
+  info: 'bg-brand-50 text-brand-700 ring-brand-200',
+  neutral: 'bg-ink-50 text-ink-600 ring-ink-200',
+}[tone];
+---
+
+<span class={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[10px] font-semibold whitespace-nowrap ring-1 ring-inset ${toneClass} ${className}`}><slot /></span>

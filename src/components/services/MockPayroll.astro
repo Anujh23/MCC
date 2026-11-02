@@ -1,0 +1,85 @@
+---
+// Hero visual for HR Solutions: attendance calendar + payslip summary (sample data).
+// Below sm only the payslip card shows.
+import { CalendarCheck, CircleCheck } from '@lucide/astro';
+import SampleBadge from '../ui/SampleBadge.astro';
+
+// October 2026 starts on a Thursday. P = present, L = leave, H = holiday, W = weekly off (Sunday), A = loss of pay
+const lead = 3; // Mon, Tue, Wed empty before Thu 1st
+const days = Array.from({ length: 31 }, (_, i) => {
+  const date = i + 1;
+  if ((lead + i) % 7 === 6) return 'W';
+  if (date === 2) return 'H';
+  if (date === 16) return 'L';
+  if (date === 27) return 'L';
+  return 'P';
+});
+const count = (c: string) => days.filter((d) => d === c).length;
+const tone: Record<string, string> = {
+  P: 'bg-brand-500/80 text-white',
+  L: 'bg-amber-400 text-ink-950',
+  H: 'bg-white/20 text-white',
+  W: 'bg-white/[0.05] text-ink-500',
+  A: 'bg-rose-400/80 text-white',
+};
+const pay = [
+  { label: 'Gross salary', value: '₹48,500' },
+  { label: 'PF (employee)', value: '− ₹1,800' },
+  { label: 'Professional tax', value: '− ₹200' },
+  { label: 'TDS', value: '− ₹1,250' },
+];
+---
+
+<div class="relative mx-auto w-full max-w-xl" aria-hidden="true">
+  <div class="grid gap-4 sm:grid-cols-[1.05fr_1fr] sm:items-start">
+    <div class="hidden rounded-2xl bg-ink-900/90 p-4 shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur sm:block">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-white">Attendance</p>
+          <p class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-ink-400">October 2026 <SampleBadge tone="dark" /></p>
+        </div>
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-saffron-400"><CalendarCheck size={16} /></span>
+      </div>
+      <div class="mt-4 grid grid-cols-7 gap-1 text-center text-[9px] font-semibold text-ink-500">
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => <span>{d}</span>)}
+      </div>
+      <div class="mt-1.5 grid grid-cols-7 gap-1">
+        {Array.from({ length: lead }).map(() => <span class="aspect-square"></span>)}
+        {days.map((d, i) => (
+          <span class={`grid aspect-square place-items-center rounded-md text-[10px] font-medium ${tone[d]}`}>{i + 1}</span>
+        ))}
+      </div>
+      <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-lg bg-white/[0.05] py-2"><p class="text-sm font-bold text-white">{count('P')}</p><p class="text-[10px] text-ink-400">Present</p></div>
+        <div class="rounded-lg bg-white/[0.05] py-2"><p class="text-sm font-bold text-amber-300">{count('L')}</p><p class="text-[10px] text-ink-400">Leave</p></div>
+        <div class="rounded-lg bg-white/[0.05] py-2"><p class="text-sm font-bold text-white">{count('H') + count('W')}</p><p class="text-[10px] text-ink-400">Off days</p></div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white p-4 shadow-2xl shadow-black/40 ring-1 ring-ink-100 sm:mt-10">
+      <div class="flex items-center gap-3">
+        <span class="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white">PN</span>
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-ink-900">Priya N.</p>
+          <p class="text-[11px] text-ink-600">Field officer · Pune branch</p>
+        </div>
+        <SampleBadge class="ml-auto sm:hidden" />
+      </div>
+      <dl class="mt-4 space-y-2 text-xs">
+        {pay.map((p) => (
+          <div class="flex justify-between gap-3">
+            <dt class="text-ink-500">{p.label}</dt>
+            <dd class="font-medium text-ink-800 tabular-nums">{p.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <div class="mt-3 flex items-end justify-between border-t border-dashed border-ink-200 pt-3">
+        <span class="text-xs font-semibold text-ink-900">Net pay</span>
+        <span class="text-xl font-extrabold text-ink-900 tabular-nums">₹45,250</span>
+      </div>
+      <p class="mt-3 flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[11px] font-medium text-emerald-700">
+        <CircleCheck size={13} /> Payslip ready · bank file generated
+      </p>
+    </div>
+  </div>
+</div>

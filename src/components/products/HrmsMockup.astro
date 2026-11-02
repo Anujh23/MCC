@@ -1,0 +1,130 @@
+---
+// Manka HRMS mockup: attendance calendar + payroll summary (sample data).
+import { LayoutDashboard, CalendarCheck, Wallet, Users, FileText, Settings, ScanFace, Check, MapPin, ChevronLeft, ChevronRight } from '@lucide/astro';
+import MockupFrame from './MockupFrame.astro';
+import AppRail from './AppRail.astro';
+import StatusPill from './StatusPill.astro';
+import FloatChip from './FloatChip.astro';
+
+interface Props { float?: boolean }
+const { float = true } = Astro.props;
+
+// October 2026 starts on a Thursday (Monday-first grid => 3 leading blanks)
+type S = 'p' | 'l' | 'lv' | 'a' | 'w' | 'h';
+const special: Record<number, S> = { 2: 'h', 7: 'l', 21: 'l', 14: 'lv', 15: 'lv', 27: 'a' };
+const days = Array.from({ length: 31 }, (_, i) => {
+  const d = i + 1;
+  const dow = (3 + i) % 7; // 0 = Mon ... 6 = Sun
+  const s: S = special[d] ?? (dow >= 5 ? 'w' : 'p');
+  return { d, s };
+});
+const cell: Record<S, string> = {
+  p: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
+  l: 'bg-amber-50 text-amber-700 ring-amber-200',
+  lv: 'bg-brand-50 text-brand-700 ring-brand-100',
+  a: 'bg-rose-50 text-rose-700 ring-rose-200',
+  w: 'bg-transparent text-ink-300 ring-transparent',
+  h: 'bg-ink-100 text-ink-600 ring-ink-200',
+};
+const legend = [
+  { s: 'p' as S, label: 'Present', n: 16 }, { s: 'l' as S, label: 'Late', n: 2 },
+  { s: 'lv' as S, label: 'Leave', n: 2 }, { s: 'a' as S, label: 'Absent', n: 1 }, { s: 'h' as S, label: 'Holiday', n: 1 },
+];
+const payroll = [
+  { k: 'Gross', v: '68,42,000', strong: true },
+  { k: 'PF (employee)', v: '4,12,600' },
+  { k: 'ESI', v: '38,900' },
+  { k: 'Professional tax', v: '29,400' },
+  { k: 'TDS', v: '2,86,500' },
+];
+const feed = [
+  { who: 'PN', name: 'Priya Nair', t: '9:04 am', tag: 'On time', tone: 'pass' as const },
+  { who: 'RK', name: 'Rohit Kale', t: '9:41 am', tag: 'Late', tone: 'warn' as const },
+];
+---
+
+<div class="relative">
+  {float && (
+    <>
+      <FloatChip icon={ScanFace} tone="pass" title="Selfie check-in verified" text="Priya N · 9:04 am · inside geo-fence" class="-top-12 right-8" />
+      <FloatChip icon={FileText} tone="brand" title="148 payslips published" text="September 2026 payroll" class="-bottom-10 left-6" />
+    </>
+  )}
+  <MockupFrame title="Manka HRMS · Attendance & payroll">
+    <div class="flex">
+      <AppRail icons={[LayoutDashboard, CalendarCheck, Wallet, Users, FileText, Settings]} active={1} />
+      <div class="min-w-0 flex-1 bg-ink-50/70 p-3 @sm:p-4">
+        <div class="grid gap-3 @lg:grid-cols-[1.1fr_1fr]">
+          <!-- attendance calendar -->
+          <div class="rounded-lg bg-white p-3 ring-1 ring-ink-100">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex min-w-0 items-center gap-2">
+                <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-600 text-[8.5px] font-bold text-white">PN</span>
+                <div class="min-w-0 leading-tight">
+                  <p class="truncate text-[11px] font-bold text-ink-900">Priya Nair</p>
+                  <p class="truncate text-[9.5px] text-ink-500">Field sales · Pune</p>
+                </div>
+              </div>
+              <span class="flex shrink-0 items-center gap-1 text-[10px] font-semibold text-ink-700"><ChevronLeft size={12} class="text-ink-400" />Oct 2026<ChevronRight size={12} class="text-ink-400" /></span>
+            </div>
+            <div class="mt-2.5 grid grid-cols-7 gap-1 text-center text-[8.5px] font-semibold text-ink-400">
+              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => <span>{d}</span>)}
+            </div>
+            <div class="mt-1 grid grid-cols-7 gap-1">
+              {[0, 1, 2].map(() => <span></span>)}
+              {days.map(({ d, s }) => (
+                <span class={`grid aspect-square place-items-center rounded text-[9.5px] font-semibold ring-1 ring-inset ${cell[s]} ${d === 30 ? 'outline outline-2 outline-offset-1 outline-brand-500' : ''}`}>{d}</span>
+              ))}
+            </div>
+            <div class="mt-2.5 flex flex-wrap gap-x-2.5 gap-y-1 text-[9px] text-ink-500">
+              {legend.map((l) => (
+                <span class="flex items-center gap-1"><span class={`h-2 w-2 rounded-sm ring-1 ring-inset ${cell[l.s]}`}></span>{l.label} <b class="text-ink-800">{l.n}</b></span>
+              ))}
+            </div>
+          </div>
+
+          <!-- payroll + check-ins -->
+          <div class="flex min-w-0 flex-col gap-3">
+            <div class="rounded-lg bg-white p-3 ring-1 ring-ink-100">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-[11px] font-bold text-ink-900">Sep payroll</p>
+                <StatusPill tone="pass"><Check size={10} stroke-width={3} />Approved</StatusPill>
+              </div>
+              <p class="mt-0.5 text-[9.5px] text-ink-500">148 employees · 3 locations</p>
+              <ul class="mt-2 space-y-1 text-[10px]">
+                {payroll.map((r) => (
+                  <li class="flex justify-between gap-2">
+                    <span class={r.strong ? 'font-semibold text-ink-800' : 'text-ink-500'}>{r.k}</span>
+                    <span class={`tabular-nums ${r.strong ? 'font-bold text-ink-900' : 'text-ink-700'}`}>₹{r.v}</span>
+                  </li>
+                ))}
+              </ul>
+              <div class="mt-2 flex h-1.5 overflow-hidden rounded-full" aria-hidden="true">
+                <span class="bg-brand-500" style="width: 88.8%"></span>
+                <span class="bg-saffron-500" style="width: 6%"></span>
+                <span class="bg-brand-200" style="width: 4.2%"></span>
+                <span class="bg-ink-300" style="width: 1%"></span>
+              </div>
+              <div class="mt-2 flex items-center justify-between border-t border-ink-100 pt-2">
+                <span class="text-[10px] font-semibold text-ink-700">Net payable</span>
+                <span class="text-[14px] font-extrabold text-ink-900 tabular-nums">₹60,74,600</span>
+              </div>
+            </div>
+            <div class="rounded-lg bg-white p-3 ring-1 ring-ink-100">
+              <p class="flex items-center gap-1 text-[11px] font-bold text-ink-900"><MapPin size={11} class="text-brand-600" />Today’s check-ins</p>
+              <ul class="mt-2 space-y-1.5">
+                {feed.map((f) => (
+                  <li class="flex items-center gap-2">
+                    <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink-800 text-[7.5px] font-bold text-white">{f.who}</span>
+                    <span class="min-w-0 flex-1 truncate text-[10px] text-ink-700">{f.name} <span class="text-ink-400">· {f.t}</span></span>
+                    <StatusPill tone={f.tone}>{f.tag}</StatusPill>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </MockupFrame>
+</div>

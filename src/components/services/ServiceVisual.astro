@@ -1,0 +1,16 @@
+---
+// Picks the hero mockup for a service.
+import type { Visual } from '../../data/services-content';
+import MockBrowser from './MockBrowser.astro';
+import MockKanban from './MockKanban.astro';
+import MockPayroll from './MockPayroll.astro';
+import MockDashboard from './MockDashboard.astro';
+import MockApi from './MockApi.astro';
+
+interface Props { visual: Visual }
+const { visual } = Astro.props;
+const map = { browser: MockBrowser, kanban: MockKanban, payroll: MockPayroll, dashboard: MockDashboard, api: MockApi };
+const Mock = map[visual];
+---
+
+<Mock />

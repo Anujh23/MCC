@@ -1,0 +1,19 @@
+---
+// Rounded square holding a Lucide icon. Usage: <IconBadge icon={item.icon} />
+interface Props {
+  icon: any;
+  tone?: 'brand' | 'saffron' | 'dark';
+  size?: 'md' | 'lg';
+}
+const { icon: Icon, tone = 'brand', size = 'md' } = Astro.props;
+const toneClass = {
+  brand: 'bg-brand-50 text-brand-600 ring-brand-100',
+  saffron: 'bg-saffron-50 text-saffron-700 ring-saffron-100',
+  dark: 'bg-white/10 text-saffron-400 ring-white/15',
+}[tone];
+const box = size === 'lg' ? 'h-14 w-14 rounded-2xl' : 'h-11 w-11 rounded-xl';
+---
+
+<span class={`grid shrink-0 place-items-center ring-1 ${box} ${toneClass}`}>
+  <Icon size={size === 'lg' ? 26 : 22} stroke-width={1.75} />
+</span>

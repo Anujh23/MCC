@@ -1,0 +1,70 @@
+---
+import { MessagesSquare, Landmark, IndianRupee, KeyRound, Headset, ArrowRight, Check } from '@lucide/astro';
+import IconBadge from '../ui/IconBadge.astro';
+import { contactHref, cta } from '../../data/site';
+
+const points = [
+  { icon: Landmark, title: 'Lending and fintech depth', text: 'FOIR, ABB, bounce ratios, bureau pulls, co-lending MIS. We already speak your credit team’s language, so you don’t spend weeks explaining your policy.' },
+  { icon: IndianRupee, title: 'Written scope, quoted in ₹', text: 'Project work gets a written scope and one fixed price in ₹, GST shown separately. Ongoing teams get a monthly rate agreed in writing. Changes are quoted before they’re done.' },
+  { icon: KeyRound, title: 'Your code, your data', text: 'For custom builds, you own the code and IP, and they run in accounts in your name. Products are licensed and run on our hosted setup or on your servers; your data is always yours. No lock-in, no exit fees.' },
+  { icon: Headset, title: 'Support in IST hours', text: 'Support during Indian working hours (IST), by email, from someone who knows your system. Bug-fix support after launch is part of every project scope, with the length agreed up front; after that, an AMC is available.' },
+];
+---
+
+<section class="relative overflow-hidden bg-ink-950 py-14 text-ink-300 sm:py-20 lg:py-28">
+  <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
+  <div class="animate-glow pointer-events-none absolute top-1/3 -left-40 h-[30rem] w-[30rem] rounded-full bg-brand-600/30 blur-3xl"></div>
+  <div class="animate-glow pointer-events-none absolute -right-40 -bottom-40 h-[26rem] w-[26rem] rounded-full bg-saffron-500/10 blur-3xl [animation-delay:-3s]"></div>
+
+  <div class="container-page relative">
+    <div class="reveal max-w-3xl">
+      <span class="eyebrow-pill"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Why Manka</span>
+      <h2 class="mt-4 text-3xl leading-tight font-extrabold text-white sm:text-4xl lg:text-[2.75rem]">Straight answers, written quotes and code you own.</h2>
+    </div>
+
+    <div class="mt-8 grid gap-4 sm:mt-12 md:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+      <!-- Lead tile -->
+      <div class="reveal relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 p-6 ring-1 ring-white/10 sm:p-8 md:col-span-2 lg:col-span-1 lg:row-span-2 lg:flex lg:flex-col">
+        <div class="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-saffron-500/20 blur-3xl" aria-hidden="true"></div>
+        <div class="relative">
+          <div class="hidden sm:block"><IconBadge icon={MessagesSquare} tone="dark" size="lg" /></div>
+          <h3 class="text-2xl font-extrabold text-white sm:mt-6">Engineers you talk to directly</h3>
+          <p class="mt-3 leading-relaxed text-brand-100">The person on your first call is the person who builds your system. No account-manager relay, no requirements lost in translation.</p>
+        </div>
+
+        <!-- mini chat, shows the idea, clearly illustrative -->
+        <div class="relative mt-8 hidden space-y-2 sm:block lg:mt-auto lg:pt-8" aria-hidden="true">
+          <p class="text-[10px] font-semibold tracking-wider text-brand-200/70 uppercase">For example</p>
+          <div class="max-w-[85%] rounded-2xl rounded-bl-md bg-white/10 px-3.5 py-2.5 text-xs leading-relaxed text-white ring-1 ring-white/10">
+            Can the BSA report show EMI outflow separately?
+          </div>
+          <div class="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-white px-3.5 py-2.5 text-xs leading-relaxed text-ink-800">
+            Yes. I’ll add it as a column and share the staging link by Thursday.
+            <span class="mt-1 block text-[10px] font-semibold text-brand-700">Your engineer</span>
+          </div>
+        </div>
+      </div>
+
+      {points.map((p, i) => (
+        <div class="reveal card-dark max-sm:rounded-none max-sm:border-t max-sm:border-white/10 max-sm:bg-transparent max-sm:px-0 max-sm:pt-6 max-sm:pb-2 max-sm:ring-0 max-sm:backdrop-blur-none" style={`--d: ${(i + 1) * 80}ms`}>
+          <div class="flex items-center gap-4 sm:block">
+            <IconBadge icon={p.icon} tone="dark" />
+            <h3 class="text-lg font-bold text-white sm:mt-5">{p.title}</h3>
+          </div>
+          <p class="mt-2 text-sm leading-relaxed text-ink-300">{p.text}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="reveal mt-6 flex flex-col gap-5 sm:mt-4 sm:rounded-3xl sm:bg-white/[0.04] sm:p-8 sm:ring-1 sm:ring-white/10 lg:flex-row lg:items-center lg:justify-between">
+      <ul class="hidden flex-wrap gap-x-6 gap-y-2 text-sm text-ink-200 sm:flex">
+        {['Written scope', 'Quoted in ₹, GST separate', 'Code you own on custom builds', 'NDA on request', 'Support after go-live'].map((t) => (
+          <li class="flex items-center gap-2"><span class="text-emerald-400" aria-hidden="true"><Check size={16} stroke-width={2.5} /></span>{t}</li>
+        ))}
+      </ul>
+      <a href={contactHref()} class="btn btn-primary group w-full shrink-0 px-6 py-3 sm:w-auto sm:self-start lg:self-auto">
+        {cta.call}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+</section>

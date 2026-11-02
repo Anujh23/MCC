@@ -1,0 +1,21 @@
+---
+// Renders the right product UI mockup for a slug.
+import BsaMockup from './BsaMockup.astro';
+import PayslipMockup from './PayslipMockup.astro';
+import MapsMockup from './MapsMockup.astro';
+import CrmMockup from './CrmMockup.astro';
+import HrmsMockup from './HrmsMockup.astro';
+
+interface Props { slug: string; float?: boolean }
+const { slug, float = true } = Astro.props;
+const map: Record<string, any> = {
+  'bank-statement-analyser': BsaMockup,
+  'payslip-checker': PayslipMockup,
+  'maps-api': MapsMockup,
+  crm: CrmMockup,
+  hrms: HrmsMockup,
+};
+const Mockup = map[slug];
+---
+
+{Mockup && <Mockup float={float} />}

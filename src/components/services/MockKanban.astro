@@ -1,0 +1,77 @@
+---
+// Hero visual for CRM Development: a lending pipeline kanban with sample cards.
+// Below sm only the first two columns show, so labels fit without ellipses.
+import { MessageCircle, CircleCheck, Plus } from '@lucide/astro';
+import SampleBadge from '../ui/SampleBadge.astro';
+
+const columns = [
+  {
+    name: 'New lead', count: 18, dot: 'bg-ink-400',
+    cards: [
+      { name: 'R. Sharma', meta: '₹4.5L · Personal', tag: 'Website', due: 'Today', who: 'AK' },
+      { name: 'M. Iqbal', meta: '₹1.2L · Two-wheeler', tag: 'DSA', due: 'Today', who: 'SP' },
+    ],
+  },
+  {
+    name: 'Docs pending', count: 9, dot: 'bg-amber-400',
+    cards: [
+      { name: 'S. Reddy', meta: '₹8L · Business', tag: 'Branch', due: 'Due tomorrow', who: 'NV', active: true },
+      { name: 'P. Joshi', meta: '₹2.75L · Personal', tag: 'Ads', due: 'Fri', who: 'AK' },
+    ],
+  },
+  {
+    name: 'Sanctioned', count: 6, dot: 'bg-emerald-400',
+    cards: [
+      { name: 'K. Menon', meta: '₹5L · LAP', tag: 'Referral', due: 'Disburse', who: 'RG' },
+      { name: 'A. Das', meta: '₹90K · Consumer', tag: 'Website', due: 'Disburse', who: 'SP' },
+    ],
+  },
+];
+---
+
+<div class="relative mx-auto w-full max-w-xl pb-12" aria-hidden="true">
+  <div class="rounded-2xl bg-ink-900/90 p-3 shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur sm:p-4">
+    <div class="flex items-center justify-between gap-3 px-1">
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-white">Pipeline · Retail loans</p>
+        <p class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-ink-400"><SampleBadge tone="dark" />33 open leads</p>
+      </div>
+      <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white"><Plus size={12} /> Lead</span>
+    </div>
+
+    <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
+      {columns.map((col, ci) => (
+        <div class={`min-w-0 rounded-xl bg-white/[0.04] p-1.5 ring-1 ring-white/[0.06] sm:p-2 ${ci === 2 ? 'max-sm:hidden' : ''}`}>
+          <div class="flex items-center justify-between gap-1 px-1 pb-2">
+            <span class="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-ink-300 uppercase sm:text-[11px]">
+              <span class={`h-1.5 w-1.5 shrink-0 rounded-full ${col.dot}`}></span>{col.name}
+            </span>
+            <span class="text-[10px] text-ink-400">{col.count}</span>
+          </div>
+          <div class="space-y-2">
+            {col.cards.map((c: any) => (
+              <div class={`rounded-lg p-2 sm:p-2.5 ${c.active ? 'rotate-[-2deg] bg-white shadow-lg shadow-brand-900/40 ring-2 ring-brand-400' : 'bg-white/[0.07] ring-1 ring-white/10'}`}>
+                <p class={`text-[11px] font-semibold whitespace-nowrap sm:text-xs ${c.active ? 'text-ink-900' : 'text-white'}`}>{c.name}</p>
+                <p class={`mt-0.5 text-[10px] leading-snug sm:text-[11px] ${c.active ? 'text-ink-600' : 'text-ink-400'}`}>{c.meta}</p>
+                <div class="mt-2 flex items-center justify-between gap-1">
+                  <span class={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap ${c.active ? 'bg-brand-50 text-brand-700' : 'bg-white/10 text-ink-300'}`}>{c.tag}</span>
+                  <span class={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[9px] font-bold ${c.active ? 'bg-brand-600 text-white' : 'bg-ink-700 text-ink-200'}`}>{c.who}</span>
+                </div>
+                <p class={`mt-1.5 text-[10px] whitespace-nowrap ${c.active ? 'font-semibold text-amber-700' : 'text-ink-400'}`}>{c.due}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="absolute right-3 bottom-0 flex max-w-[90%] items-center gap-3 rounded-xl bg-white p-3 shadow-2xl shadow-black/40 ring-1 ring-ink-100 sm:-right-4">
+    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-600"><MessageCircle size={16} /></span>
+    <div class="min-w-0">
+      <p class="text-xs font-semibold text-ink-900">Docs reminder sent on WhatsApp</p>
+      <p class="text-[11px] text-ink-600">S. Reddy · bank statement, ITR</p>
+    </div>
+    <CircleCheck size={16} class="shrink-0 text-emerald-600" />
+  </div>
+</div>

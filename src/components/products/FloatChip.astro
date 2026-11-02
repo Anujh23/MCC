@@ -1,0 +1,28 @@
+---
+// Small notification card pinned around a hero mockup. Hidden on small screens.
+interface Props {
+  icon: any;
+  tone?: 'pass' | 'warn' | 'fail' | 'brand';
+  title: string;
+  text?: string;
+  class?: string;
+}
+const { icon: Icon, tone = 'brand', title, text, class: className = '' } = Astro.props;
+const toneClass = {
+  pass: 'bg-emerald-50 text-emerald-600 ring-emerald-100',
+  warn: 'bg-amber-50 text-amber-600 ring-amber-100',
+  fail: 'bg-rose-50 text-rose-600 ring-rose-100',
+  brand: 'bg-brand-50 text-brand-600 ring-brand-100',
+}[tone];
+---
+
+<div
+  class={`pointer-events-none absolute z-10 hidden items-center gap-2.5 rounded-xl bg-white/95 py-2.5 pr-4 pl-2.5 shadow-xl shadow-ink-950/30 ring-1 ring-ink-900/5 backdrop-blur sm:flex ${className}`}
+  aria-hidden="true"
+>
+  <span class={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ring-1 ${toneClass}`}><Icon size={16} stroke-width={2} /></span>
+  <span class="leading-tight">
+    <span class="block text-[12px] font-semibold text-ink-900">{title}</span>
+    {text && <span class="block text-[11px] text-ink-500">{text}</span>}
+  </span>
+</div>

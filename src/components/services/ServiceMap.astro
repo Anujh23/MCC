@@ -1,0 +1,36 @@
+---
+// Hero visual for /services: how the five services connect, as a layered stack.
+import { services } from '../../data/site';
+
+const notes: Record<string, string> = {
+  'website-development': 'Enquiries in',
+  'crm-development': 'Leads worked',
+  'hr-solutions': 'Teams paid',
+  'data-analytics': 'Numbers read',
+  'custom-software': 'Systems linked',
+};
+---
+
+<div class="relative mx-auto w-full max-w-md" aria-hidden="true">
+  <div class="rounded-3xl bg-ink-900/80 p-4 shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur sm:p-5">
+    <div class="flex items-center justify-between px-1">
+      <p class="text-sm font-semibold text-white">One team, five services</p>
+      <span class="flex items-center gap-1.5 text-[11px] text-ink-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>Connected</span>
+    </div>
+    <div class="relative mt-4 space-y-2.5">
+      <span class="absolute top-5 bottom-5 left-[1.6rem] w-px bg-gradient-to-b from-brand-400/60 via-brand-300/40 to-brand-400/60"></span>
+      {services.map((s, i) => (
+        <div class="relative flex items-center gap-3 rounded-2xl bg-white/[0.05] p-3 ring-1 ring-white/[0.08]">
+          <span class={`relative grid h-9 w-9 shrink-0 place-items-center rounded-xl ring-1 ${i === 1 ? 'bg-saffron-500/15 text-saffron-400 ring-saffron-400/30' : 'bg-brand-600/20 text-brand-300 ring-brand-400/30'}`}>
+            <s.icon size={17} stroke-width={1.75} />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-semibold text-white">{s.title}</span>
+            <span class="block text-[11px] leading-snug text-ink-400">{s.blurb}</span>
+          </span>
+          <span class="hidden shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold text-ink-300 sm:inline">{notes[s.slug]}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

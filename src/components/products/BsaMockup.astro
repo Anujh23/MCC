@@ -1,0 +1,141 @@
+---
+// BSA statement-analysis screen mockup (sample data).
+import { LayoutDashboard, FileText, ShieldAlert, Download, Settings, Lock, Upload, Check, CircleAlert } from '@lucide/astro';
+import MockupFrame from './MockupFrame.astro';
+import AppRail from './AppRail.astro';
+import StatusPill from './StatusPill.astro';
+import FloatChip from './FloatChip.astro';
+
+interface Props { float?: boolean }
+const { float = true } = Astro.props;
+
+const kpis = [
+  { label: 'ABB (6 mo)', value: '₹84,250', sub: 'Avg balance', tone: '' },
+  { label: 'Salary credit', value: '₹48,300', sub: '6 of 6 months', tone: '' },
+  { label: 'EMI obligations', value: '₹14,300', sub: 'FOIR input', tone: '' },
+  { label: 'Bounces', value: '2', sub: 'ECS · Jul, Sep', tone: 'text-rose-600' },
+];
+// ₹ thousands; Sep has a large round-figure cash deposit just before applying
+const months = [
+  { m: 'Apr', in: 58, out: 55 }, { m: 'May', in: 61, out: 57 }, { m: 'Jun', in: 59, out: 60 },
+  { m: 'Jul', in: 64, out: 62 }, { m: 'Aug', in: 60, out: 56 }, { m: 'Sep', in: 108, out: 61, spike: true },
+];
+const max = 112;
+const flagged = [
+  { date: '22 Sep', narr: 'CASH DEP SELF', amt: '+50,000', flag: 'Round figure', tone: 'warn' },
+  { date: '14 Jul', narr: 'IMPS / IN-OUT', amt: '+25,000', flag: 'Circular', tone: 'fail' },
+  { date: '05 Sep', narr: 'ACH RTN / EMI', amt: '−14,300', flag: 'EMI bounce', tone: 'fail' },
+  { date: '05 Jul', narr: 'ACH RTN / EMI', amt: '−14,300', flag: 'EMI bounce', tone: 'fail' },
+] as const;
+const checks = [
+  { label: 'PDF metadata', ok: true }, { label: 'Balance continuity', ok: true },
+  { label: 'Circular txns', ok: false, n: 1 }, { label: 'Round-figure deposits', ok: false, n: 1 },
+];
+---
+
+<div class="relative">
+  {float && (
+    <>
+      <FloatChip icon={Lock} tone="pass" title="Protected PDF unlocked" text="Sample Bank · 1,248 transactions" class="-top-12 right-8" />
+      <FloatChip icon={ShieldAlert} tone="fail" title="4 items need review" text="Before sanction" class="-bottom-10 left-6" />
+    </>
+  )}
+  <MockupFrame title="BSA · APP-2026-00418">
+    <div class="flex">
+      <AppRail icons={[LayoutDashboard, FileText, ShieldAlert, Upload, Download, Settings]} />
+      <div class="min-w-0 flex-1 space-y-3 bg-ink-50/70 p-3 @sm:p-4">
+        <!-- header -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="truncate text-[13px] font-bold text-ink-900">R. Sharma · Savings XXXX4821</p>
+            <p class="truncate text-[11px] text-ink-500">Sample Bank · 01 Apr – 30 Sep 2026</p>
+          </div>
+          <div class="flex shrink-0 items-center gap-1.5">
+            <StatusPill tone="pass"><Check size={10} stroke-width={3} />Analysed</StatusPill>
+            <span class="hidden items-center gap-1 rounded-md bg-brand-600 px-2 py-1 text-[10px] font-semibold text-white @sm:inline-flex"><Download size={11} />Excel</span>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-2 gap-2 @lg:grid-cols-4">
+          {kpis.map((k) => (
+            <div class="rounded-lg bg-white p-2.5 ring-1 ring-ink-100">
+              <p class="text-[9.5px] font-semibold tracking-wide text-ink-400 uppercase">{k.label}</p>
+              <p class={`mt-0.5 text-[15px] font-extrabold text-ink-900 tabular-nums ${k.tone}`}>{k.value}</p>
+              <p class="truncate text-[10px] text-ink-500">{k.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- chart + checks -->
+        <div class="grid gap-2 @lg:grid-cols-[1fr_9.5rem]">
+          <div class="rounded-lg bg-white p-3 ring-1 ring-ink-100">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-bold text-ink-900">Monthly inflow vs outflow</p>
+              <span class="flex items-center gap-2.5 text-[9.5px] text-ink-500">
+                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-sm bg-brand-500"></span>In</span>
+                <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-sm bg-ink-200"></span>Out</span>
+              </span>
+            </div>
+            <div class="relative mt-3 h-28">
+              <div class="pointer-events-none absolute inset-0 flex flex-col justify-between" aria-hidden="true">
+                {[0, 1, 2, 3].map(() => <span class="border-t border-dashed border-ink-100"></span>)}
+              </div>
+              <div class="relative flex h-full items-end justify-between gap-2 px-1">
+                {months.map((d, i) => (
+                  <div class="flex h-full flex-1 items-end justify-center gap-[3px]">
+                    <span class={`animate-bar w-full max-w-3.5 rounded-t-[3px] ${d.spike ? 'bg-amber-500' : 'bg-brand-500'}`} style={`--h: ${(d.in / max) * 100}%; animation-delay: ${i * 70}ms`}></span>
+                    <span class="animate-bar w-full max-w-3.5 rounded-t-[3px] bg-ink-200" style={`--h: ${(d.out / max) * 100}%; animation-delay: ${i * 70 + 40}ms`}></span>
+                  </div>
+                ))}
+              </div>
+              <span class="absolute -top-1 right-0 rounded bg-amber-50 px-1 text-[9px] font-semibold text-amber-700 ring-1 ring-amber-200">Spike before applying</span>
+            </div>
+            <div class="mt-1.5 flex justify-between px-1 text-[9.5px] text-ink-400">
+              {months.map((d) => <span class="flex-1 text-center">{d.m}</span>)}
+            </div>
+          </div>
+          <div class="hidden rounded-lg bg-white p-3 ring-1 ring-ink-100 @lg:block">
+            <p class="text-[11px] font-bold text-ink-900">Fraud checks</p>
+            <ul class="mt-2 space-y-2">
+              {checks.map((c) => (
+                <li class="flex items-center justify-between gap-1 text-[10px] text-ink-600">
+                  <span class="truncate">{c.label}</span>
+                  {c.ok
+                    ? <span class="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-600"><Check size={10} stroke-width={3} /></span>
+                    : <span class="grid h-4 min-w-4 shrink-0 place-items-center rounded-full bg-rose-100 px-1 text-[9px] font-bold text-rose-600">{c.n}</span>}
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 border-t border-ink-100 pt-2 text-[9.5px] leading-snug text-ink-400">Salary credited 1st–3rd every month</p>
+          </div>
+        </div>
+
+        <!-- flagged table -->
+        <div class="overflow-hidden rounded-lg bg-white ring-1 ring-ink-100">
+          <div class="flex items-center justify-between border-b border-ink-100 px-3 py-2">
+            <p class="text-[11px] font-bold text-ink-900">Flagged transactions</p>
+            <span class="flex items-center gap-1 text-[10px] font-semibold text-rose-600"><CircleAlert size={11} />4 to review</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[10.5px] @sm:min-w-[19rem]">
+              <thead class="bg-ink-50 text-left text-[9.5px] tracking-wide text-ink-400 uppercase">
+                <tr><th class="px-3 py-1.5 font-semibold">Date</th><th class="hidden px-2 py-1.5 font-semibold @sm:table-cell">Narration</th><th class="px-2 py-1.5 text-right font-semibold">₹</th><th class="px-3 py-1.5 text-right font-semibold">Flag</th></tr>
+              </thead>
+              <tbody class="divide-y divide-ink-100">
+                {flagged.map((r) => (
+                  <tr>
+                    <td class="px-3 py-1.5 whitespace-nowrap text-ink-500">{r.date}</td>
+                    <td class="hidden max-w-[9rem] truncate px-2 @sm:table-cell py-1.5 font-mono text-[9.5px] text-ink-700 @lg:max-w-[13rem]">{r.narr}</td>
+                    <td class={`px-2 py-1.5 text-right font-semibold whitespace-nowrap tabular-nums ${r.amt.startsWith('+') ? 'text-ink-900' : 'text-rose-600'}`}>{r.amt}</td>
+                    <td class="px-3 py-1.5 text-right"><StatusPill tone={r.tone}>{r.flag}</StatusPill></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </MockupFrame>
+</div>
