@@ -1,41 +1,19 @@
 ---
-import { Mail, Phone, MapPin, Clock, Link, MessageSquareText, CalendarCheck, FileText } from '@lucide/astro';
+import { PhoneCall, MessageCircle } from '@lucide/astro';
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/ui/PageHero.astro';
-import Section from '../components/ui/Section.astro';
-import Steps from '../components/ui/Steps.astro';
-import Faq from '../components/ui/Faq.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 import ContactForm from '../components/company/ContactForm.astro';
-import { site, contact, href, cta } from '../data/site';
+import { contact, cta } from '../data/site';
 import { breadcrumbList } from '../data/schema';
 
 const crumbs = [{ label: 'Contact' }];
-
-// Only real channels render. Email, phone and LinkedIn stay hidden while they're placeholders.
-const details = [
-  contact.email && { icon: Mail, label: 'Email', value: contact.email, link: `mailto:${contact.email}` },
-  contact.phone && { icon: Phone, label: 'Phone', value: contact.phone, link: contact.phoneHref },
-  contact.linkedin && { icon: Link, label: 'LinkedIn', value: 'Manka on LinkedIn', link: contact.linkedin },
-  { icon: MapPin, label: 'Location', value: site.location, link: null },
-  { icon: Clock, label: 'Hours', value: 'Indian working hours (IST)', link: null },
-].filter((d): d is { icon: any; label: string; value: string; link: string | null } => Boolean(d));
-const hasDirect = Boolean(contact.email || contact.phone);
+const whatsapp = contact.phone ? `https://wa.me/${contact.phone.replace(/\D/g, '')}` : null;
 
 const next = [
-  { icon: MessageSquareText, title: 'We call you back', text: 'An engineer calls you back within one working day, at a time that suits you.' },
-  { icon: CalendarCheck, title: 'A 30-minute call', text: 'We go through the problem, the people using it and any deadline. No slides, no sales script.' },
-  { icon: FileText, title: 'A written scope and quote', text: 'Scope, timeline and one fixed price in ₹, or a plain “this isn’t a fit” and a pointer elsewhere.' },
+  'We call you back within one working day.',
+  'A free 30-minute call with an engineer.',
+  'A written scope and one fixed price in ₹.',
 ];
-
-const faqs = [
-  { q: 'Is the first call really free?', a: 'Yes. The first conversation is to understand your problem and tell you whether we can help. There is no charge and no obligation.' },
-  { q: 'Do you work with small businesses?', a: 'Yes. Small teams are a good fit. For smaller budgets we often suggest starting with one of our products or a tightly scoped first phase.' },
-  { q: 'Who owns the code you build for us?', a: 'For custom builds, you do. Source code and infrastructure accounts are handed over to you, and that is written into the contract. Products are licensed, and your data is always yours.' },
-  { q: 'Can you work with our existing systems?', a: 'Usually, yes. Connecting new tools to what you already use is a core part of every build: your LOS, accounting software, payroll, bureau APIs or spreadsheets.' },
-  { q: 'Do you sign an NDA?', a: 'Yes, happily, before you share anything sensitive. Just mention it in your message.' },
-];
-
-const link = 'font-semibold text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-600';
 ---
 
 <Base
@@ -43,74 +21,63 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
   description="Book a free 30-minute call with a Manka engineer about a CRM, HR system, website, data project or lending tool. We aim to reply within one working day."
   schema={breadcrumbList(crumbs, '/contact/')}
 >
-  <PageHero
-    title="Book a free 30‑minute call."
-    highlight="30‑minute call."
-    intro="Leave your name and mobile number. An engineer calls you back, usually within one working day."
-    breadcrumbs={crumbs}
-  />
-
-  <section class="relative bg-ink-50 pb-20 lg:pb-28">
-    <div class="container-page relative -mt-6 grid sm:-mt-10 gap-8 lg:-mt-14 lg:grid-cols-[1.45fr_1fr] lg:gap-10">
-      <!-- Form -->
-      <div class="reveal self-start rounded-3xl bg-white p-5 shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:p-8 lg:p-10">
-        <h2 class="text-2xl font-extrabold sm:text-3xl" data-cf-title>{cta.call}</h2>
-        <p class="mt-2 text-ink-600">Takes 20 seconds. We’ll call you back.</p>
-        <div class="mt-8">
-          <ContactForm />
-        </div>
-      </div>
-
-      <!-- Details -->
-      <aside class="space-y-6" aria-label="Contact details">
-        <div class="reveal relative overflow-hidden rounded-3xl bg-ink-950 p-6 text-white sm:p-8" style="--d: 100ms">
-          <div class="bg-grid pointer-events-none absolute inset-0 opacity-70"></div>
-          <div class="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-brand-600/40 blur-3xl"></div>
-          <div class="relative">
-            <h2 class="text-xl text-white">{hasDirect ? 'Reach us directly' : 'Good to know'}</h2>
-            <ul class="mt-6 space-y-3">
-              {details.map((d) => (
-                <li>
-                  {d.link ? (
-                    <a href={d.link} class="group flex items-center gap-4 rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10 transition hover:bg-white/[0.08] hover:ring-white/20">
-                      <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-brand-200 ring-1 ring-white/15"><d.icon size={19} aria-hidden="true" /></span>
-                      <span class="min-w-0">
-                        <span class="block text-xs font-semibold tracking-[0.14em] text-ink-400 uppercase">{d.label}</span>
-                        <span class="mt-0.5 block truncate font-semibold text-white">{d.value}</span>
-                      </span>
-                    </a>
-                  ) : (
-                    <div class="flex items-center gap-4 rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10">
-                      <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-brand-200 ring-1 ring-white/15"><d.icon size={19} aria-hidden="true" /></span>
-                      <span>
-                        <span class="block text-xs font-semibold tracking-[0.14em] text-ink-400 uppercase">{d.label}</span>
-                        <span class="mt-0.5 block font-semibold text-white">{d.value}</span>
-                      </span>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <p class="mt-6 rounded-2xl bg-white/[0.06] p-4 text-sm leading-relaxed text-ink-100 ring-1 ring-white/10">
-              We aim to reply to every request within one working day.
-            </p>
-          </div>
-        </div>
-
-        <div class="reveal rounded-3xl bg-white p-6 ring-1 ring-ink-100 sm:p-8" style="--d: 180ms">
-          <h2 class="mb-6 text-xl">What happens next</h2>
-          <Steps vertical steps={next} />
-        </div>
-      </aside>
+  <section class="relative overflow-hidden bg-ink-950 text-white">
+    <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
+    <div class="pointer-events-none absolute -top-40 -right-32 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
+    <div class="container-page relative pt-4 pb-16 sm:pt-6 sm:pb-20">
+      <Breadcrumbs items={crumbs} class="mb-3" />
+      <h1 class="text-3xl leading-tight font-extrabold text-white sm:text-4xl lg:text-5xl">
+        Talk to an <span class="text-gradient-saffron">engineer.</span>
+      </h1>
+      <p class="mt-3 max-w-3xl text-base leading-relaxed text-ink-300 sm:text-lg">
+        Leave your name and mobile number. We call you back, usually within one working day.
+      </p>
     </div>
   </section>
 
-  <Section tone="light" eyebrow="FAQ" title="Before you book a call." align="center">
-    <div class="mx-auto max-w-3xl">
-      <Faq items={faqs} />
+  <section class="bg-ink-50 pb-12 lg:pb-16">
+    <div class="container-page">
+      <div class={`relative -mt-10 grid overflow-hidden rounded-3xl bg-white shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:-mt-12 ${contact.phone ? 'lg:grid-cols-[1fr_24rem]' : ''}`}>
+        <div class="p-5 sm:p-8 lg:p-10">
+          <h2 class="text-xl font-extrabold sm:text-2xl" data-cf-title>{cta.call}</h2>
+          <div class="mt-5 sm:mt-6">
+            <ContactForm />
+          </div>
+        </div>
+
+        {contact.phone && (
+          <aside class="relative bg-ink-950 p-5 text-white sm:p-8 lg:p-10" aria-labelledby="call-title">
+            <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
+            <div class="relative">
+              <h2 id="call-title" class="text-sm font-semibold text-ink-300">Prefer to talk now?</h2>
+              <a
+                href={contact.phoneHref}
+                class="mt-1 inline-flex min-h-11 items-center rounded-lg text-2xl font-extrabold tracking-tight text-white transition hover:text-brand-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
+              >{contact.phone}</a>
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <a href={contact.phoneHref} class="btn btn-primary">
+                  <PhoneCall size={16} aria-hidden="true" />Call now
+                </a>
+                {whatsapp && (
+                  <a href={whatsapp} target="_blank" rel="noopener" class="btn bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15">
+                    <MessageCircle size={16} aria-hidden="true" />WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+                  </a>
+                )}
+              </div>
+
+              <h2 class="mt-8 border-t border-white/10 pt-6 text-sm font-semibold text-white">What happens next</h2>
+              <ol class="mt-4 space-y-3 text-sm leading-snug text-ink-300">
+                {next.map((t, i) => (
+                  <li class="flex items-start gap-3">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-bold text-saffron-400 ring-1 ring-white/15" aria-hidden="true">{i + 1}</span>
+                    <span class="pt-0.5">{t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
+        )}
+      </div>
     </div>
-    <p class="reveal mt-10 text-center text-ink-600">
-      Prefer to read first? See <a href={href('/about/#how-we-work')} class={link}>how we work</a> or browse our <a href={href('/insights/')} class={link}>insights</a>.
-    </p>
-  </Section>
+  </section>
 </Base>
