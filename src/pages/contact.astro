@@ -22,7 +22,7 @@ const details = [
 const hasDirect = Boolean(contact.email || contact.phone);
 
 const next = [
-  { icon: MessageSquareText, title: 'We read and reply', text: 'An engineer reads your request and emails you within one working day with times for a call.' },
+  { icon: MessageSquareText, title: 'We call you back', text: 'An engineer calls you back within one working day, at a time that suits you.' },
   { icon: CalendarCheck, title: 'A 30-minute call', text: 'We go through the problem, the people using it and any deadline. No slides, no sales script.' },
   { icon: FileText, title: 'A written scope and quote', text: 'Scope, timeline and one fixed price in ₹, or a plain “this isn’t a fit” and a pointer elsewhere.' },
 ];
@@ -46,16 +46,16 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
   <PageHero
     title="Book a free 30‑minute call."
     highlight="30‑minute call."
-    intro="Tell us a little about the problem. An engineer reads it and replies, usually within one working day, with times for a call."
+    intro="Leave your name and mobile number. An engineer calls you back, usually within one working day."
     breadcrumbs={crumbs}
   />
 
   <section class="relative bg-ink-50 pb-20 lg:pb-28">
     <div class="container-page relative -mt-6 grid sm:-mt-10 gap-8 lg:-mt-14 lg:grid-cols-[1.45fr_1fr] lg:gap-10">
       <!-- Form -->
-      <div class="reveal rounded-3xl bg-white p-5 shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:p-8 lg:p-10">
+      <div class="reveal self-start rounded-3xl bg-white p-5 shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:p-8 lg:p-10">
         <h2 class="text-2xl font-extrabold sm:text-3xl" data-cf-title>{cta.call}</h2>
-        <p class="mt-2 text-ink-600">The more context you give, the more useful the call will be.</p>
+        <p class="mt-2 text-ink-600">Takes 20 seconds. We’ll call you back.</p>
         <div class="mt-8">
           <ContactForm />
         </div>

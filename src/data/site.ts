@@ -16,7 +16,7 @@ export const site = {
     'Manka Commerce & Consultancy builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip verification for growing businesses.',
   // The only public contact detail is the mobile number (owner's choice: no email, LinkedIn,
   // CIN or address on the site). TODO: real number before going live. Read via `contact`.
-  phone: '+91 00000 00000',
+  phone: '+91 95871 13160',
   email: '',
   location: 'India',
   linkedin: '',
