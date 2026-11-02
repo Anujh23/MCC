@@ -107,7 +107,7 @@ export const industries: NavItem[] = [
 
 export const company: NavItem[] = [
   { title: 'About Us', slug: 'about', blurb: 'Who we are and how we work.', icon: Info },
-  { title: 'Careers', slug: 'careers', blurb: 'Build products that ship.', icon: Briefcase },
+  { title: 'Careers', slug: 'careers', blurb: 'No open roles right now.', icon: Briefcase },
   { title: 'Insights', slug: 'insights', blurb: 'Notes from the work.', icon: Newspaper },
   { title: 'Contact', slug: 'contact', blurb: 'Talk to an engineer, not a salesperson.', icon: Mail },
 ];
@@ -125,7 +125,6 @@ export const interests: Interest[] = [
   ...services.map((s) => ({ value: s.slug, label: s.title, kind: 'service' as const })),
   ...products.map((p) => ({ value: p.slug, label: p.title, kind: 'product' as const })),
   { value: 'lending-stack', label: 'Lending stack (BSA + Payslip Checker + CRM)', kind: 'other' },
-  { value: 'careers', label: 'Careers', kind: 'other' },
   { value: 'other', label: 'Something else', kind: 'other' },
 ];
 
