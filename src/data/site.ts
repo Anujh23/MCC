@@ -14,11 +14,12 @@ export const site = {
   tagline: 'We build the software your business runs on.',
   description:
     'Manka Commerce & Consultancy builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip verification for growing businesses.',
-  // TODO: replace with real details before going live. Read them through `contact`, never directly.
-  email: 'hello@yourdomain.com',
+  // The only public contact detail is the mobile number (owner's choice: no email, LinkedIn,
+  // CIN or address on the site). TODO: real number before going live. Read via `contact`.
   phone: '+91 00000 00000',
+  email: '',
   location: 'India',
-  linkedin: '#',
+  linkedin: '',
   // Free key from https://web3forms.com (contact form posts there, works on GitHub Pages)
   formAccessKey: 'YOUR_WEB3FORMS_ACCESS_KEY',
 };

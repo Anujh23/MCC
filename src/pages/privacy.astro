@@ -1,6 +1,6 @@
 ---
 // TEMPLATE: needs review by a legal professional before launch.
-// Bracketed items like [Grievance Officer name] must be filled in.
+// Bracketed items like [hosting provider] must be filled in.
 import LegalPage from '../components/company/LegalPage.astro';
 import { site, contact, href, contactHref } from '../data/site';
 
@@ -18,7 +18,7 @@ const sections = [
   { id: 'cookies', title: 'Cookies and third-party services' },
   { id: 'children', title: 'Children' },
   { id: 'changes', title: 'Changes to this policy' },
-  { id: 'grievance', title: 'Grievance officer and contact' },
+  { id: 'grievance', title: 'Contact' },
 ];
 ---
 
@@ -34,7 +34,6 @@ const sections = [
     <p>
       This website is operated by {site.name} (“Manka”, “we”, “us”), based in {site.location}. For personal data we collect through this website and our own enquiries, we act as the <strong>Data Fiduciary</strong> under the Digital Personal Data Protection Act, 2023 (the “DPDP Act”).
     </p>
-    <p>[Registered legal name, registration number (e.g. CIN) and registered address to be added.]</p>
   </section>
 
   <section id="scope">
@@ -88,7 +87,7 @@ const sections = [
     <ul>
       <li><strong>Form handling:</strong> our contact form is delivered by Web3Forms, which forwards your message to our inbox.</li>
       <li><strong>Website hosting:</strong> [hosting provider], which serves this website.</li>
-      <li><strong>Web fonts:</strong> fonts on this site are loaded from Google Fonts, which receives your IP address when the font files load.</li>
+      <li><strong>Web fonts:</strong> fonts are served from this website itself, so no third-party font service receives your IP address.</li>
       <li><strong>Email and productivity tools:</strong> [email provider and other tools].</li>
       <li><strong>Professional advisers:</strong> accountants, auditors and lawyers, where needed.</li>
     </ul>
@@ -153,14 +152,11 @@ const sections = [
   </section>
 
   <section id="grievance">
-    <h2>14. Grievance officer and contact</h2>
-    <p>For questions, requests or complaints about personal data, contact:</p>
+    <h2>14. Contact</h2>
     <p>
-      <strong>[Grievance Officer name]</strong><br />
-      {site.name}<br />
-      Email: {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : '[Email address]'}<br />
-      Phone: {contact.phone ?? '[Phone number]'}<br />
-      [Postal address]
+      For questions, requests or complaints about your personal data, {contact.phone
+        ? <>call us on <a href={contact.phoneHref}>{contact.phone}</a> or use our <a href={contactHref()}>contact form</a>.</>
+        : <>use our <a href={contactHref()}>contact form</a>.</>}
     </p>
     <p>We aim to acknowledge requests promptly and resolve them within the time required by law. See also our <a href={href('/terms/')}>terms of use</a>.</p>
   </section>
