@@ -21,7 +21,6 @@ npm run build    # outputs to dist/
 | Logo | `src/components/Logo.astro`, `public/favicon.svg` |
 | Header / footer | `src/components/` |
 | Page shell + SEO tags | `src/layouts/Base.astro` |
-| Brand guidelines page | `/brand` (not in nav, noindex) |
 
 ## Deploy
 

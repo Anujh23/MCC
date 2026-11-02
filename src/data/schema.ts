@@ -17,9 +17,7 @@ export const organization = () => ({
   logo: abs('/logo-512.png'),
   description: site.description,
   areaServed: INDIA,
-  ...(contact.email ? { email: contact.email } : {}),
   ...(contact.phone ? { telephone: contact.phone } : {}),
-  ...(contact.linkedin ? { sameAs: [contact.linkedin] } : {}),
 });
 
 export const website = () => ({

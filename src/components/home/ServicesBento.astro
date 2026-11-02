@@ -3,7 +3,7 @@ import { ArrowRight } from '@lucide/astro';
 import Section from '../ui/Section.astro';
 import IconBadge from '../ui/IconBadge.astro';
 import SampleBadge from '../ui/SampleBadge.astro';
-import { services, href, cta } from '../../data/site';
+import { services, href } from '../../data/site';
 
 const bySlug = Object.fromEntries(services.map((s) => [s.slug, s]));
 const featured = bySlug['data-analytics'];
@@ -25,7 +25,7 @@ const pts = mis.map((v, i) => `${(i / (mis.length - 1)) * 300},${100 - v}`).join
   eyebrow="Services"
   title="Five services, one team that knows lending."
   highlight="knows lending."
-  intro="From a company website to a lending workflow with bank statement checks built in. Each one scoped, priced and built by the same engineers you speak to."
+  intro="From a company website to a full lending workflow, built by the engineers you speak to."
   class="max-sm:py-14"
 >
   <!-- Below sm: one row per service -->
@@ -53,14 +53,14 @@ const pts = mis.map((v, i) => `${(i / (mis.length - 1)) * 300},${100 - v}`).join
         <div class="flex flex-col lg:w-[44%]">
           <IconBadge icon={featured.icon} tone="dark" size="lg" />
           <h3 class="mt-6 text-2xl font-extrabold text-white sm:text-3xl">{featured.title}</h3>
-          <p class="mt-3 leading-relaxed text-ink-300">{featured.blurb} Disbursal, collections, sales and HR numbers pulled from the systems you already have, refreshed on a schedule.</p>
+          <p class="mt-3 leading-relaxed text-ink-300">{featured.blurb}</p>
           <ul class="mt-5 flex flex-wrap gap-2">
             {['MIS reports', 'Metabase', 'Data pipelines', 'Portfolio tracking'].map((t) => (
               <li class="rounded-full bg-white/[0.06] px-3 py-1 text-xs font-medium text-ink-200 ring-1 ring-white/10">{t}</li>
             ))}
           </ul>
-          <span class="mt-auto inline-flex items-center gap-1.5 pt-8 text-sm font-semibold text-brand-300 transition group-hover:text-white">
-            {cta.explore(featured.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
+          <span class="mt-auto pt-8" aria-hidden="true">
+            <span class="grid h-10 w-10 place-items-center rounded-full text-ink-300 ring-1 ring-white/20 transition group-hover:bg-brand-600 group-hover:text-white group-hover:ring-brand-600"><ArrowRight size={18} /></span>
           </span>
         </div>
 

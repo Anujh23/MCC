@@ -1,5 +1,5 @@
 ---
-// Shared layout for Privacy and Terms: compact dark header with the draft-template notice,
+// Shared layout for Privacy and Terms: compact dark header with the draft notice,
 // sticky table of contents and readable prose. Put <section id="..."> blocks in the slot
 // whose ids match `sections`.
 import { TriangleAlert } from '@lucide/astro';
@@ -29,8 +29,7 @@ const { title, description, intro, updated, sections } = Astro.props;
       <div class="mt-6 flex max-w-3xl gap-3 rounded-2xl bg-saffron-50 p-4 text-sm leading-relaxed text-ink-900 ring-1 ring-saffron-100 sm:p-5" role="note">
         <TriangleAlert size={20} class="mt-0.5 shrink-0 text-saffron-700" aria-hidden="true" />
         <p>
-          <strong class="font-semibold">Draft template, not yet reviewed by a lawyer.</strong>{' '}
-          Bracketed items are placeholders and will be completed before launch.
+          <strong class="font-semibold">Draft, not yet reviewed by a lawyer.</strong>
         </p>
       </div>
     </div>

@@ -15,11 +15,8 @@ export const site = {
   description:
     'Manka Commerce & Consultancy builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip verification for growing businesses.',
   // The only public contact detail is the mobile number (owner's choice: no email, LinkedIn,
-  // CIN or address on the site). TODO: real number before going live. Read via `contact`.
+  // CIN, legal name or address on the site). Read via `contact`.
   phone: '+91 95871 13160',
-  email: '',
-  location: 'India',
-  linkedin: '',
   // Free key from https://web3forms.com (contact form posts there, works on GitHub Pages)
   formAccessKey: 'YOUR_WEB3FORMS_ACCESS_KEY',
 };
@@ -29,10 +26,8 @@ const isPlaceholder = (v?: string | null) => !v || v === '#' || /yourdomain|0{5}
 const real = (v: string) => (isPlaceholder(v) ? null : v);
 
 export const contact = {
-  email: real(site.email),
   phone: real(site.phone),
   phoneHref: real(site.phone) ? `tel:${site.phone.replace(/\s/g, '')}` : null,
-  linkedin: real(site.linkedin),
   formKey: real(site.formAccessKey),
 };
 
@@ -73,15 +68,7 @@ export const cta = {
   demo: 'Request a demo',
   api: 'See the API',
   how: 'How it works',
-  apiDocs: 'Request API docs',
-  model: 'Discuss this model',
-  ask: 'Ask an engineer',
-  email: 'Email us',
-  cv: 'Send your CV',
   introduce: 'Introduce yourself',
-  allServices: 'See all services',
-  allProducts: 'See all products',
-  allIndustries: 'See all industries',
   explore: (name: string) => `Explore ${name}`,
 };
 
@@ -103,11 +90,11 @@ export const services: NavItem[] = [
 ];
 
 export const products: NavItem[] = [
-  { title: 'Manka CRM', short: 'Manka CRM', slug: 'crm', blurb: 'Leads, follow-ups and field teams on one screen.', icon: SquareKanban },
+  { title: 'CRM', short: 'CRM', slug: 'crm', blurb: 'Leads, follow-ups and field teams on one screen.', icon: SquareKanban },
   { title: 'BSA: Bank Statement Analyser', short: 'BSA', slug: 'bank-statement-analyser', blurb: 'Parse statements, score cash flow and flag bounces before sanction.', icon: Landmark },
   { title: 'Payslip Checker', short: 'Payslip Checker', slug: 'payslip-checker', blurb: 'Verify salary slips and catch tampered documents before you lend.', icon: FileCheck },
   { title: 'Maps API', short: 'Maps API', slug: 'maps-api', blurb: 'Geocoding, distance and territory mapping for field operations.', icon: MapPin },
-  { title: 'Manka HRMS', short: 'Manka HRMS', slug: 'hrms', blurb: 'Attendance, leave and Indian payroll, set up with your HR team.', icon: IdCard },
+  { title: 'HRMS', short: 'HRMS', slug: 'hrms', blurb: 'Attendance, leave and Indian payroll, set up with your HR team.', icon: IdCard },
 ];
 
 export const industries: NavItem[] = [
@@ -137,18 +124,18 @@ export type Interest = { value: string; label: string; kind: 'service' | 'produc
 export const interests: Interest[] = [
   ...services.map((s) => ({ value: s.slug, label: s.title, kind: 'service' as const })),
   ...products.map((p) => ({ value: p.slug, label: p.title, kind: 'product' as const })),
-  { value: 'lending-stack', label: 'Lending stack (BSA + Payslip Checker + Manka CRM)', kind: 'other' },
+  { value: 'lending-stack', label: 'Lending stack (BSA + Payslip Checker + CRM)', kind: 'other' },
   { value: 'careers', label: 'Careers', kind: 'other' },
   { value: 'other', label: 'Something else', kind: 'other' },
 ];
 
 // The 5-step engagement process. Used on home and the services index via ui/Steps.
 export const howWeWork = [
-  { icon: PhoneCall, title: 'Free scoping call', text: 'Thirty minutes with an engineer on the problem, your users and the systems you already run.' },
-  { icon: FileText, title: 'Written scope and quote', text: 'One fixed price in ₹ for project work, GST shown separately. Ongoing teams get a monthly rate agreed in writing.' },
-  { icon: CodeXml, title: 'Build with regular demos', text: 'Short cycles with a demo at the end of each, on a staging link you can try yourself. Changes are quoted before they’re done.' },
-  { icon: Rocket, title: 'Launch and handover', text: 'Data migration, user training and go-live. For custom builds, you get the code and the handover docs.' },
-  { icon: LifeBuoy, title: 'Support', text: 'Bug-fix support after launch, with the length agreed up front. After that, an AMC is available.' },
+  { icon: PhoneCall, title: 'Free call', text: 'Thirty minutes with an engineer on the problem and the systems you already run.' },
+  { icon: FileText, title: 'Written quote', text: 'Scope, timeline and one fixed price in ₹, before any work starts.' },
+  { icon: CodeXml, title: 'Build with demos', text: 'Short cycles, each ending in a demo on a link you can try yourself.' },
+  { icon: Rocket, title: 'Launch', text: 'Data migration, training and go-live.' },
+  { icon: LifeBuoy, title: 'Support', text: 'The same team fixes bugs and makes changes after launch.' },
 ];
 
 // Cards for ui/RelatedCards from product and service slugs, in the order given.

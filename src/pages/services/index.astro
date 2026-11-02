@@ -1,10 +1,9 @@
 ---
-import { ArrowRight, Headset, FileText, MonitorPlay, FolderGit2 } from '@lucide/astro';
+import { ArrowRight } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/ui/PageHero.astro';
 import Section from '../../components/ui/Section.astro';
 import CtaBand from '../../components/ui/CtaBand.astro';
-import IconBadge from '../../components/ui/IconBadge.astro';
 import Steps from '../../components/ui/Steps.astro';
 import ServiceMap from '../../components/services/ServiceMap.astro';
 import ServicesBento from '../../components/services/ServicesBento.astro';
@@ -18,12 +17,6 @@ const description =
 const crumbs = [{ label: 'Services' }];
 const path = '/services/';
 
-const promises = [
-  { icon: Headset, title: 'An engineer on the first call', text: 'The person scoping your project understands how it will be built, so estimates are grounded.' },
-  { icon: FileText, title: 'Scope and quote in writing', text: 'What’s in, what’s out, the timeline and the number, before any work starts.' },
-  { icon: MonitorPlay, title: 'Working demos, not status reports', text: 'You see real software on a staging link at every milestone and can change course early.' },
-  { icon: FolderGit2, title: 'Code and docs handed over', text: 'For custom builds, the repository, the hosting accounts and the data are in your name, with docs your next developer can follow.' },
-];
 ---
 
 <Base
@@ -34,7 +27,7 @@ const promises = [
   <PageHero
     title="Websites to loan workflows, built by one accountable team"
     highlight="one accountable team"
-    intro="Websites, CRMs, HR and payroll, dashboards and custom integrations, built by one team that also builds lending products like bank statement analysis and payslip checks. Pick one service or connect them all."
+    intro="Websites, CRMs, HR and payroll, dashboards and integrations, from the team that builds our lending products."
     breadcrumbs={crumbs}
   >
     <Fragment slot="actions">
@@ -51,7 +44,6 @@ const promises = [
     eyebrow="What we do"
     title="Five services, each with depth behind it"
     highlight="depth behind it"
-    intro="Each service page covers what you get, how the project runs, the tools we use and the questions to ask first."
   >
     <ServicesBento />
   </Section>
@@ -60,34 +52,19 @@ const promises = [
     tone="dark"
     eyebrow="How we work"
     title="From first call to support, the same five steps"
-    intro="Every project gets its own dated plan once the scope is agreed."
   >
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 opacity-60"></div>
     <Steps tone="dark" steps={howWeWork} class="relative" />
-  </Section>
-
-  <Section eyebrow="What you can expect" title="How every engagement is run">
-    <ul class="grid gap-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-      {promises.map((p, i) => (
-        <li class="reveal flex gap-4 sm:block sm:rounded-2xl sm:bg-white sm:p-6 sm:ring-1 sm:ring-ink-100" style={`--d: ${i * 80}ms`}>
-          <IconBadge icon={p.icon} />
-          <div class="min-w-0">
-            <h3 class="text-lg font-bold sm:mt-5">{p.title}</h3>
-            <p class="mt-1.5 text-[0.95rem] leading-relaxed text-ink-600 sm:mt-2">{p.text}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
   </Section>
 
   <Section
     tone="muted"
     eyebrow="Engagement models"
     title="Three ways to work with us"
-    intro="Pick the model that fits the work. Every engagement gets a written quote after a scoping call."
+    intro="Every engagement starts with a written quote."
   >
     <EngagementModels />
   </Section>
 
-  <CtaBand secondary={{ label: cta.allIndustries, path: '/industries/' }} />
+  <CtaBand />
 </Base>

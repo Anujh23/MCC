@@ -25,7 +25,7 @@ const crumbs = [{ label: 'Products' }];
   <PageHero
     title="Ready-made software for lending, sales and HR"
     highlight="Ready-made software"
-    intro="Five products, built and ready to deploy. We're onboarding our first clients now. Use them as they are, connect them through the API, or have our engineers adapt them to your process."
+    intro="Five products, built and ready to deploy. We're onboarding our first clients now."
     breadcrumbs={crumbs}
     status={productStatus}
   >
@@ -52,7 +52,7 @@ const crumbs = [{ label: 'Products' }];
   </PageHero>
 
   <!-- Showcase -->
-  <Section class="max-sm:py-14" eyebrow="The line-up" title="Real software, not slideware" highlight="not slideware" intro="Each product below is shown with sample data, the way your team would see it on screen.">
+  <Section class="max-sm:py-14" eyebrow="The line-up" title="Real software, not slideware" highlight="not slideware" intro="Shown with sample data, the way your team would see it.">
     <div class="space-y-16 lg:space-y-28">
       {products.map((p, i) => {
         const c = productsContent[p.slug];
@@ -66,7 +66,6 @@ const crumbs = [{ label: 'Products' }];
               </div>
               <h3 class="mt-5 text-2xl font-extrabold sm:mt-6 sm:text-3xl">{p.title}</h3>
               <p class="mt-2 text-lg font-medium text-ink-900">{c.card.tagline}</p>
-              <p class="mt-3 hidden text-[17px] leading-relaxed text-ink-600 sm:block">{c.hero.intro}</p>
               <ul class="mt-5 space-y-2.5 sm:mt-6">
                 {c.card.bullets.map((b) => (
                   <li class="flex gap-3 text-ink-700">
@@ -79,7 +78,6 @@ const crumbs = [{ label: 'Products' }];
                 <a href={href(`/products/${p.slug}/`)} class="btn btn-primary group">
                   {cta.explore(p.short ?? p.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
                 </a>
-                <a href={contactHref(p.slug)} class="btn btn-ghost">{cta.demo}</a>
               </div>
             </div>
             <div class={`reveal min-w-0 ${flip ? 'lg:order-1' : ''}`} style="--d: 120ms">
@@ -99,7 +97,7 @@ const crumbs = [{ label: 'Products' }];
   </Section>
 
   <!-- Built for lenders -->
-  <Section tone="dark" id="lenders" class="max-sm:py-14" eyebrow="Built for lenders" title="One loan journey, four products, no re-keying" intro="BSA, Payslip Checker, Maps API and Manka CRM share data. A file moves from lead to disbursal with every check attached to it.">
+  <Section tone="dark" id="lenders" class="max-sm:py-14" eyebrow="Built for lenders" title="One loan journey, four products, no re-keying" intro="BSA, Payslip Checker, Maps API and our CRM share data, so every check stays on the file.">
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 -z-0"></div>
     <ol class="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
       <span class="absolute top-[2.15rem] right-[10%] left-[10%] hidden h-px bg-gradient-to-r from-brand-500/0 via-brand-400/60 to-saffron-500/60 lg:block" aria-hidden="true"></span>
@@ -120,14 +118,11 @@ const crumbs = [{ label: 'Products' }];
         </li>
       ))}
     </ol>
-    <p class="reveal relative mt-10 max-w-3xl text-ink-300">
-      Your credit policy stays in charge. The products gather and check the evidence; your team makes the decision. And for your own staff, <a href={href('/products/hrms/')} class="font-semibold text-white underline decoration-saffron-500/60 underline-offset-4 hover:decoration-saffron-400">Manka HRMS</a> runs attendance and payroll.
-    </p>
   </Section>
 
   <CtaBand
     title="Not sure which product fits?"
-    text="Tell us how your team works today. In 30 minutes an engineer will show you the relevant product with sample data and tell you what would need changing."
+    text="Tell us how your team works. An engineer will show you the right product in 30 minutes."
     primary={{ label: cta.demo }}
   />
 </Base>

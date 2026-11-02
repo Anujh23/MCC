@@ -40,7 +40,7 @@ If the borrower submits three payslips and a statement covering the same period,
 A slip from a company that does not exist, or that exists but could not plausibly employ this person at this salary, is a red flag. Useful public sources include:
 
 - The Ministry of Corporate Affairs company records, for registration status and the registered address.
-- The GST portal's taxpayer search, if a GSTIN is printed on the slip.
+- The tax department's public taxpayer search, if a tax registration number is printed on the slip.
 - EPFO's establishment search, to confirm that an employer deducting PF is actually registered with EPFO.
 
 These lookups can be automated or semi-automated and cached, since the same employers appear again and again across your files.

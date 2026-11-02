@@ -21,10 +21,10 @@ const [feature, ...rest] = items;
 const focus = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
 
 const common = [
-  { icon: IndianRupee, title: 'Indian money rails', text: 'UPI, NACH, GST invoices, PF and ESI are part of the design from day one, not bolted on later.' },
-  { icon: MessageCircle, title: 'WhatsApp-first teams', text: 'Alerts, reminders and confirmations go where your staff and customers already are.' },
-  { icon: MapPin, title: 'Field teams on the map', text: 'Geo-tagged visits, routes and territories for sales, verification and collections staff.' },
-  { icon: Plug, title: 'Works next to what you have', text: 'We integrate with your LMS, ERP, accounting or billing software before suggesting a replacement.' },
+  { icon: IndianRupee, title: 'Indian money rails', text: 'UPI, NACH, PF and ESI built in from day one.' },
+  { icon: MessageCircle, title: 'WhatsApp-first teams', text: 'Alerts go where your staff and customers already are.' },
+  { icon: MapPin, title: 'Field teams on the map', text: 'Geo-tagged visits, routes and territories.' },
+  { icon: Plug, title: 'Works next to what you have', text: 'We connect to your current software before suggesting a replacement.' },
 ];
 ---
 
@@ -36,7 +36,7 @@ const common = [
   <PageHero
     title="Software shaped by how your industry works"
     highlight="your industry"
-    intro="Lending has FOIR and bounce checks. Real estate has site visits. Clinics have token queues. We build around the specifics of your trade, starting with the work your team does every day."
+    intro="Lending has FOIR checks, real estate has site visits, clinics have token queues. We build around your trade."
     breadcrumbs={crumbs}
   >
     <Fragment slot="actions">
@@ -84,7 +84,6 @@ const common = [
     eyebrow="Who we build for"
     title="Five industries, each with its own workflow"
     highlight="its own workflow"
-    intro="Each page shows the problems common in each sector, the workflow we build around, and the products and services that fit."
   >
     <div class="grid gap-4 lg:grid-cols-6">
       <a
@@ -101,9 +100,7 @@ const common = [
             </div>
             <h3 class="mt-6 text-2xl font-extrabold text-white sm:text-3xl">{feature.title}</h3>
             <p class="mt-3 max-w-xl leading-relaxed text-ink-300">{feature.c.intro}</p>
-            <span class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-8">
-              {cta.explore(feature.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-            </span>
+            <ArrowRight size={20} class="mt-6 text-white transition group-hover:translate-x-0.5 sm:mt-8" aria-hidden="true" />
           </div>
           <ul class="hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3">
             {feature.c.deepDive!.items.map((d) => (
@@ -125,7 +122,6 @@ const common = [
         >
           <div class="flex items-start justify-between gap-3">
             <IconBadge icon={item.icon} size="lg" tone={i % 2 ? 'saffron' : 'brand'} />
-            <span class="hidden rounded-full bg-ink-50 px-2.5 py-1 text-[11px] font-semibold text-ink-600 ring-1 ring-ink-100 sm:inline">{item.c.pairs.length} problems mapped</span>
           </div>
           <h3 class="mt-6 text-xl font-bold">{item.title}</h3>
           <p class="mt-2 leading-relaxed text-ink-600">{item.c.intro}</p>
@@ -134,9 +130,7 @@ const common = [
               <li class="flex gap-2 text-sm text-ink-600"><Check size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{f}</li>
             ))}
           </ul>
-          <span class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 sm:mt-6">
-            {cta.explore(item.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-          </span>
+          <ArrowRight size={20} class="mt-5 text-brand-700 transition group-hover:translate-x-0.5 sm:mt-6" aria-hidden="true" />
         </a>
       ))}
     </div>
@@ -146,7 +140,6 @@ const common = [
     tone="muted"
     eyebrow="Across every industry"
     title="What carries over, whatever you do"
-    intro="Different trades, same Indian business realities. These show up in almost everything we build."
   >
     <ul class="grid gap-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
       {common.map((p, i) => (
@@ -159,11 +152,7 @@ const common = [
         </li>
       ))}
     </ul>
-    <p class="reveal mt-10 text-ink-600">
-      Don’t see your industry? Most of what we build (CRMs, HR, dashboards, integrations) works anywhere.
-      <a href={href('/services/')} class="inline-flex items-center gap-1 py-2 font-semibold text-brand-700 hover:underline">{cta.allServices}<ArrowRight size={15} aria-hidden="true" /></a>
-    </p>
   </Section>
 
-  <CtaBand secondary={{ label: cta.allServices, path: '/services/' }} />
+  <CtaBand />
 </Base>

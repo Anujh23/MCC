@@ -1,7 +1,7 @@
 ---
 import {
-  MessagesSquare, KeyRound, LifeBuoy, ClipboardCheck, FileText, ShieldCheck,
-  Sprout, Compass, Wrench, MessageSquareText, ArrowRight, UserRoundPlus, NotebookPen,
+  MessagesSquare, KeyRound, LifeBuoy, ClipboardCheck, ShieldCheck,
+  Compass, Wrench, MessageSquareText, ArrowRight, UserRoundPlus, NotebookPen,
 } from '@lucide/astro';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/ui/PageHero.astro';
@@ -23,33 +23,25 @@ const promises = [
 ];
 
 const values = [
-  {
-    icon: MessageSquareText,
-    title: 'Plain speaking',
-    text: 'We tell you what something will cost and how long it will take, including when the honest answer is “you don’t need to build this”. No jargon to hide behind.',
-  },
-  { icon: Compass, title: 'Learn the business first', text: 'We sit with the people who will use the software before we design it. The workflow decides the screens, not the other way round.' },
-  { icon: Wrench, title: 'Care for the boring parts', text: 'Readable code, tested flows, backups, sensible permissions. The parts nobody demos are the parts that keep you running.' },
-  { icon: ShieldCheck, title: 'Respect for data', text: 'Customer and financial data is handled as if it were ours: least-privilege access, no copies where they aren’t needed.' },
-  { icon: Sprout, title: 'Built to last', text: 'We pick proven, well-supported tools so the system is still maintainable in five years, by us or by anyone else.' },
+  { icon: MessageSquareText, title: 'Plain speaking', text: 'We tell you what it will cost and how long it will take, even when the answer is “don’t build this”.' },
+  { icon: Compass, title: 'Learn the business first', text: 'The workflow decides the screens, not the other way round.' },
+  { icon: Wrench, title: 'Care for the boring parts', text: 'Readable code, tests, backups and sensible permissions.' },
+  { icon: ShieldCheck, title: 'Respect for data', text: 'Least-privilege access, and no copies where they aren’t needed.' },
 ];
 
 const principles = [
-  { icon: MessagesSquare, title: 'Engineers talk to you directly', text: 'The person scoping your project is the person building it. Questions get answered by someone who knows the code, not relayed through an account manager.' },
-  { icon: ClipboardCheck, title: 'Fixed scope, written down', text: 'Before work starts you get a written scope: what is in, what is out, the timeline and the price. Changes are quoted and agreed in writing before they’re done.' },
-  { icon: KeyRound, title: 'You own the code and IP', text: 'For custom builds, the source code and infrastructure accounts are in your name, with no licence fee on software you paid us to build. Products are licensed. Your data is always yours.' },
-  { icon: FileText, title: 'Documented handover', text: 'On custom builds: setup guides, architecture notes and admin manuals, so your own team, or another vendor, can pick it up without us.' },
-  { icon: LifeBuoy, title: 'Support after launch', text: 'Bug-fix support after launch is part of every project scope, with the length agreed up front. After that, an AMC is available.' },
+  { icon: MessagesSquare, title: 'Engineers talk to you directly', text: 'The person scoping your project is the person building it.' },
+  { icon: ClipboardCheck, title: 'A written quote', text: 'Scope, timeline and price before work starts. Changes are quoted first.' },
+  { icon: KeyRound, title: 'You own the code', text: 'On custom builds, the code and docs are handed over in full.' },
+  { icon: LifeBuoy, title: 'Support after launch', text: 'The same team stays on to fix and improve it.' },
 ];
-
-const link = 'font-semibold text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-600';
 ---
 
 <Base title="About us" description={description} schema={breadcrumbList(crumbs, '/about/')}>
   <PageHero
     title="Engineers you talk to directly. Code you own."
     highlight="Code you own."
-    intro="Manka Commerce & Consultancy is an Indian IT services and products company. We build CRMs, HR systems, websites, data tools and lending software, and we stay on after launch to keep them running."
+    intro="We’re an Indian IT services and products company. We build CRMs, HR systems, websites, data tools and lending software, and stay on after launch."
     breadcrumbs={crumbs}
   >
     <Fragment slot="actions">
@@ -81,15 +73,8 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
           Software should fit the business, <span class="text-gradient-brand">not the other way round.</span>
         </h2>
         <div class="mt-8 space-y-5 text-lg leading-relaxed text-ink-600">
-          <p>
-            A lot of growing businesses in India run on a patchwork. A CRM half the team uses. Payroll in spreadsheets. Approvals on WhatsApp. Reports that take a day to put together every Monday. Off-the-shelf tools cover some of it, and people work around the rest.
-          </p>
-          <p>
-            Manka exists to close that gap. We build the CRM, HR, data and custom software a business needs, connect it to the tools already in place, and hand it over in a state your team can live with.
-          </p>
-          <p>
-            We focus on lending, where every loan file goes through the same slow checks and small savings add up across a portfolio. That is why we build our own products, like <a href={href('/products/bank-statement-analyser/')} class={link}>BSA (Bank Statement Analyser)</a> and <a href={href('/products/payslip-checker/')} class={link}>Payslip Checker</a>, alongside custom builds.
-          </p>
+          <p>Many growing businesses run on a patchwork: a CRM half the team uses, payroll in spreadsheets, approvals on WhatsApp.</p>
+          <p>We build the software that closes that gap, connect it to what you already use, and focus most on lending, with our own products like BSA (Bank Statement Analyser) and Payslip Checker.</p>
         </div>
       </div>
 
@@ -99,7 +84,7 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
           <Placeholder
             icon={NotebookPen}
             title="Founder story coming soon"
-            text="Owner to add: who started Manka, why, and the problem that started it. A photo and a short first-person note work best."
+            text="Owner to add: who started the company, why, and the problem that started it. A photo and a short first-person note work best."
             class="w-full bg-ink-50/60 lg:min-h-[22rem]"
           />
         </div>
@@ -122,9 +107,9 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
       </div>
       <div class="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-3">
         {[
-          { t: 'Fits the work', d: 'Designed around your real process, including the exceptions.' },
-          { t: 'Easy to reach', d: 'A direct line to the people who build and maintain it.' },
-          { t: 'Yours to keep', d: 'On custom builds, code, data and documentation are handed over in full.' },
+          { t: 'Fits the work', d: 'Designed around your real process.' },
+          { t: 'Easy to reach', d: 'A direct line to the people who build it.' },
+          { t: 'Yours to keep', d: 'Code and docs handed over on custom builds.' },
         ].map((x, i) => (
           <div class="reveal card-dark text-center sm:text-left" style={`--d: ${i * 100}ms`}>
             <p class="font-semibold text-white">{x.t}</p>
@@ -136,11 +121,11 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
   </section>
 
   <!-- Values (bento) -->
-  <Section tone="muted" eyebrow="What we value" title="Five things we won’t trade away.">
+  <Section tone="muted" eyebrow="What we value" title="Four things we won’t trade away.">
     <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {values.map((v, i) => (
         i === 0 ? (
-          <div class="reveal relative overflow-hidden rounded-2xl bg-brand-700 p-8 text-white md:col-span-2 lg:p-10" style={`--d: ${i * 80}ms`}>
+          <div class="reveal relative overflow-hidden rounded-2xl bg-brand-700 p-8 text-white md:col-span-2 lg:col-span-3 lg:p-10" style={`--d: ${i * 80}ms`}>
             <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
             <div class="pointer-events-none absolute -right-16 -bottom-20 h-64 w-64 rounded-full bg-saffron-500/25 blur-3xl"></div>
             <div class="relative">
@@ -165,11 +150,7 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
       <div class="reveal lg:sticky lg:top-28 lg:self-start">
         <p class="eyebrow">How we work</p>
-        <h2 class="mt-3 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Five promises, written into every project.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-ink-600">
-          These aren’t slogans. They go into the proposal and the contract, so you can hold us to them.
-        </p>
-        <a href={contactHref()} class="btn btn-primary mt-8">{cta.call}<ArrowRight size={16} aria-hidden="true" /></a>
+        <h2 class="mt-3 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Four promises, written into every project.</h2>
       </div>
       <ul class="space-y-4">
         {principles.map((p, i) => (
@@ -189,14 +170,11 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
   <Section tone="dark" eyebrow="What we do" title="Services for what’s unique. Products for what isn’t.">
     <div class="grid gap-6 lg:grid-cols-2">
       {[
-        { label: 'Services', base: '/services', items: services, note: 'Built to your spec. You own the code.' },
-        { label: 'Products', base: '/products', items: products, note: 'Ready to deploy, configurable to your process.' },
+        { label: 'Services', base: '/services', items: services, note: 'Built to your spec.' },
+        { label: 'Products', base: '/products', items: products, note: 'Ready to deploy.' },
       ].map((group, gi) => (
         <div class="reveal rounded-3xl bg-white/[0.03] p-6 ring-1 ring-white/10 sm:p-8" style={`--d: ${gi * 120}ms`}>
-          <div class="flex items-baseline justify-between gap-4">
-            <h3 class="text-xl text-white">{group.label}</h3>
-            <a href={href(`${group.base}/`)} class="inline-flex items-center gap-1 py-2 text-sm font-semibold text-brand-300 hover:text-white">See all {group.label.toLowerCase()}<ArrowRight size={14} aria-hidden="true" /></a>
-          </div>
+          <h3 class="text-xl text-white">{group.label}</h3>
           <p class="mt-1 text-sm text-ink-400">{group.note}</p>
           <ul class="mt-6 divide-y divide-white/10">
             {group.items.map((item) => (
@@ -220,7 +198,7 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
   </Section>
 
   {flags.team && (
-    <Section tone="muted" eyebrow="The team" title="The people you’ll work with." intro="Profiles of the engineers and analysts behind Manka are on their way.">
+    <Section tone="muted" eyebrow="The team" title="The people you’ll work with." intro="Profiles of our engineers and analysts are on their way.">
       {/* TODO: real people only (name, role, photo, one line on their work). No stock photos or invented names. */}
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
@@ -232,5 +210,5 @@ const link = 'font-semibold text-brand-700 underline decoration-brand-200 underl
     </Section>
   )}
 
-  <CtaBand secondary={{ label: cta.allServices, path: '/services/' }} />
+  <CtaBand />
 </Base>

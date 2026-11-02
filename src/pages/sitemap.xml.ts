@@ -1,4 +1,4 @@
-// No-package sitemap. Indexable pages only: /brand/, /privacy/, /terms/ and 404 are noindex and stay out.
+// No-package sitemap. Indexable pages only: /privacy/, /terms/ and 404 are noindex and stay out.
 // Add a new top-level page to `pages` by hand.
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';

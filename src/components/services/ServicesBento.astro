@@ -2,7 +2,7 @@
 // Bento grid of all services for /services. CRM is the large dark tile.
 // Below sm the "included" lists drop out so each tile is a short row, not a tall card.
 import { ArrowRight, Check } from '@lucide/astro';
-import { services, href, cta } from '../../data/site';
+import { services, href } from '../../data/site';
 import { servicesContent } from '../../data/services-content';
 import IconBadge from '../ui/IconBadge.astro';
 import SampleBadge from '../ui/SampleBadge.astro';
@@ -37,9 +37,7 @@ const focus = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
             <li class="flex gap-2 text-sm text-ink-200"><Check size={16} class="mt-0.5 shrink-0 text-saffron-400" aria-hidden="true" />{i}</li>
           ))}
         </ul>
-        <span class="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-8">
-          {cta.explore(feature.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-        </span>
+        <ArrowRight size={20} class="mt-6 text-white transition group-hover:translate-x-0.5 sm:mt-8" aria-hidden="true" />
       </div>
       <div aria-hidden="true" class="hidden rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10 sm:block">
         <div class="grid grid-cols-3 gap-2">
@@ -100,9 +98,7 @@ const focus = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
           <li class="flex gap-2 text-sm text-ink-600"><Check size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{x}</li>
         ))}
       </ul>
-      <span class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 sm:mt-6">
-        {cta.explore(item.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-      </span>
+      <ArrowRight size={20} class="mt-5 text-brand-700 transition group-hover:translate-x-0.5 sm:mt-6" aria-hidden="true" />
     </a>
   ))}
 </div>

@@ -13,45 +13,45 @@ const details: Record<string, { label: string; headline: string; points: string[
     label: 'CRM',
     headline: 'Every lead, follow-up and field visit in one place.',
     points: [
-      'Leads from your website, calls and walk-ins land in one queue, auto-assigned by branch or product.',
-      'Daily follow-up lists and reminders, so no lead goes cold because someone forgot.',
-      'Stages that match your process, from first call to sanction and disbursal.',
+      'Leads from every source in one queue, auto-assigned.',
+      'Daily follow-up lists, so no lead goes cold.',
+      'Your stages, from first call to disbursal.',
     ],
   },
   'bank-statement-analyser': {
     label: 'BSA',
     headline: 'A six-month statement, summarised for credit.',
     points: [
-      'Upload PDF statements and get every transaction categorised: salary, EMI, UPI, cash, cheques.',
-      'Average bank balance, monthly credits and debits, and existing EMI outflow at a glance.',
-      'Flags cheque bounces, cash-deposit spikes and circular transactions for your credit team.',
+      'Every transaction categorised: salary, EMI, UPI, cash.',
+      'ABB, monthly cash flow and EMI outflow at a glance.',
+      'Flags bounces, cash spikes and circular transactions.',
     ],
   },
   'payslip-checker': {
     label: 'Payslip',
     headline: 'Catch an edited salary slip before you lend.',
     points: [
-      'Checks the arithmetic: gross, PF, PT, TDS and net pay have to add up.',
-      'Matches net pay against the salary credit in the applicant’s bank statement.',
-      'Looks for edits in fonts, layout and PDF metadata, and explains each flag in plain words.',
+      'Gross, PF, PT, TDS and net pay have to add up.',
+      'Net pay matched against the bank salary credit.',
+      'Flags edited fonts, layout and PDF metadata.',
     ],
   },
   'maps-api': {
     label: 'Maps API',
     headline: 'Distance, location and territory, as simple API calls.',
     points: [
-      'Turn Indian addresses into coordinates and PIN codes your systems can use.',
-      'Distance and travel time between branches, customers and field agents.',
-      'Draw territories and assign PIN codes to teams for visits and collections.',
+      'Indian addresses to coordinates and PIN codes.',
+      'Distance and travel time for field teams.',
+      'Territories by PIN code for visits and collections.',
     ],
   },
   hrms: {
     label: 'HRMS',
     headline: 'Attendance and leave that feed payroll directly.',
     points: [
-      'Attendance, shifts and leave, with approvals on the manager’s phone.',
-      'Monthly payroll with PF, ESI, PT and TDS worked out for you.',
-      'Employees download payslips and apply for leave themselves.',
+      'Attendance, shifts and leave, approved on the phone.',
+      'Payroll with PF, ESI, PT and TDS worked out.',
+      'Payslips and leave on the employee app.',
     ],
   },
 };
@@ -69,14 +69,14 @@ const mocks: Record<string, any> = {
   tone="muted"
   eyebrow="Products"
   title="Products built around FOIR, PF and PIN codes."
-  intro="Built and ready to deploy. Use them as they are, or have us customise them to your process."
+  intro="Ready to deploy, as they are or customised to your process."
   class="cv-auto max-sm:py-14"
 >
   <div class="reveal grid gap-6 lg:grid-cols-[19rem_1fr] lg:gap-8" data-tabs>
     <!-- Tab list: horizontal scroll on mobile, vertical on desktop -->
     <div
       role="tablist"
-      aria-label="Manka products"
+      aria-label="Products"
       aria-orientation="vertical"
       class="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [mask-image:linear-gradient(to_right,#000_80%,transparent)] [scrollbar-width:none] sm:mx-0 sm:px-0 lg:flex-col lg:overflow-visible lg:pb-0 lg:[mask-image:none] [&::-webkit-scrollbar]:hidden"
     >

@@ -1,32 +1,28 @@
 ---
-// Three ways to work with us. No prices; every card goes to the form, pre-filled with `interest`.
+// Three ways to work with us. No prices, no per-card buttons (the page's closing band is the CTA).
 // Below sm the cards sit in a snap rail instead of a tall stack.
-import { ClipboardList, Users, LifeBuoy, Check, ArrowRight, Info } from '@lucide/astro';
-import { contactHref, cta } from '../../data/site';
+import { ClipboardList, Users, LifeBuoy, Check } from '@lucide/astro';
 import IconBadge from '../ui/IconBadge.astro';
-
-interface Props { note?: string; interest?: string }
-const { note, interest } = Astro.props;
 
 const models = [
   {
     icon: ClipboardList,
     name: 'Fixed-scope project',
     best: 'Best when you know what you need',
-    points: ['Written scope, timeline and one fixed price in ₹', 'Milestone-based billing', 'Demos at every milestone', 'Handover with docs and training'],
+    points: ['One fixed price in ₹', 'Demos at every milestone', 'Handover with docs'],
   },
   {
     icon: Users,
     name: 'Dedicated team',
     best: 'Best for ongoing products and roadmaps',
-    points: ['Engineers who know your system, with QA built in', 'Monthly billing, sized to your roadmap', 'Your backlog, your priorities', 'Weekly planning and demos'],
+    points: ['Engineers who know your system', 'Monthly billing', 'Your backlog, your priorities'],
     featured: true,
   },
   {
     icon: LifeBuoy,
-    name: 'Support & AMC',
+    name: 'Support',
     best: 'Best after go-live',
-    points: ['Bug fixes and security updates', 'Small changes from a monthly bank of hours', 'Uptime and backup checks', 'Agreed response times'],
+    points: ['Bug fixes and security updates', 'Small changes', 'Uptime and backup checks'],
   },
 ];
 ---
@@ -49,15 +45,7 @@ const models = [
             </li>
           ))}
         </ul>
-        <a href={contactHref(interest)} class={`btn group mt-8 w-full ${m.featured ? 'btn-primary' : 'btn-ghost'}`}>
-          {cta.model}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-        </a>
       </li>
     ))}
   </ul>
-  {note && (
-    <p class="reveal mt-6 flex items-start gap-2 text-sm text-ink-600">
-      <Info size={16} class="mt-0.5 shrink-0 text-brand-600" aria-hidden="true" />{note}
-    </p>
-  )}
 </div>

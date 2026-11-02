@@ -11,7 +11,7 @@ import RelatedCards from '../../components/ui/RelatedCards.astro';
 import ProductMockup from '../../components/products/ProductMockup.astro';
 import FeatureVisual from '../../components/products/FeatureVisual.astro';
 import CodeBlock from '../../components/products/CodeBlock.astro';
-import { products, href, contactHref, cta, productStatus, relatedFrom } from '../../data/site';
+import { products, contactHref, cta, productStatus, relatedFrom } from '../../data/site';
 import { softwareLd, breadcrumbList } from '../../data/schema';
 import { productsContent, securityCommon } from '../../data/products-content';
 
@@ -67,14 +67,6 @@ const rest = c.features.items.slice(2);
           </li>
         ))}
       </ul>
-      {c.custom && (
-        <p class="mt-4 text-center text-sm text-ink-600">
-          Need it fully custom?{' '}
-          <a href={href(c.custom.path)} class="group inline-flex items-center gap-1 py-2 font-semibold text-brand-700 hover:text-brand-800">
-            See {c.custom.label}<ArrowRight size={15} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-          </a>
-        </p>
-      )}
     </div>
   </section>
 
@@ -92,9 +84,9 @@ const rest = c.features.items.slice(2);
         </div>
       ))}
     </div>
-    <ul class="mt-10 grid gap-x-10 gap-y-6 sm:mt-12 sm:grid-cols-2 sm:gap-y-8 lg:grid-cols-3">
+    <ul class="mt-10 grid gap-x-8 gap-y-6 sm:mt-12 sm:grid-cols-2 sm:gap-y-8 lg:grid-cols-4">
       {rest.map((f, i) => (
-        <li class="reveal flex gap-4" style={`--d: ${(i % 3) * 80}ms`}>
+        <li class="reveal flex gap-4" style={`--d: ${(i % 4) * 80}ms`}>
           <IconBadge icon={f.icon} />
           <span>
             <span class="block font-bold text-ink-900">{f.title}</span>
@@ -119,9 +111,8 @@ const rest = c.features.items.slice(2);
         <span class="eyebrow-pill"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>API &amp; integration</span>
         <h2 class="mt-4 text-3xl leading-tight font-extrabold text-white sm:text-4xl">{c.api.title}</h2>
         <p class="mt-4 text-lg leading-relaxed text-ink-300">{c.api.intro}</p>
-        <p class="mt-6 flex flex-wrap items-center gap-2 text-sm text-ink-300">
+        <p class="mt-6">
           <span class="rounded-md bg-white/10 px-2 py-1 font-mono text-xs text-white ring-1 ring-white/10">{c.api.method} {c.api.endpoint}</span>
-          <span>Bearer-token auth · JSON over HTTPS · test keys on request</span>
         </p>
         <ul class="mt-6 grid gap-2.5 sm:mt-8 sm:gap-3">
           {c.api.options.map((o) => (
@@ -137,15 +128,12 @@ const rest = c.features.items.slice(2);
       </div>
       <div class="reveal min-w-0" style="--d: 120ms">
         <CodeBlock method={c.api.method} endpoint={c.api.endpoint} request={c.api.request} response={c.api.response} />
-        <a href={contactHref(slug)} class="group mt-5 inline-flex items-center gap-2 py-2 text-sm font-semibold text-brand-300 hover:text-white">
-          {cta.apiDocs}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-        </a>
       </div>
     </div>
   </Section>
 
   <!-- Security & deployment -->
-  <Section class="max-sm:py-14" eyebrow="Security & deployment" title="Your data, under your control" intro="Lending and HR data is sensitive. These controls are built in, and you choose where it runs.">
+  <Section class="max-sm:py-14" eyebrow="Security" title="Your data, under your control">
     <div class="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
       <ul class="grid gap-x-8 gap-y-5 sm:grid-cols-2 sm:gap-y-7">
         {securityCommon.map((s, i) => (
@@ -170,21 +158,20 @@ const rest = c.features.items.slice(2);
               </li>
             ))}
           </ul>
-          <p class="mt-6 hidden border-t border-white/10 pt-5 text-sm text-ink-300 sm:block">Need it to fit your information security policy? Our engineers will go through your checklist with you.</p>
         </div>
       </div>
     </div>
   </Section>
 
   <!-- Works well with -->
-  <Section tone="muted" class="max-sm:py-14" eyebrow="Works well with" title="Better together" intro="Each product works on its own. Connected, they share data so your team does not re-key anything.">
+  <Section tone="muted" class="max-sm:py-14" eyebrow="Works well with" title="Better together" intro="Each product works on its own. Connected, nobody re-keys anything.">
     <RelatedCards items={related} />
   </Section>
 
   <!-- FAQ -->
   <Section class="max-sm:py-14">
-    <Faq title={`Questions about ${name}`} items={c.faqs} askInterest={slug} />
+    <Faq title={`Questions about ${name}`} items={c.faqs} />
   </Section>
 
-  <CtaBand title={c.cta.title} text={c.cta.text} primary={{ label: cta.demo }} interest={slug} secondary={{ label: cta.allProducts, path: '/products/' }} />
+  <CtaBand title={c.cta.title} text={c.cta.text} primary={{ label: cta.demo }} interest={slug} />
 </Base>

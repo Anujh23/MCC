@@ -1,10 +1,8 @@
 ---
-// The one FAQ: native <details> in a single card. With `title`, it gets a side header
-// (h2, intro, "Ask an engineer" link to the contact form, pre-filled with `askInterest`).
-// Without `title` it's just the card, for use under a Section heading or in an aside.
-// Usage: <Section tone="muted"><Faq title="Questions about CRM builds" items={c.faqs} askInterest="crm-development" /></Section>
-import { Plus, ArrowRight } from '@lucide/astro';
-import { contactHref, cta } from '../../data/site';
+// The one FAQ: native <details> in a single card. With `title`, it gets a side header (h2, intro).
+// Without `title` it's just the card, for use under a Section heading or in an aside. Keep it to 4 items.
+// Usage: <Section tone="muted"><Faq title="Questions about CRM builds" items={c.faqs} /></Section>
+import { Plus } from '@lucide/astro';
 
 interface Props {
   items: { q: string; a: string }[];
@@ -12,11 +10,10 @@ interface Props {
   /** Words in the title to render with the brand gradient. Max one gradient H2 per page. */
   highlight?: string;
   intro?: string;
-  askInterest?: string;
   /** Index of the item that starts open; -1 for none. */
   open?: number;
 }
-const { items, title, highlight, intro, askInterest, open = 0 } = Astro.props;
+const { items, title, highlight, intro, open = 0 } = Astro.props;
 const [before, after] = highlight && title?.includes(highlight) ? title.split(highlight) : [title, undefined];
 ---
 
@@ -27,12 +24,6 @@ const [before, after] = highlight && title?.includes(highlight) ? title.split(hi
         {before}{after !== undefined && <span class="text-gradient-brand">{highlight}</span>}{after}
       </h2>
       {intro && <p class="mt-4 text-lg leading-relaxed text-ink-600">{intro}</p>}
-      <p class="mt-6 text-sm text-ink-600">
-        Something else on your mind?{' '}
-        <a href={contactHref(askInterest)} class="group inline-flex items-center gap-1 py-2 font-semibold text-brand-700 hover:text-brand-800">
-          {cta.ask}<ArrowRight size={15} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-        </a>
-      </p>
     </div>
   )}
   <div class="reveal divide-y divide-ink-100 rounded-2xl bg-white px-5 ring-1 ring-ink-100 sm:px-8" style={title ? '--d: 120ms' : undefined}>

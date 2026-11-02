@@ -1,10 +1,10 @@
 ---
-// The one related-links card grid ("Explore {Name} →"). Snap rail below sm.
+// The one related-links card grid. The whole card is the link. Snap rail below sm.
 // Usage: <RelatedCards items={relatedFrom(['crm'], ['crm-development'])} />
 //        <RelatedCards groups={[{ label: 'Products', items: relatedFrom(c.products) }, { label: 'Services', items: relatedFrom([], c.services) }]} />
 // Build items with relatedFrom() from src/data/site.ts, or pass your own (path is a site path, e.g. '/insights/x/').
 import { ArrowRight } from '@lucide/astro';
-import { href, cta, type RelatedItem } from '../../data/site';
+import { href, type RelatedItem } from '../../data/site';
 import IconBadge from './IconBadge.astro';
 
 interface Props {
@@ -33,9 +33,7 @@ const kindLabel = { product: 'Product', service: 'Service' } as const;
               </div>
               <Title class="mt-5 text-lg font-bold">{item.title}</Title>
               <p class="mt-2 flex-1 text-[0.95rem] leading-relaxed text-ink-600">{item.blurb}</p>
-              <span class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-700">
-                {cta.explore(item.name ?? item.title)}<ArrowRight size={16} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
-              </span>
+              <ArrowRight size={18} class="mt-5 text-brand-700 transition group-hover:translate-x-0.5" aria-hidden="true" />
             </a>
           </li>
         ))}

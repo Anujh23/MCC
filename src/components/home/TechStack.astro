@@ -2,17 +2,16 @@
 import Section from '../ui/Section.astro';
 
 const groups = [
-  { title: 'Backend', items: ['Node.js', 'Python', 'Django', 'FastAPI', 'Docker'] },
-  { title: 'Data', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Metabase', 'Superset'] },
-  { title: 'Web & mobile', items: ['React', 'Next.js', 'Astro', 'Tailwind CSS', 'Flutter', 'React Native'] },
-  { title: 'Integrations', items: ['REST & webhooks', 'Bureau & eKYC', 'e-sign & e-NACH', 'Payment gateways', 'Tally imports'] },
+  { title: 'Backend', items: ['Python', 'Node.js', 'Django'] },
+  { title: 'Data', items: ['PostgreSQL', 'MySQL', 'Metabase'] },
+  { title: 'Web & mobile', items: ['React', 'Next.js', 'Flutter'] },
+  { title: 'Integrations', items: ['Bureau & eKYC', 'e-sign & e-NACH', 'UPI & payments'] },
 ];
 ---
 
 <Section
   eyebrow="Tech we build with"
   title="Boring, well-supported tools your next hire knows."
-  intro="The stack your team can hire for and maintain after handover, not whatever is new this month."
   class="max-sm:py-14"
 >
   <div class="-mt-4 grid grid-cols-2 gap-x-5 gap-y-6 sm:mt-0 sm:gap-x-8 lg:grid-cols-4">

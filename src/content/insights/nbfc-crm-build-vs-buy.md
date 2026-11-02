@@ -6,7 +6,7 @@ tags: [CRM, NBFC, Build vs buy]
 product: crm
 related:
   - { label: CRM Development, path: /services/crm-development/ }
-  - { label: Manka CRM, path: /products/crm/ }
+  - { label: CRM, path: /products/crm/ }
 ---
 
 Most small NBFCs reach the same point. Leads come in from DSAs, branches, the website and a few digital partners. Follow-ups live in WhatsApp groups and spreadsheets. Someone asks for a weekly pipeline report and it takes a day to put together. Everyone agrees a CRM would help, and then the debate starts: buy one, or build one?
