@@ -1,12 +1,8 @@
 ---
 // Payslip Checker mockup: payslip on the left, check results on the right (sample data).
-import { Check, TriangleAlert, X, Landmark, ScanSearch } from '@lucide/astro';
+import { Check, TriangleAlert, X } from '@lucide/astro';
 import MockupFrame from './MockupFrame.astro';
 import StatusPill from './StatusPill.astro';
-import FloatChip from './FloatChip.astro';
-
-interface Props { float?: boolean }
-const { float = true } = Astro.props;
 
 const earnings = [
   { k: 'Basic', v: '30,000' },
@@ -39,86 +35,75 @@ const iconTone = {
 const pillText = { pass: 'Pass', warn: 'Warn', fail: 'Fail' };
 ---
 
-<div class="relative">
-  {float && (
-    <>
-      <FloatChip icon={Landmark} tone="brand" title="Cross-checked with BSA" text="Salary credit found: ₹48,300" class="-top-12 right-8" />
-      <FloatChip icon={ScanSearch} tone="warn" title="Edited region found" text="Special allowance, net pay" class="-bottom-10 left-6" />
-    </>
-  )}
-  <MockupFrame title="Payslip Checker · PSV-3Lr9Xa">
-    <div class="grid gap-3 bg-ink-50/70 p-3 @sm:p-4 @lg:grid-cols-[1fr_1.05fr]">
-      <!-- payslip document -->
-      <div class="relative rounded-md bg-white p-3.5 font-mono shadow-sm ring-1 ring-ink-200">
-        <div class="flex items-start justify-between gap-2 border-b border-ink-200 pb-2.5">
-          <div class="flex items-center gap-2">
-            <span class="grid h-7 w-7 shrink-0 place-items-center rounded bg-ink-800 font-sans text-[10px] font-bold text-white">ST</span>
-            <div class="leading-tight">
-              <p class="font-sans text-[11px] font-bold text-ink-900">Sample Traders Pvt Ltd</p>
-              <p class="text-[9px] text-ink-400">Pune, Maharashtra</p>
-            </div>
+<MockupFrame title="Payslip Checker · PSV-3Lr9Xa">
+  <div class="grid gap-3 bg-ink-50/70 p-3 @sm:p-4 @lg:grid-cols-[1fr_1.05fr]">
+    <!-- payslip document -->
+    <div class="relative rounded-md bg-white p-3.5 font-mono shadow-sm ring-1 ring-ink-200">
+      <div class="flex items-start justify-between gap-2 border-b border-ink-200 pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="grid h-7 w-7 shrink-0 place-items-center rounded bg-ink-800 font-sans text-[10px] font-bold text-white">ST</span>
+          <div class="leading-tight">
+            <p class="font-sans text-[11px] font-bold text-ink-900">Sample Traders Pvt Ltd</p>
+            <p class="text-[9px] text-ink-400">Pune, Maharashtra</p>
           </div>
-          <p class="shrink-0 text-right text-[9px] leading-tight text-ink-500">PAYSLIP<br /><span class="font-semibold text-ink-800">SEP 2026</span></p>
         </div>
-        <div class="grid grid-cols-2 gap-x-2 border-b border-ink-100 py-2 text-[9px] text-ink-500">
-          <span>Name: <span class="text-ink-800">R. Sharma</span></span>
-          <span>Emp ID: <span class="text-ink-800">EMP-0417</span></span>
-          <span>UAN: <span class="text-ink-800">XXXX2210</span></span>
-          <span>Bank: <span class="text-ink-800">XXXX4821</span></span>
-        </div>
-        <p class="mt-2 text-[9px] font-semibold tracking-wider text-ink-400">EARNINGS</p>
-        <ul class="mt-1 space-y-0.5 text-[10px]">
-          {earnings.map((e) => (
-            <li class={`relative flex justify-between rounded px-1 ${e.edited ? 'bg-amber-50 outline outline-1 outline-dashed outline-amber-500' : ''}`}>
-              <span class="text-ink-600">{e.k}</span><span class={`tabular-nums ${e.edited ? 'font-sans font-semibold text-ink-900' : 'text-ink-800'}`}>{e.v}</span>
-            </li>
-          ))}
-          <li class="flex justify-between border-t border-ink-100 px-1 pt-1 font-semibold"><span class="text-ink-700">Gross</span><span class="text-ink-900 tabular-nums">60,100</span></li>
-        </ul>
-        <p class="mt-2 text-[9px] font-semibold tracking-wider text-ink-400">DEDUCTIONS</p>
-        <ul class="mt-1 space-y-0.5 text-[10px]">
-          {deductions.map((d) => (
-            <li class="flex justify-between px-1"><span class="text-ink-600">{d.k}</span><span class="text-ink-800 tabular-nums">{d.v}</span></li>
-          ))}
-          <li class="flex justify-between border-t border-ink-100 px-1 pt-1 font-semibold"><span class="text-ink-700">Total</span><span class="text-ink-900 tabular-nums">3,800</span></li>
-        </ul>
-        <div class="relative mt-3 flex items-center justify-between rounded bg-ink-50 px-2 py-1.5 outline outline-1 outline-dashed outline-amber-500">
-          <span class="text-[10px] font-semibold text-ink-700">NET PAY</span>
-          <span class="font-sans text-[13px] font-extrabold text-ink-900 tabular-nums">₹56,300</span>
-          <span class="absolute -top-2 right-2 rounded bg-amber-500 px-1 font-sans text-[8.5px] font-bold text-white">EDITED?</span>
-        </div>
-        <p class="mt-3 text-center text-[8.5px] text-ink-300">Net pay in words: Fifty-six thousand three hundred only</p>
-        <p class="mt-1 text-center text-[8.5px] text-ink-300">This is a computer-generated payslip.</p>
+        <p class="shrink-0 text-right text-[9px] leading-tight text-ink-500">PAYSLIP<br /><span class="font-semibold text-ink-800">SEP 2026</span></p>
       </div>
-
-      <!-- results -->
-      <div class="flex min-w-0 flex-col gap-2.5">
-        <div class="flex items-center gap-3 rounded-lg bg-white p-3 ring-1 ring-ink-100">
-          <div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-full" style="background: conic-gradient(var(--color-rose-500, #f43f5e) 72%, var(--color-ink-100) 0)">
-            <span class="grid h-11 w-11 place-items-center rounded-full bg-white text-[15px] font-extrabold text-ink-900">72</span>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-semibold tracking-wide text-ink-400 uppercase">Risk score</p>
-            <p class="text-[13px] font-bold text-rose-600">High · refer to credit</p>
-            <p class="truncate text-[10px] text-ink-500">Net pay above salary credited</p>
-          </div>
-        </div>
-        <ul class="divide-y divide-ink-100 rounded-lg bg-white ring-1 ring-ink-100">
-          {checks.map((c) => {
-            const Icon = icon[c.tone];
-            return (
-              <li class="flex items-center gap-2 px-2.5 py-[7px]">
-                <span class={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full ${iconTone[c.tone]}`}><Icon size={10} stroke-width={3} /></span>
-                <span class="min-w-0 flex-1 leading-tight">
-                  <span class="block truncate text-[10.5px] font-semibold text-ink-800">{c.label}</span>
-                  <span class="block truncate text-[9.5px] text-ink-500">{c.detail}</span>
-                </span>
-                <StatusPill tone={c.tone}>{pillText[c.tone]}</StatusPill>
-              </li>
-            );
-          })}
-        </ul>
+      <div class="grid grid-cols-2 gap-x-2 border-b border-ink-100 py-2 text-[9px] text-ink-500">
+        <span>Name: <span class="text-ink-800">R. Sharma</span></span>
+        <span>Emp ID: <span class="text-ink-800">EMP-0417</span></span>
+        <span>UAN: <span class="text-ink-800">XXXX2210</span></span>
+        <span>Bank: <span class="text-ink-800">XXXX4821</span></span>
+      </div>
+      <p class="mt-2 text-[9px] font-semibold tracking-wider text-ink-400">EARNINGS</p>
+      <ul class="mt-1 space-y-0.5 text-[10px]">
+        {earnings.map((e) => (
+          <li class={`relative flex justify-between rounded px-1 ${e.edited ? 'bg-amber-50 outline outline-1 outline-dashed outline-amber-500' : ''}`}>
+            <span class="text-ink-600">{e.k}</span><span class={`tabular-nums ${e.edited ? 'font-sans font-semibold text-ink-900' : 'text-ink-800'}`}>{e.v}</span>
+          </li>
+        ))}
+        <li class="flex justify-between border-t border-ink-100 px-1 pt-1 font-semibold"><span class="text-ink-700">Gross</span><span class="text-ink-900 tabular-nums">60,100</span></li>
+      </ul>
+      <p class="mt-2 text-[9px] font-semibold tracking-wider text-ink-400">DEDUCTIONS</p>
+      <ul class="mt-1 space-y-0.5 text-[10px]">
+        {deductions.map((d) => (
+          <li class="flex justify-between px-1"><span class="text-ink-600">{d.k}</span><span class="text-ink-800 tabular-nums">{d.v}</span></li>
+        ))}
+        <li class="flex justify-between border-t border-ink-100 px-1 pt-1 font-semibold"><span class="text-ink-700">Total</span><span class="text-ink-900 tabular-nums">3,800</span></li>
+      </ul>
+      <div class="relative mt-3 flex items-center justify-between rounded bg-ink-50 px-2 py-1.5 outline outline-1 outline-dashed outline-amber-500">
+        <span class="text-[10px] font-semibold text-ink-700">NET PAY</span>
+        <span class="font-sans text-[13px] font-extrabold text-ink-900 tabular-nums">₹56,300</span>
+        <span class="absolute -top-2 right-2 rounded bg-amber-500 px-1 font-sans text-[8.5px] font-bold text-white">EDITED?</span>
       </div>
     </div>
-  </MockupFrame>
-</div>
+
+    <!-- results -->
+    <div class="flex min-w-0 flex-col gap-2.5">
+      <div class="flex items-center gap-3 rounded-lg bg-white p-3 ring-1 ring-ink-100">
+        <div class="relative grid h-14 w-14 shrink-0 place-items-center rounded-full" style="background: conic-gradient(var(--color-rose-500, #f43f5e) 72%, var(--color-ink-100) 0)">
+          <span class="grid h-11 w-11 place-items-center rounded-full bg-white text-[15px] font-extrabold text-ink-900">72</span>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-semibold tracking-wide text-ink-400 uppercase">Risk score</p>
+          <p class="text-[13px] font-bold text-rose-600">High · refer to credit</p>
+        </div>
+      </div>
+      <ul class="divide-y divide-ink-100 rounded-lg bg-white ring-1 ring-ink-100">
+        {checks.map((c) => {
+          const Icon = icon[c.tone];
+          return (
+            <li class="flex items-center gap-2 px-2.5 py-[7px]">
+              <span class={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full ${iconTone[c.tone]}`}><Icon size={10} stroke-width={3} /></span>
+              <span class="min-w-0 flex-1 leading-tight">
+                <span class="block truncate text-[10.5px] font-semibold text-ink-800">{c.label}</span>
+                <span class="block truncate text-[9.5px] text-ink-500">{c.detail}</span>
+              </span>
+              <StatusPill tone={c.tone}>{pillText[c.tone]}</StatusPill>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </div>
+</MockupFrame>

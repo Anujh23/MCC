@@ -17,10 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # Keeps every page noindex (and drops canonicals) until launch. Remove this line at launch,
-      # once site.ts has a real email or Web3Forms key.
-      PUBLIC_SITE_NOINDEX: 'true'
+    # Indexing is on. To hide the site from search again, add under build:
+    #   env: { PUBLIC_SITE_NOINDEX: 'true' }
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

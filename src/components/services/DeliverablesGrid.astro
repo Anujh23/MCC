@@ -9,10 +9,7 @@ const { items } = Astro.props;
 <ul class="grid gap-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
   {items.map((item, i) => (
     <li class="reveal flex gap-4 sm:block sm:rounded-2xl sm:bg-white sm:p-6 sm:ring-1 sm:ring-ink-100 lg:p-7" style={`--d: ${(i % 3) * 80}ms`}>
-      <div class="flex items-center justify-between">
-        <IconBadge icon={item.icon} tone={i === 0 ? 'saffron' : 'brand'} />
-        <span class="hidden text-xs font-semibold text-ink-500 tabular-nums sm:inline" aria-hidden="true">0{i + 1}</span>
-      </div>
+      <IconBadge icon={item.icon} tone={i === 0 ? 'saffron' : 'brand'} />
       <div class="min-w-0">
         <h3 class="text-lg font-bold text-ink-900 sm:mt-5">{item.title}</h3>
         <p class="mt-1.5 text-[0.95rem] leading-relaxed text-ink-600 sm:mt-2">{item.text}</p>

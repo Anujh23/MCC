@@ -12,20 +12,17 @@ export type Visual = 'browser' | 'kanban' | 'payroll' | 'dashboard' | 'api';
 export type ServiceContent = {
   metaTitle: string;
   metaDescription: string;
-  eyebrow: string;
   /** Short noun used in headings, e.g. "Planning a CRM project?" */
   noun: string;
   headline: string;
   highlight: string;
   intro: string;
   visual: Visual;
-  /** Short bullets used on the services index bento and the strip under the hero */
-  included: string[];
   deliverables: { icon: any; title: string; text: string }[];
   /** H2 above the problems grid */
   problemsTitle: string;
   problems: { problem: string; fix: string }[];
-  steps: { title: string; duration: string; text: string }[];
+  steps: { title: string; text: string }[];
   products: string[];
   relatedServices: string[];
   faqs: { q: string; a: string }[];
@@ -36,13 +33,11 @@ export const servicesContent: Record<string, ServiceContent> = {
     metaTitle: 'Website Development: Company Sites & Online Stores',
     metaDescription:
       'Fast, SEO-ready company websites, landing pages and online stores for Indian businesses, with UPI payments, a simple CMS and enquiries sent to your CRM.',
-    eyebrow: 'Website development',
     noun: 'website',
     headline: 'Websites that load fast and bring in enquiries',
     highlight: 'bring in enquiries',
     intro: 'Company sites, landing pages and online stores, fast on mid-range phones and wired to your CRM.',
     visual: 'browser',
-    included: ['Design and build', 'SEO and page speed', 'Editable CMS', 'Payments and lead capture'],
     deliverables: [
       { icon: Palette, title: 'Design that fits your brand', text: 'Desktop and mobile designs that stay consistent as you add pages.' },
       { icon: Gauge, title: 'Fast build', text: 'Tested on mid-range Android phones over 4G.' },
@@ -59,11 +54,11 @@ export const servicesContent: Record<string, ServiceContent> = {
       { problem: 'Your pages don’t show up in search', fix: 'One focused page per product or city, with FAQs and schema.' },
     ],
     steps: [
-      { title: 'Discovery and sitemap', duration: 'typically 1 week', text: 'The pages, who reads them and what each should do.' },
-      { title: 'Design', duration: 'typically 1–2 weeks', text: 'Key templates for desktop and mobile, two rounds of changes.' },
-      { title: 'Build and content', duration: 'typically 2–4 weeks', text: 'A staging link from the first week.' },
-      { title: 'QA and launch', duration: 'typically 3–5 days', text: 'Device tests, redirects and speed checks.' },
-      { title: 'After launch', duration: 'ongoing, if you want it', text: 'Fixes and small changes from the same team.' },
+      { title: 'Discovery and sitemap', text: 'The pages, who reads them and what each should do.' },
+      { title: 'Design', text: 'Key templates for desktop and mobile, two rounds of changes.' },
+      { title: 'Build and content', text: 'A staging link from the first week.' },
+      { title: 'QA and launch', text: 'Device tests, redirects and speed checks.' },
+      { title: 'After launch', text: 'Fixes and small changes from the same team.' },
     ],
     products: ['crm'],
     relatedServices: ['crm-development', 'data-analytics'],
@@ -79,13 +74,11 @@ export const servicesContent: Record<string, ServiceContent> = {
     metaTitle: 'Custom CRM Development for Sales & Field Teams',
     metaDescription:
       'Custom CRM development for Indian businesses: your pipeline stages, lead capture, follow-ups, WhatsApp and SMS, field visits and MIS.',
-    eyebrow: 'CRM development',
     noun: 'CRM',
     headline: 'A CRM with your stages, from first call to disbursal',
     highlight: 'your stages',
     intro: 'Leads, follow-ups, field visits and collections in one system, shaped to your stages and roles.',
     visual: 'kanban',
-    included: ['Your stages and fields', 'Lead capture from every source', 'Field app with geo-tagging', 'WhatsApp, SMS and calls'],
     deliverables: [
       { icon: SquareKanban, title: 'Your pipeline', text: 'Your stages, fields and rules, from enquiry to disbursal.' },
       { icon: Inbox, title: 'Leads from every source', text: 'Web forms, lead ads, IndiaMART and walk-ins in one queue.' },
@@ -102,11 +95,11 @@ export const servicesContent: Record<string, ServiceContent> = {
       { problem: 'Monday morning goes on building the MIS', fix: 'Reports built in and sent on schedule.' },
     ],
     steps: [
-      { title: 'Process mapping', duration: 'typically 1–2 weeks', text: 'Stages, roles and the reports leadership reads.' },
-      { title: 'Prototype', duration: 'typically 1–2 weeks', text: 'Clickable screens, reviewed by the people who’ll use them.' },
-      { title: 'Build in sprints', duration: 'typically 6–12 weeks', text: 'A demo at the end of every two-week sprint.' },
-      { title: 'Migration and training', duration: 'typically 1–2 weeks', text: 'Old leads imported, teams trained branch by branch.' },
-      { title: 'Go-live and support', duration: 'ongoing', text: 'Fixes and new features from the same team.' },
+      { title: 'Process mapping', text: 'Stages, roles and the reports leadership reads.' },
+      { title: 'Prototype', text: 'Clickable screens, reviewed by the people who’ll use them.' },
+      { title: 'Build in sprints', text: 'A demo at the end of every two-week sprint.' },
+      { title: 'Migration and training', text: 'Old leads imported, teams trained branch by branch.' },
+      { title: 'Go-live and support', text: 'Fixes and new features from the same team.' },
     ],
     products: ['crm', 'maps-api'],
     relatedServices: ['custom-software', 'data-analytics'],
@@ -122,13 +115,11 @@ export const servicesContent: Record<string, ServiceContent> = {
     metaTitle: 'HR & Payroll Software Development',
     metaDescription:
       'HR and payroll systems built to your policies: onboarding, attendance, leave, PF, ESI, PT and TDS, and appraisals. Or start on our HRMS.',
-    eyebrow: 'HR solutions',
     noun: 'HR system',
     headline: 'HR and payroll that closes the month without spreadsheets',
     highlight: 'without spreadsheets',
     intro: 'Onboarding, attendance, leave, payroll and appraisals in one system, with PF, ESI, PT and TDS handled.',
     visual: 'payroll',
-    included: ['Attendance and leave', 'Payroll with PF, ESI, PT, TDS', 'Employee self-service app', 'Appraisals and goals'],
     deliverables: [
       { icon: UserPlus, title: 'Onboarding', text: 'Offer letters, documents and e-sign from day one.' },
       { icon: CalendarCheck, title: 'Attendance and shifts', text: 'Biometric imports, geo-fenced check-in and rosters.' },
@@ -145,11 +136,11 @@ export const servicesContent: Record<string, ServiceContent> = {
       { problem: 'Statutory rule changes catch you out', fix: 'PF, ESI and PT rules set per state, with challan-ready reports.' },
     ],
     steps: [
-      { title: 'Policy review', duration: 'typically 1 week', text: 'Salary structures, leave rules and approvals.' },
-      { title: 'Configure or build', duration: 'typically 2–6 weeks', text: 'Our HRMS for standard needs, custom only where you differ.' },
-      { title: 'Parallel payroll run', duration: 'typically 1 payroll cycle', text: 'One cycle alongside your current process, reconciled.' },
-      { title: 'Rollout', duration: 'typically 1–2 weeks', text: 'Data import, app rollout and HR training.' },
-      { title: 'Support', duration: 'ongoing', text: 'Rule updates and new reports.' },
+      { title: 'Policy review', text: 'Salary structures, leave rules and approvals.' },
+      { title: 'Configure or build', text: 'Our HRMS for standard needs, custom only where you differ.' },
+      { title: 'Parallel payroll run', text: 'One cycle alongside your current process, reconciled.' },
+      { title: 'Rollout', text: 'Data import, app rollout and HR training.' },
+      { title: 'Support', text: 'Rule updates and new reports.' },
     ],
     products: ['hrms'],
     relatedServices: ['data-analytics', 'custom-software'],
@@ -165,13 +156,11 @@ export const servicesContent: Record<string, ServiceContent> = {
     metaTitle: 'Data & Analytics: Dashboards, MIS & Portfolio',
     metaDescription:
       'Data pipelines, leadership dashboards, automated MIS and lending portfolio analytics (DPD, buckets, vintage) built on your LMS, CRM and accounting data.',
-    eyebrow: 'Data & analytics',
     noun: 'analytics',
     headline: 'One disbursal number finance and sales agree on',
     highlight: 'One disbursal number',
     intro: 'Your LMS, CRM, accounts and spreadsheets in one clean store, with the few dashboards you check every Monday.',
     visual: 'dashboard',
-    included: ['Data pipelines', 'Leadership dashboards', 'Automated daily MIS', 'Portfolio and risk analytics'],
     deliverables: [
       { icon: Workflow, title: 'Data pipelines', text: 'Scheduled pulls into one store, checked for gaps.' },
       { icon: LayoutDashboard, title: 'Leadership dashboards', text: 'Disbursals, collections and sales on one screen.' },
@@ -188,11 +177,11 @@ export const servicesContent: Record<string, ServiceContent> = {
       { problem: 'Underwriters read statements line by line', fix: 'BSA turns the PDF into a one-page summary.' },
     ],
     steps: [
-      { title: 'KPI workshop', duration: 'typically 1 week', text: 'The decisions you make and the numbers behind them.' },
-      { title: 'Data audit', duration: 'typically 1–2 weeks', text: 'Sources, quality checks and agreed definitions.' },
-      { title: 'Pipelines and storage', duration: 'typically 2–4 weeks', text: 'Scheduled, cleaned and fast to query.' },
-      { title: 'Dashboards and MIS', duration: 'typically 2–3 weeks', text: 'Built in rounds with the people who use them.' },
-      { title: 'Iteration', duration: 'ongoing', text: 'New metrics as the business asks for them.' },
+      { title: 'KPI workshop', text: 'The decisions you make and the numbers behind them.' },
+      { title: 'Data audit', text: 'Sources, quality checks and agreed definitions.' },
+      { title: 'Pipelines and storage', text: 'Scheduled, cleaned and fast to query.' },
+      { title: 'Dashboards and MIS', text: 'Built in rounds with the people who use them.' },
+      { title: 'Iteration', text: 'New metrics as the business asks for them.' },
     ],
     products: ['bank-statement-analyser', 'payslip-checker'],
     relatedServices: ['crm-development', 'custom-software'],
@@ -208,13 +197,11 @@ export const servicesContent: Record<string, ServiceContent> = {
     metaTitle: 'Custom Software & API Development',
     metaDescription:
       'Custom software and API development in India: system integrations, documented REST APIs, workflow automation, partner portals and internal tools.',
-    eyebrow: 'Custom software & APIs',
     noun: 'software',
     headline: 'Custom software and APIs, built to spec and documented',
     highlight: 'built to spec',
     intro: 'Integrations between your systems, internal tools that replace spreadsheets, and APIs other teams can rely on.',
     visual: 'api',
-    included: ['System integrations', 'REST APIs and webhooks', 'Workflow automation', 'Internal tools and portals'],
     deliverables: [
       { icon: Plug, title: 'System integrations', text: 'LMS, CRM, accounts and payments, with no re-typing.' },
       { icon: Webhook, title: 'REST APIs and webhooks', text: 'Versioned, documented and secured.' },
@@ -231,11 +218,11 @@ export const servicesContent: Record<string, ServiceContent> = {
       { problem: 'Your old vendor left and nobody understands the code', fix: 'An audit and a plain plan to extend or rebuild.' },
     ],
     steps: [
-      { title: 'Scoping', duration: 'typically 1 week', text: 'Requirements, integrations and what’s out of scope.' },
-      { title: 'API design', duration: 'typically 1 week', text: 'Data model and contracts agreed before code.' },
-      { title: 'Build in sprints', duration: 'typically 4–12 weeks', text: 'Working demos every two weeks.' },
-      { title: 'Testing and handover', duration: 'typically 1–2 weeks', text: 'Automated tests, deployment and docs.' },
-      { title: 'Support', duration: 'ongoing', text: 'Monitoring, fixes and small changes.' },
+      { title: 'Scoping', text: 'Requirements, integrations and what’s out of scope.' },
+      { title: 'API design', text: 'Data model and contracts agreed before code.' },
+      { title: 'Build in sprints', text: 'Working demos every two weeks.' },
+      { title: 'Testing and handover', text: 'Automated tests, deployment and docs.' },
+      { title: 'Support', text: 'Monitoring, fixes and small changes.' },
     ],
     products: ['maps-api', 'bank-statement-analyser', 'payslip-checker'],
     relatedServices: ['crm-development', 'data-analytics'],

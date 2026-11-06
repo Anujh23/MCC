@@ -20,7 +20,6 @@ export function getStaticPaths() {
 
 const { industry } = Astro.props;
 const c = industriesContent[industry.slug];
-const topic = /^[A-Z]{2}/.test(c.eyebrow) ? c.eyebrow : c.eyebrow.charAt(0).toLowerCase() + c.eyebrow.slice(1);
 const crumbs = [{ label: 'Industries', path: '/industries/' }, { label: industry.title }];
 const path = `/industries/${industry.slug}/`;
 ---
@@ -38,41 +37,26 @@ const path = `/industries/${industry.slug}/`;
       <a href={contactHref(industry.slug)} class="btn btn-primary group px-6 py-3 text-base">
         {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
       </a>
-      <a href="#workflow" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">See how it works</a>
     </Fragment>
     <Fragment slot="aside"><IndustryVisual card={c.heroCard} icon={industry.icon} /></Fragment>
   </PageHero>
 
-  <Section
-    eyebrow="Challenges and answers"
-    title="Common problems, and what we build for them"
-    highlight="what we build for them"
-  >
+  <Section title="Common problems, and what we build for them" highlight="what we build for them">
     <ChallengePairs pairs={c.pairs} />
   </Section>
 
   {c.deepDive && (
-    <Section tone="muted" eyebrow={c.deepDive.eyebrow} title={c.deepDive.title} intro={c.deepDive.intro}>
+    <Section tone="muted" title={c.deepDive.title}>
       <DeepDive items={c.deepDive.items} />
-      <p class="reveal mt-6 text-sm text-ink-600">Sample values are for illustration only.</p>
     </Section>
   )}
 
-  <Section id="workflow" tone="dark" eyebrow="Example workflow" title={c.workflow.title} intro={c.workflow.intro}>
+  <Section tone="dark" title={c.workflow.title}>
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 opacity-60"></div>
-    <div class="relative">
-      <ul class="reveal mb-10 flex flex-wrap gap-4 text-xs text-ink-300">
-        <li class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Our product</li>
-        <li class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true"></span>Built as a service</li>
-      </ul>
-      <Steps tone="dark" steps={c.workflow.steps.map((s) => ({ ...s, tags: s.tools }))} />
-    </div>
+    <Steps tone="dark" steps={c.workflow.steps.map((s) => ({ ...s, tags: s.tools }))} class="relative" />
   </Section>
 
-  <Section
-    eyebrow="Relevant products and services"
-    title={`What we’d use for ${topic}`}
-  >
+  <Section title="What we’d use">
     <RelatedCards
       groups={[
         { label: 'Products', items: relatedFrom(c.products) },
@@ -82,15 +66,8 @@ const path = `/industries/${industry.slug}/`;
   </Section>
 
   <Section tone="muted">
-    <Faq
-      title={`Questions about ${topic}`}
-      items={c.faqs}
-    />
+    <Faq title="Questions" items={c.faqs} />
   </Section>
 
-  <CtaBand
-    title="Tell us how your team works today."
-    text="An engineer will point out which parts are worth automating first."
-    interest={industry.slug}
-  />
+  <CtaBand title="Tell us how your team works today." interest={industry.slug} />
 </Base>

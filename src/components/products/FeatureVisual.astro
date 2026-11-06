@@ -23,27 +23,10 @@ const stages = [
   { s: 'Sanction', n: 5, dot: 'bg-amber-500', cards: 2 },
   { s: 'Disbursed', n: 3, dot: 'bg-emerald-500', cards: 1 },
 ];
-const label = 'text-[11px] font-bold text-ink-900';
 ---
 
 <div class="rounded-xl bg-ink-50 p-3 ring-1 ring-ink-100" aria-hidden="true">
-  <div class="mb-2 flex items-center justify-between gap-2">
-    <p class={label}>
-      {{
-        'bsa-flow': 'Monthly inflow vs outflow',
-        'bsa-flags': 'Flagged transactions',
-        'ps-math': 'Payslip · Sep 2026',
-        'ps-tamper': 'Edited region found',
-        'maps-geo': 'Geocode',
-        'maps-match': 'Field visit check',
-        'crm-stages': 'Lending pipeline',
-        'crm-assign': 'New lead · DSA portal',
-        'hr-attend': 'Today’s check-ins',
-        'hr-payroll': 'Payroll · Sep 2026',
-      }[kind]}
-    </p>
-    <SampleBadge />
-  </div>
+  <div class="mb-2 flex justify-end"><SampleBadge /></div>
 
   {kind === 'bsa-flow' && (
     <div class="rounded-lg bg-white p-2.5 ring-1 ring-ink-100">

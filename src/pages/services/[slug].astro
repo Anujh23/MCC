@@ -20,8 +20,6 @@ export function getStaticPaths() {
 
 const { service } = Astro.props;
 const c = servicesContent[service.slug];
-// "Website development" -> "website development", but keep acronyms like "CRM development"
-const topic = /^[A-Z]{2}/.test(c.eyebrow) ? c.eyebrow : c.eyebrow.charAt(0).toLowerCase() + c.eyebrow.slice(1);
 const crumbs = [{ label: 'Services', path: '/services/' }, { label: service.title }];
 const path = `/services/${service.slug}/`;
 ---
@@ -36,71 +34,34 @@ const path = `/services/${service.slug}/`;
       <a href={contactHref(service.slug)} class="btn btn-primary group px-6 py-3 text-base">
         {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
       </a>
-      <a href="#process" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">See how it works</a>
     </Fragment>
     <Fragment slot="aside"><ServiceVisual visual={c.visual} /></Fragment>
   </PageHero>
 
-  <div class="border-b border-ink-100 bg-white">
-    <div class="container-page">
-      <ul class="grid grid-cols-2 divide-ink-100 py-2 lg:grid-cols-4 lg:divide-x">
-        {c.included.map((item, i) => (
-          <li class="flex items-center gap-3 px-2 py-4 text-sm font-semibold text-ink-800 lg:px-6">
-            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-50 text-[11px] font-bold text-brand-700">{i + 1}</span>
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
-
   <Section
     class="max-sm:py-16"
-    eyebrow="What you get"
     title={`Everything a good ${c.noun} project should include`}
     highlight="should include"
   >
     <DeliverablesGrid items={c.deliverables} />
   </Section>
 
-  <Section
-    class="max-sm:py-16"
-    tone="muted"
-    eyebrow="Problems we solve"
-    title={c.problemsTitle}
-  >
+  <Section class="max-sm:py-16" tone="muted" title={c.problemsTitle}>
     <ProblemsGrid items={c.problems} />
   </Section>
 
-  <Section
-    class="max-sm:py-16"
-    id="process"
-    tone="dark"
-    eyebrow="How the engagement runs"
-    title="A plan with dates, not a black box"
-    intro="Typical ranges. You get a dated plan after scoping."
-  >
+  <Section class="max-sm:py-16" tone="dark" title="A plan with dates, not a black box">
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 -z-0 opacity-60"></div>
     <Steps tone="dark" steps={c.steps} class="relative" />
   </Section>
 
-  <Section
-    class="max-sm:py-16"
-    eyebrow="Related"
-    title={`Products and services that pair with ${topic}`}
-  >
+  <Section class="max-sm:py-16" title="Pairs well with">
     <RelatedCards items={relatedFrom(c.products, c.relatedServices)} />
   </Section>
 
   <Section tone="muted" class="max-sm:py-16">
-    <Faq
-      title={`Questions about ${topic}`}
-      items={c.faqs}
-    />
+    <Faq title="Questions" items={c.faqs} />
   </Section>
 
-  <CtaBand
-    title={`Planning your ${c.noun} project?`}
-    interest={service.slug}
-  />
+  <CtaBand title={`Planning your ${c.noun} project?`} interest={service.slug} />
 </Base>

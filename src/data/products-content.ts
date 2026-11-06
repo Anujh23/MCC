@@ -2,51 +2,48 @@
 // Everything shown in mockups and API samples is sample data, not real customers.
 // Products are built but have no clients yet: no production, track-record or time claims.
 import {
-  Upload, Tags, Calculator, ShieldAlert, FileSpreadsheet, LayoutDashboard, Timer, Scale, Eye, Plug,
-  Webhook, FileLock, BadgeCheck, Landmark, ScanSearch, Building, Gauge, MapPin, MapPinned, Route,
-  Camera, Crosshair, Radar, Signpost, LocateFixed, UserPlus, Workflow, Bell, Smartphone, ChartPie,
-  Funnel, Inbox, CalendarCheck, Clock, Wallet, FileText, Star, ScanFace, ListChecks, Target,
+  Upload, Tags, Calculator, ShieldAlert, FileSpreadsheet, LayoutDashboard, Timer, Scale,
+  Webhook, FileLock, BadgeCheck, Landmark, ScanSearch, Building, Gauge, MapPin, Route,
+  Crosshair, Radar, Signpost, LocateFixed, UserPlus, Workflow, Bell, Smartphone, ChartPie,
+  Funnel, CalendarCheck, Clock, Wallet, FileText, Star, ScanFace, ListChecks, Target,
   HandCoins, UserCheck, TrendingUp,
 } from '@lucide/astro';
 
 /** `visual` keys a mini-visual in components/products/FeatureVisual.astro (featured items only). */
 export type Item = { title: string; text: string; icon: any; visual?: string };
+export type Point = { title: string; icon: any };
 export type Step = { title: string; text: string };
 export type Faq = { q: string; a: string };
 
 export type ProductContent = {
   meta: { title: string; description: string };
-  /** secondary: the hero's second CTA. 'api' → "See the API" (#api), 'how' → "How it works" (#how). */
-  hero: { title: string; highlight: string; intro: string; secondary: 'api' | 'how' };
-  /** Short pitch + bullets for the products index showcase */
-  card: { tagline: string; bullets: string[] };
-  outcomes: Item[];
+  hero: { title: string; highlight: string; intro: string };
   /** The first two items are featured (with a mini-visual); the rest render as a plain list. */
-  features: { title: string; highlight: string; intro: string; items: Item[] };
+  features: { title: string; highlight: string; items: Item[] };
   steps: { title: string; items: Step[] };
   api: {
     title: string;
-    intro: string;
     method: 'GET' | 'POST';
     endpoint: string;
     /** Raw HTTP request as shown in the code block */
     request: string;
     response: unknown;
-    options: Item[];
+    options: Point[];
   };
   /** Product-specific security points, shown alongside the common ones */
   security: string[];
   related: { slug: string; reason: string }[];
   faqs: Faq[];
-  cta: { title: string; text: string };
+  /** Closing CtaBand heading */
+  cta: string;
 };
 
 /** Shared security & deployment capabilities, shown on every product page */
-export const securityCommon: Item[] = [
-  { title: 'Encrypted in transit and at rest', text: 'TLS for every request. Stored files are encrypted on disk.', icon: FileLock },
-  { title: 'Role-based access', text: 'Each role sees only what it needs. Account and ID numbers are masked.', icon: UserCheck },
-  { title: 'Audit logs', text: 'Who uploaded, viewed, exported or changed what, and when.', icon: ListChecks },
-  { title: 'Retention you control', text: 'You set how long documents are kept. Then they are deleted.', icon: Timer },
+export const securityCommon: Point[] = [
+  { title: 'Encrypted in transit and at rest', icon: FileLock },
+  { title: 'Role-based access', icon: UserCheck },
+  { title: 'Audit logs', icon: ListChecks },
+  { title: 'Retention you control', icon: Timer },
 ];
 
 export const productsContent: Record<string, ProductContent> = {
@@ -61,23 +58,11 @@ export const productsContent: Record<string, ProductContent> = {
       title: 'A 30-page statement, down to ABB, EMIs and bounces',
       highlight: 'EMIs and bounces',
       intro:
-        'Upload a PDF, a scan or a password-protected statement. BSA (Bank Statement Analyser) puts ABB, EMIs, bounces and fraud flags on one screen.',
-      secondary: 'api',
+        'BSA (Bank Statement Analyser) reads PDFs, scans and password-protected statements.',
     },
-    card: {
-      tagline: 'Cash-flow underwriting from raw statements.',
-      bullets: ['ABB, inflow/outflow and FOIR inputs', 'Bounce and cheque-return detection', 'Circular and round-figure fraud flags'],
-    },
-    outcomes: [
-      { title: 'No calculator work', text: 'Every transaction is read and totalled on upload.', icon: Calculator },
-      { title: 'One method, every file', text: 'ABB and FOIR worked out the same way every time.', icon: Scale },
-      { title: 'Fraud signals up front', text: 'Suspicious patterns flagged before sanction.', icon: ShieldAlert },
-      { title: 'Fits how you work', text: 'Dashboard, Excel export or API.', icon: Plug },
-    ],
     features: {
       title: 'Statement reading and maths, done for you',
       highlight: 'done for you',
-      intro: 'BSA does the reading and the maths. Your credit team does the judgement.',
       items: [
         { title: 'ABB and monthly cash flow', text: 'ABB on the dates your policy uses, plus monthly inflow, outflow and closing balance.', icon: Calculator, visual: 'bsa-flow' },
         { title: 'Fraud and tamper flags', text: 'Circular transactions, round-figure deposits, edited PDF metadata and balances that don’t add up.', icon: ShieldAlert, visual: 'bsa-flags' },
@@ -95,7 +80,6 @@ export const productsContent: Record<string, ProductContent> = {
     ] },
     api: {
       title: 'Send a statement, get structured JSON back',
-      intro: 'Post the statement from your LOS. The result comes back to your webhook.',
       method: 'POST',
       endpoint: '/v1/bsa/analyse',
       request: `POST /v1/bsa/analyse
@@ -130,9 +114,9 @@ callback_url=https://lms.example.in/hooks/bsa`,
         excel_url: '/v1/bsa/analyses/bsa_7Hk2Qm/export.xlsx',
       },
       options: [
-        { title: 'Webhooks', text: 'A callback when an analysis is ready.', icon: Webhook },
-        { title: 'Excel export', text: 'Summary, monthly table and flags in one workbook.', icon: FileSpreadsheet },
-        { title: 'Web dashboard', text: 'No integration needed.', icon: LayoutDashboard },
+        { title: 'Webhooks', icon: Webhook },
+        { title: 'Excel export', icon: FileSpreadsheet },
+        { title: 'Web dashboard', icon: LayoutDashboard },
       ],
     },
     security: [
@@ -150,7 +134,7 @@ callback_url=https://lms.example.in/hooks/bsa`,
       { q: 'Does BSA make the credit decision?', a: 'No. It gives you the numbers and the flags. Your credit policy decides.' },
       { q: 'Do we need a tech team to start?', a: 'No. Start with the dashboard and Excel export, and move to the API when your LOS team is ready.' },
     ],
-    cta: { title: 'Send us a statement. See the analysis.', text: 'Bring a sample statement to a 30-minute demo.' },
+    cta: 'Send us a statement. See the analysis.',
   },
 
   /* ---------------------------------------------------------- Payslip */
@@ -164,23 +148,11 @@ callback_url=https://lms.example.in/hooks/bsa`,
       title: 'Catch an edited payslip before it becomes a bad loan',
       highlight: 'edited payslip',
       intro:
-        'Payslip Checker redoes the maths, checks PF, PT and TDS, looks for edits and matches net pay with the salary credited to the bank.',
-      secondary: 'api',
+        'Payslip Checker redoes the maths, checks PF, PT and TDS, and matches net pay with the bank credit.',
     },
-    card: {
-      tagline: 'Income proof, checked line by line.',
-      bullets: ['Arithmetic and statutory checks', 'Font, metadata and edit detection', 'Net pay vs bank salary credit'],
-    },
-    outcomes: [
-      { title: 'Same checks, every slip', text: 'No more depending on who looked that day.', icon: ListChecks },
-      { title: 'Reasons, not just a score', text: 'Each warning says which line failed.', icon: Eye },
-      { title: 'Proof matched with money', text: 'The slip compared with what reached the bank.', icon: Landmark },
-      { title: 'Checked on upload', text: 'Before it reaches a credit officer.', icon: Timer },
-    ],
     features: {
       title: 'The checks a sharp credit officer would do',
       highlight: 'sharp credit officer',
-      intro: 'Every check shows pass, warn or fail, and your team can overrule it.',
       items: [
         { title: 'Arithmetic checks', text: 'Gross must equal earnings. Net must equal gross minus deductions.', icon: Calculator, visual: 'ps-math' },
         { title: 'Tamper detection', text: 'Font changes, edited regions and PDF metadata from editing tools.', icon: ScanSearch, visual: 'ps-tamper' },
@@ -198,7 +170,6 @@ callback_url=https://lms.example.in/hooks/bsa`,
     ] },
     api: {
       title: 'Send a slip, get every check back',
-      intro: 'Send the payslip, plus a BSA analysis ID for the bank credit check.',
       method: 'POST',
       endpoint: '/v1/payslip/verify',
       request: `POST /v1/payslip/verify
@@ -224,9 +195,9 @@ applicant_ref=APP-2026-00418`,
         risk: { score: 72, band: 'high' },
       },
       options: [
-        { title: 'Webhooks', text: 'Results posted back when checks finish.', icon: Webhook },
-        { title: 'PDF report', text: 'One page for the credit file.', icon: FileSpreadsheet },
-        { title: 'Web dashboard', text: 'Edited regions highlighted on screen.', icon: LayoutDashboard },
+        { title: 'Webhooks', icon: Webhook },
+        { title: 'PDF report', icon: FileSpreadsheet },
+        { title: 'Web dashboard', icon: LayoutDashboard },
       ],
     },
     security: [
@@ -244,7 +215,7 @@ applicant_ref=APP-2026-00418`,
       { q: 'Is a high risk score a rejection?', a: 'No. It’s for triage. Your credit team decides.' },
       { q: 'Do we need BSA as well?', a: 'No. Adding BSA turns on the strongest check: net pay against the salary that reached the bank.' },
     ],
-    cta: { title: 'See it catch an edited slip.', text: 'Bring a few sample payslips to a 30-minute demo.' },
+    cta: 'See it catch an edited slip.',
   },
 
   /* ------------------------------------------------------------- Maps */
@@ -258,23 +229,11 @@ applicant_ref=APP-2026-00418`,
       title: 'Turn messy Indian addresses into points on a map',
       highlight: 'messy Indian addresses',
       intro:
-        '“Near Hanuman mandir, behind the school” is how addresses get written. Maps API turns it into a location, checks if your branch serves it and verifies the field visit.',
-      secondary: 'api',
+        'Maps API checks if your branch serves the address and verifies the field visit.',
     },
-    card: {
-      tagline: 'Location checks built for Indian addresses.',
-      bullets: ['Geocoding of landmark-style addresses', 'Pincode, branch and serviceability checks', 'Geo-tagged visits with address match score'],
-    },
-    outcomes: [
-      { title: 'Fewer wasted visits', text: 'Know if an address is in your area first.', icon: Route },
-      { title: 'Visits you can verify', text: 'Photo, location and time on every visit.', icon: Camera },
-      { title: 'Clean location data', text: 'Pincode, district and state on capture.', icon: MapPinned },
-      { title: 'One API for field ops', text: 'Geocoding, distance and territories.', icon: Plug },
-    ],
     features: {
       title: 'Location data your field and credit teams can rely on',
       highlight: 'can rely on',
-      intro: 'Built for how addresses are actually written in India.',
       items: [
         { title: 'Geocoding for messy addresses', text: 'Landmarks, missing pincodes and Hinglish, with a confidence level.', icon: MapPin, visual: 'maps-geo' },
         { title: 'Address match score', text: 'KYC address against where the visit happened.', icon: Crosshair, visual: 'maps-match' },
@@ -292,7 +251,6 @@ applicant_ref=APP-2026-00418`,
     ] },
     api: {
       title: 'Send an address as typed, get a location back',
-      intro: 'Send the address exactly as the applicant wrote it.',
       method: 'POST',
       endpoint: '/v1/geo/geocode',
       request: `POST /v1/geo/geocode
@@ -313,9 +271,9 @@ Content-Type: application/json
         nearest_branch: { code: 'BR-014', name: 'Kothrud', distance_km: 3.2, eta_min: 14 },
       },
       options: [
-        { title: 'Visit webhooks', text: 'Each visit and its score, sent to you.', icon: Webhook },
-        { title: 'Excel batch', text: 'A sheet of addresses, geocoded.', icon: FileSpreadsheet },
-        { title: 'Map dashboard', text: 'Branches and visits on one map.', icon: LayoutDashboard },
+        { title: 'Visit webhooks', icon: Webhook },
+        { title: 'Excel batch', icon: FileSpreadsheet },
+        { title: 'Map dashboard', icon: LayoutDashboard },
       ],
     },
     security: [
@@ -333,7 +291,7 @@ Content-Type: application/json
       { q: 'How is the match score worked out?', a: 'From the distance between the KYC address and the visit. You set what counts as a match.' },
       { q: 'Can we define our own territories?', a: 'Yes: a radius per branch, a list of pincodes, or boundaries drawn on the map.' },
     ],
-    cta: { title: 'Try it on your hardest addresses.', text: 'Bring a sheet of addresses to a 30-minute demo.' },
+    cta: 'Try it on your hardest addresses.',
   },
 
   /* -------------------------------------------------------------- CRM */
@@ -347,23 +305,11 @@ Content-Type: application/json
       title: 'Every lead, follow-up and loan file on one pipeline',
       highlight: 'one pipeline',
       intro:
-        'Leads from your website, WhatsApp, Excel and DSA partners land in one place and go to the right person. Lending files are tracked to disbursal.',
-      secondary: 'how',
+        'CRM pulls in leads from your website, WhatsApp, Excel and DSA partners.',
     },
-    card: {
-      tagline: 'Sales pipeline with a lending mode built in.',
-      bullets: ['Leads from web, WhatsApp, Excel and DSAs', 'Auto-assignment and follow-up reminders', 'Lead → login → sanction → disbursal'],
-    },
-    outcomes: [
-      { title: 'No lead left in a sheet', text: 'Every source in one pipeline.', icon: Inbox },
-      { title: 'Follow-ups that don’t slip', text: 'Reminders and overdue lists.', icon: Bell },
-      { title: 'Managers see the real picture', text: 'Live pipeline by stage and branch.', icon: ChartPie },
-      { title: 'Field and office in sync', text: 'Field check-ins on the office dashboard.', icon: Smartphone },
-    ],
     features: {
       title: 'Built for teams that sell on the phone and in the field',
       highlight: 'in the field',
-      intro: 'Set up around your stages, products and branches.',
       items: [
         { title: 'Your pipeline stages', text: 'Stages per product, with required fields and documents.', icon: Workflow, visual: 'crm-stages' },
         { title: 'Auto-assignment', text: 'By pincode, branch or product. Duplicates caught on mobile number.', icon: Funnel, visual: 'crm-assign' },
@@ -382,7 +328,6 @@ Content-Type: application/json
     ] },
     api: {
       title: 'Push leads in, read the pipeline back',
-      intro: 'Push leads from any system and read status back.',
       method: 'POST',
       endpoint: '/v1/crm/leads',
       request: `POST /v1/crm/leads
@@ -406,9 +351,9 @@ Content-Type: application/json
         follow_up_at: '2026-10-31T16:30:00+05:30',
       },
       options: [
-        { title: 'Stage webhooks', text: 'Tell your LOS when a file moves.', icon: Webhook },
-        { title: 'Excel import and export', text: 'Old lead sheets in on day one.', icon: FileSpreadsheet },
-        { title: 'Dashboards', text: 'Pipeline and conversion by person and branch.', icon: LayoutDashboard },
+        { title: 'Stage webhooks', icon: Webhook },
+        { title: 'Excel import and export', icon: FileSpreadsheet },
+        { title: 'Dashboards', icon: LayoutDashboard },
       ],
     },
     security: [
@@ -426,7 +371,7 @@ Content-Type: application/json
       { q: 'Is it only for lenders?', a: 'No. It works for any sales team. Lenders also get login, sanction and disbursal stages.' },
       { q: 'Can it connect to our LOS or accounting system?', a: 'Yes, through the API and webhooks. We can build the connector for you.' },
     ],
-    cta: { title: 'See your pipeline in our CRM.', text: 'Tell us your stages. We’ll show them in a 30-minute demo.' },
+    cta: 'See your pipeline in our CRM.',
   },
 
   /* ------------------------------------------------------------- HRMS */
@@ -440,23 +385,11 @@ Content-Type: application/json
       title: 'Attendance to payslip, without the spreadsheets',
       highlight: 'without the spreadsheets',
       intro:
-        'Selfie and geo-fenced attendance, shifts and leave feed straight into payroll, with PF, ESI, PT and TDS worked out.',
-      secondary: 'how',
+        'HRMS works out PF, ESI, PT and TDS from attendance, shifts and leave.',
     },
-    card: {
-      tagline: 'Indian payroll, set up with your HR team.',
-      bullets: ['Selfie and geo-fenced attendance', 'Payroll with PF, ESI, PT and TDS', 'Employee self-service app'],
-    },
-    outcomes: [
-      { title: 'Calm month end', text: 'Attendance is already in payroll.', icon: CalendarCheck },
-      { title: 'Fewer salary queries', text: 'Staff see their own payslips.', icon: Smartphone },
-      { title: 'Statutory maths by rule', text: 'PF, ESI, PT and TDS, not formula cells.', icon: Calculator },
-      { title: 'Field staff included', text: 'Selfie check-in on site.', icon: MapPin },
-    ],
     features: {
       title: 'The whole employee lifecycle in one system',
       highlight: 'in one system',
-      intro: 'From offer letter to full and final, set up for Indian payroll.',
       items: [
         { title: 'Selfie and geo-fenced attendance', text: 'Check-in inside an office radius, with a selfie to stop proxy punches.', icon: ScanFace, visual: 'hr-attend' },
         { title: 'Payroll with statutory deductions', text: 'Salary structures, PF, ESI, PT by state and TDS.', icon: Wallet, visual: 'hr-payroll' },
@@ -475,7 +408,6 @@ Content-Type: application/json
     ] },
     api: {
       title: 'Push employees in, pull payroll out',
-      intro: 'Read payroll runs and push employees from your other systems.',
       method: 'GET',
       endpoint: '/v1/hrms/payroll/runs/2026-09',
       request: `GET /v1/hrms/payroll/runs/2026-09
@@ -490,9 +422,9 @@ Accept: application/json`,
         bank_file: '/v1/hrms/payroll/runs/2026-09/bank-transfer.xlsx',
       },
       options: [
-        { title: 'Webhooks', text: 'Joiners, exits and payroll approval.', icon: Webhook },
-        { title: 'Excel and bank files', text: 'Statutory reports and salary transfer files.', icon: FileSpreadsheet },
-        { title: 'HR dashboard', text: 'Headcount and payroll cost at a glance.', icon: LayoutDashboard },
+        { title: 'Webhooks', icon: Webhook },
+        { title: 'Excel and bank files', icon: FileSpreadsheet },
+        { title: 'HR dashboard', icon: LayoutDashboard },
       ],
     },
     security: [
@@ -510,15 +442,15 @@ Accept: application/json`,
       { q: 'How big a team does it suit?', a: 'Teams from about 10 people upwards, in one or many locations.' },
       { q: 'Can we switch payroll mid-year?', a: 'Yes. We import year-to-date figures so TDS stays correct.' },
     ],
-    cta: { title: 'Run your next payroll on our HRMS.', text: 'See a sample payroll run in a 30-minute demo.' },
+    cta: 'Run your next payroll on our HRMS.',
   },
 };
 
-/** Journey shown on the products index: how the lending tools chain together */
+/** Products index: how the lending tools chain together on one loan file */
 export const lendingJourney = [
-  { slug: 'crm', stage: 'Lead', title: 'Lead captured and assigned', text: 'Our CRM dedupes the lead and assigns it to a branch officer.', icon: UserPlus },
-  { slug: 'maps-api', stage: 'Visit', title: 'Address and visit verified', text: 'Address geocoded, field visit geo-tagged and scored.', icon: MapPin },
-  { slug: 'payslip-checker', stage: 'Income', title: 'Payslip verified', text: 'Maths, statutory and tamper checks on each slip.', icon: BadgeCheck },
-  { slug: 'bank-statement-analyser', stage: 'Cash flow', title: 'Statement analysed', text: 'ABB, EMIs and bounces; salary matched with the payslip.', icon: TrendingUp },
-  { slug: 'crm', stage: 'Decision', title: 'Sanction and disbursal', text: 'Every result sits on the loan file. Your credit team decides.', icon: Target },
+  { slug: 'crm', title: 'Lead captured and assigned', icon: UserPlus },
+  { slug: 'maps-api', title: 'Address and visit verified', icon: MapPin },
+  { slug: 'payslip-checker', title: 'Payslip verified', icon: BadgeCheck },
+  { slug: 'bank-statement-analyser', title: 'Statement analysed', icon: TrendingUp },
+  { slug: 'crm', title: 'Sanction and disbursal', icon: Target },
 ];

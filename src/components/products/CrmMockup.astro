@@ -1,12 +1,8 @@
 ---
 // CRM mockup: lending pipeline kanban with owner avatars (sample data).
-import { Plus, Bell, MessageCircle, Globe, Users, FileSpreadsheet, Search, ChevronDown, Clock } from '@lucide/astro';
+import { Plus, MessageCircle, Globe, Users, FileSpreadsheet, Search, ChevronDown, Clock } from '@lucide/astro';
 import MockupFrame from './MockupFrame.astro';
 import StatusPill from './StatusPill.astro';
-import FloatChip from './FloatChip.astro';
-
-interface Props { float?: boolean }
-const { float = true } = Astro.props;
 
 const owners: Record<string, string> = {
   NP: 'bg-brand-600 text-white',
@@ -53,93 +49,70 @@ const columns: { stage: string; count: number; dot: string; cards: Card[] }[] = 
 ];
 ---
 
-<div class="relative">
-  {float && (
-    <>
-      <FloatChip icon={MessageCircle} tone="brand" title="New lead from WhatsApp" text="Auto-assigned to Neha P · Kothrud" class="-top-12 right-8" />
-      <FloatChip icon={Bell} tone="warn" title="Follow-up due" text="Amit Kulkarni · 4:30 pm" class="-bottom-10 left-6" />
-    </>
-  )}
-  <MockupFrame title="CRM · Lending pipeline">
-    <!-- app top bar -->
-    <div class="flex items-center gap-3 border-b border-ink-100 bg-white px-3 py-2 @sm:px-4">
-      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-brand-600 text-[10px] font-extrabold text-white">M</span>
-      <nav class="flex gap-3 text-[10.5px] font-semibold text-ink-400" aria-hidden="true">
-        <span class="border-b-2 border-brand-600 pb-0.5 text-ink-900">Pipeline</span>
-        <span class="hidden @sm:inline">Leads</span>
-        <span class="hidden @sm:inline">Follow-ups</span>
-        <span class="hidden @md:inline">Partners</span>
-        <span class="hidden @lg:inline">Reports</span>
-      </nav>
-      <span class="ml-auto hidden items-center gap-1.5 rounded-md bg-ink-50 px-2 py-1 text-[10px] text-ink-400 ring-1 ring-ink-100 @md:flex"><Search size={11} />Search leads</span>
-      <span class="inline-flex shrink-0 items-center gap-1 rounded-md bg-brand-600 px-2 py-1 text-[10px] font-semibold text-white"><Plus size={11} />Lead</span>
+<MockupFrame title="CRM · Lending pipeline">
+  <!-- app top bar -->
+  <div class="flex items-center gap-3 border-b border-ink-100 bg-white px-3 py-2 @sm:px-4">
+    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-brand-600 text-[10px] font-extrabold text-white">M</span>
+    <nav class="flex gap-3 text-[10.5px] font-semibold text-ink-400" aria-hidden="true">
+      <span class="border-b-2 border-brand-600 pb-0.5 text-ink-900">Pipeline</span>
+      <span class="hidden @sm:inline">Leads</span>
+      <span class="hidden @sm:inline">Follow-ups</span>
+      <span class="hidden @md:inline">Partners</span>
+      <span class="hidden @lg:inline">Reports</span>
+    </nav>
+    <span class="ml-auto hidden items-center gap-1.5 rounded-md bg-ink-50 px-2 py-1 text-[10px] text-ink-400 ring-1 ring-ink-100 @md:flex"><Search size={11} />Search leads</span>
+    <span class="inline-flex shrink-0 items-center gap-1 rounded-md bg-brand-600 px-2 py-1 text-[10px] font-semibold text-white"><Plus size={11} />Lead</span>
+  </div>
+
+  <div class="space-y-3 bg-ink-50/70 p-3 @sm:p-4">
+    <!-- filters + stats -->
+    <div class="flex flex-wrap items-center gap-2 text-[10px]">
+      <span class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 font-semibold text-ink-700 ring-1 ring-ink-200">All products<ChevronDown size={11} /></span>
+      <span class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 font-semibold text-ink-700 ring-1 ring-ink-200">Pune branches<ChevronDown size={11} /></span>
+      <span class="ml-auto flex items-center gap-3 text-ink-500">
+        <span><b class="text-ink-900">9</b> due today</span>
+        <span class="text-rose-600"><b>3</b> overdue</span>
+      </span>
     </div>
 
-    <div class="space-y-3 bg-ink-50/70 p-3 @sm:p-4">
-      <!-- filters + stats -->
-      <div class="flex flex-wrap items-center gap-2 text-[10px]">
-        <span class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 font-semibold text-ink-700 ring-1 ring-ink-200">All products<ChevronDown size={11} /></span>
-        <span class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 font-semibold text-ink-700 ring-1 ring-ink-200">Pune branches<ChevronDown size={11} /></span>
-        <span class="ml-auto flex items-center gap-3 text-ink-500">
-          <span><b class="text-ink-900">9</b> due today</span>
-          <span class="text-rose-600"><b>3</b> overdue</span>
-        </span>
-      </div>
-
-      <!-- kanban -->
-      <div class="-mx-1 overflow-x-auto px-1 pb-1">
-        <div class="grid grid-cols-2 gap-2 @md:min-w-[30rem] @md:grid-cols-4">
-          {columns.map((col, i) => (
-            <div class={`rounded-lg bg-ink-100/70 p-1.5 ${i >= 2 ? 'hidden @md:block' : ''}`}>
-              <div class="flex items-center gap-1.5 px-1 pt-0.5 pb-2">
-                <span class={`h-1.5 w-1.5 rounded-full ${col.dot}`}></span>
-                <span class="truncate text-[10.5px] font-bold text-ink-800">{col.stage}</span>
-                <span class="ml-auto rounded-full bg-white px-1.5 text-[9.5px] font-semibold text-ink-500">{col.count}</span>
-              </div>
-              <div class="space-y-1.5">
-                {col.cards.map((card) => {
-                  const Src = sourceIcon[card.source];
-                  return (
-                    <div class="rounded-md bg-white p-2 shadow-sm ring-1 ring-ink-100">
-                      <div class="flex items-start justify-between gap-1">
-                        <p class="text-[10.5px] leading-tight font-bold text-ink-900">{card.name}</p>
-                        <span class={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full text-[7.5px] font-bold ${owners[card.owner]}`}>{card.owner}</span>
-                      </div>
-                      <p class="text-[9.5px] text-ink-500">{card.product}</p>
-                      <p class="mt-1 text-[11px] font-extrabold text-ink-800 tabular-nums">{card.amt}</p>
-                      {card.docs !== undefined && (
-                        <div class="mt-1.5">
-                          <div class="flex justify-between text-[8.5px] text-ink-400"><span>Docs</span><span>{card.docs}/8</span></div>
-                          <div class="mt-0.5 h-1 overflow-hidden rounded-full bg-ink-100"><div class="h-full rounded-full bg-brand-500" style={`width: ${(card.docs / 8) * 100}%`}></div></div>
-                        </div>
-                      )}
-                      <div class="mt-1.5 flex items-center gap-1">
-                        <span class="grid h-4.5 w-4.5 shrink-0 place-items-center rounded bg-ink-50 text-ink-500 ring-1 ring-ink-100" title={card.source}><Src size={9} /></span>
-                        {card.note && <StatusPill tone={card.note.tone}>{card.note.tone === 'info' && <Clock size={9} />}{card.note.text}</StatusPill>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+    <!-- kanban -->
+    <div class="-mx-1 overflow-x-auto px-1 pb-1">
+      <div class="grid grid-cols-2 gap-2 @md:min-w-[30rem] @md:grid-cols-4">
+        {columns.map((col, i) => (
+          <div class={`rounded-lg bg-ink-100/70 p-1.5 ${i >= 2 ? 'hidden @md:block' : ''}`}>
+            <div class="flex items-center gap-1.5 px-1 pt-0.5 pb-2">
+              <span class={`h-1.5 w-1.5 rounded-full ${col.dot}`}></span>
+              <span class="truncate text-[10.5px] font-bold text-ink-800">{col.stage}</span>
+              <span class="ml-auto rounded-full bg-white px-1.5 text-[9.5px] font-semibold text-ink-500">{col.count}</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- conversion strip -->
-      <div class="grid grid-cols-3 gap-2">
-        {[
-          { k: 'Lead → login', v: '38%', w: '38%' },
-          { k: 'Login → sanction', v: '61%', w: '61%' },
-          { k: 'Avg TAT', v: '9 days', w: '45%' },
-        ].map((s) => (
-          <div class="rounded-lg bg-white p-2 ring-1 ring-ink-100">
-            <p class="truncate text-[9px] text-ink-400">{s.k}</p>
-            <p class="text-[12px] font-extrabold text-ink-900">{s.v}</p>
-            <div class="mt-1 h-1 overflow-hidden rounded-full bg-ink-100"><div class="h-full rounded-full bg-brand-500" style={`width: ${s.w}`}></div></div>
+            <div class="space-y-1.5">
+              {col.cards.map((card) => {
+                const Src = sourceIcon[card.source];
+                return (
+                  <div class="rounded-md bg-white p-2 shadow-sm ring-1 ring-ink-100">
+                    <div class="flex items-start justify-between gap-1">
+                      <p class="text-[10.5px] leading-tight font-bold text-ink-900">{card.name}</p>
+                      <span class={`grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full text-[7.5px] font-bold ${owners[card.owner]}`}>{card.owner}</span>
+                    </div>
+                    <p class="text-[9.5px] text-ink-500">{card.product}</p>
+                    <p class="mt-1 text-[11px] font-extrabold text-ink-800 tabular-nums">{card.amt}</p>
+                    {card.docs !== undefined && (
+                      <div class="mt-1.5">
+                        <div class="flex justify-between text-[8.5px] text-ink-400"><span>Docs</span><span>{card.docs}/8</span></div>
+                        <div class="mt-0.5 h-1 overflow-hidden rounded-full bg-ink-100"><div class="h-full rounded-full bg-brand-500" style={`width: ${(card.docs / 8) * 100}%`}></div></div>
+                      </div>
+                    )}
+                    <div class="mt-1.5 flex items-center gap-1">
+                      <span class="grid h-4.5 w-4.5 shrink-0 place-items-center rounded bg-ink-50 text-ink-500 ring-1 ring-ink-100" title={card.source}><Src size={9} /></span>
+                      {card.note && <StatusPill tone={card.note.tone}>{card.note.tone === 'info' && <Clock size={9} />}{card.note.text}</StatusPill>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
     </div>
-  </MockupFrame>
-</div>
+  </div>
+</MockupFrame>

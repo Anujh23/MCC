@@ -1,19 +1,14 @@
 ---
-import { PhoneCall, MessageCircle } from '@lucide/astro';
+import { MessageCircle } from '@lucide/astro';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 import ContactForm from '../components/company/ContactForm.astro';
-import { contact, cta } from '../data/site';
+import { contact } from '../data/site';
 import { breadcrumbList } from '../data/schema';
 
 const crumbs = [{ label: 'Contact' }];
-const whatsapp = contact.phone ? `https://wa.me/${contact.phone.replace(/\D/g, '')}` : null;
-
-const next = [
-  'We call you back within one working day.',
-  'A free 30-minute call with an engineer.',
-  'A written scope and one fixed price in ₹.',
-];
+// The side panel offers the phone next to the form. Without a form key, the form is already a call block.
+const aside = Boolean(contact.formKey && contact.phone);
 ---
 
 <Base
@@ -21,6 +16,7 @@ const next = [
   description="Book a free 30-minute call with a Manka engineer about a CRM, HR system, website, data project or lending tool. We aim to reply within one working day."
   schema={breadcrumbList(crumbs, '/contact/')}
 >
+  <div class="flex min-h-[calc(100dvh-4rem)] flex-col">
   <section class="relative overflow-hidden bg-ink-950 text-white">
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
     <div class="pointer-events-none absolute -top-40 -right-32 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
@@ -29,23 +25,17 @@ const next = [
       <h1 class="text-3xl leading-tight font-extrabold text-white sm:text-4xl lg:text-5xl">
         Talk to an <span class="text-gradient-saffron">engineer.</span>
       </h1>
-      <p class="mt-3 max-w-3xl text-base leading-relaxed text-ink-300 sm:text-lg">
-        Leave your name and mobile number. We call you back, usually within one working day.
-      </p>
     </div>
   </section>
 
-  <section class="bg-ink-50 pb-12 lg:pb-16">
+  <section class="flex-1 bg-ink-50 pb-12 lg:pb-16">
     <div class="container-page">
-      <div class={`relative -mt-10 grid overflow-hidden rounded-3xl bg-white shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:-mt-12 ${contact.phone ? 'lg:grid-cols-[1fr_24rem]' : ''}`}>
+      <div class={`relative -mt-10 grid overflow-hidden rounded-3xl bg-white shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:-mt-12 ${aside ? 'lg:grid-cols-[1fr_24rem]' : ''}`}>
         <div class="p-5 sm:p-8 lg:p-10">
-          <h2 class="text-xl font-extrabold sm:text-2xl" data-cf-title>{cta.call}</h2>
-          <div class="mt-5 sm:mt-6">
-            <ContactForm />
-          </div>
+          <ContactForm />
         </div>
 
-        {contact.phone && (
+        {aside && (
           <aside class="relative bg-ink-950 p-5 text-white sm:p-8 lg:p-10" aria-labelledby="call-title">
             <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
             <div class="relative">
@@ -54,30 +44,16 @@ const next = [
                 href={contact.phoneHref}
                 class="mt-1 inline-flex min-h-11 items-center rounded-lg text-2xl font-extrabold tracking-tight text-white transition hover:text-brand-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
               >{contact.phone}</a>
-              <div class="mt-4 grid grid-cols-2 gap-3">
-                <a href={contact.phoneHref} class="btn btn-primary">
-                  <PhoneCall size={16} aria-hidden="true" />Call now
+              {contact.whatsappHref && (
+                <a href={contact.whatsappHref} target="_blank" rel="noopener" class="btn mt-4 bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15">
+                  <MessageCircle size={16} aria-hidden="true" />WhatsApp<span class="sr-only"> (opens in a new tab)</span>
                 </a>
-                {whatsapp && (
-                  <a href={whatsapp} target="_blank" rel="noopener" class="btn bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15">
-                    <MessageCircle size={16} aria-hidden="true" />WhatsApp<span class="sr-only"> (opens in a new tab)</span>
-                  </a>
-                )}
-              </div>
-
-              <h2 class="mt-8 border-t border-white/10 pt-6 text-sm font-semibold text-white">What happens next</h2>
-              <ol class="mt-4 space-y-3 text-sm leading-snug text-ink-300">
-                {next.map((t, i) => (
-                  <li class="flex items-start gap-3">
-                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-bold text-saffron-400 ring-1 ring-white/15" aria-hidden="true">{i + 1}</span>
-                    <span class="pt-0.5">{t}</span>
-                  </li>
-                ))}
-              </ol>
+              )}
             </div>
           </aside>
         )}
       </div>
     </div>
   </section>
+  </div>
 </Base>

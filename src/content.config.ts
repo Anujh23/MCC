@@ -10,8 +10,6 @@ const insights = defineCollection({
     description: z.string(),
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
-    // Minutes. Optional: computed from word count when missing.
-    readingTime: z.number().optional(),
     // Pin one post as the featured card on /insights (newest wins if none set).
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),

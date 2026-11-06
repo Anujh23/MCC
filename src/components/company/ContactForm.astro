@@ -1,12 +1,10 @@
 ---
 // Contact form ("Book a free call"): name and mobile, plus an optional topic and note. We call back, so
-// no email is asked for. Posts JSON to Web3Forms (works on static hosting like GitHub Pages). With no form
-// key yet ('offline', staging only) it validates but sends nothing.
-// ?interest=<slug> preselects the topic and retitles the element marked [data-cf-title].
-import { Send, LoaderCircle, CircleCheck, CircleAlert } from '@lucide/astro';
+// no email is asked for. Posts JSON to Web3Forms (works on static hosting like GitHub Pages).
+// Until site.formAccessKey is a real key, it renders a call + WhatsApp block instead, so nobody fills in a dead form.
+// ?interest=<slug> preselects the topic and retitles the heading.
+import { Send, LoaderCircle, CircleCheck, CircleAlert, MessageCircle } from '@lucide/astro';
 import { site, contact, interests, products, industryInterest, href, cta } from '../../data/site';
-
-const mode = contact.formKey ? 'live' : 'offline';
 
 const groups = [
   { label: 'Services', kind: 'service' },
@@ -22,21 +20,23 @@ const optional = 'font-normal text-ink-500';
 // Empty until the field is invalid, so aria-describedby reads nothing on a fresh form. Text lives in data-msg.
 const errorCls = 'mt-1.5 text-sm font-medium text-rose-700 empty:hidden';
 const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -translate-y-1/2 text-ink-500';
+const heading = 'text-xl font-extrabold sm:text-2xl';
 ---
 
+{contact.formKey ? (
+<>
+<h2 class={heading} data-cf-title>{cta.call}</h2>
 <form
   id="contact-form"
-  class="relative"
+  class="relative mt-5 sm:mt-6"
   action="https://api.web3forms.com/submit"
   method="POST"
   novalidate
-  data-mode={mode}
   data-aliases={JSON.stringify(industryInterest)}
   data-cta-call={cta.call}
   data-cta-demo={cta.demo}
-  data-cta-introduce={cta.introduce}
 >
-  {contact.formKey && <input type="hidden" name="access_key" value={contact.formKey} />}
+  <input type="hidden" name="access_key" value={contact.formKey} />
   <input type="hidden" name="subject" value={`Call-back request from ${site.shortName} website`} />
   <input type="hidden" name="from_name" value={`${site.shortName} website`} />
   <!-- Honeypot: humans never see or tick this. Web3Forms drops submissions where it is checked. -->
@@ -82,7 +82,7 @@ const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -tran
       <LoaderCircle size={17} data-spinner class="hidden animate-spin" aria-hidden="true" />
     </button>
     <p class="mt-3 text-center text-xs leading-relaxed text-ink-500 sm:mt-0 sm:text-left">
-      {mode === 'offline' && <>This form goes live at launch. </>}By sending, you agree to our <a href={href('/privacy/')} class="font-semibold text-brand-700 underline underline-offset-2">privacy policy</a>.
+      By sending, you agree to our <a href={href('/privacy/')} class="font-semibold text-brand-700 underline underline-offset-2">privacy policy</a>.
     </p>
   </div>
 
@@ -101,12 +101,23 @@ const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -tran
           : '.'}
       </p>
     </div>
-    <div data-state="offline" class="mt-4 hidden gap-3 rounded-xl bg-ink-50 p-4 text-sm leading-relaxed text-ink-800 ring-1 ring-ink-200">
-      <CircleAlert size={20} class="mt-0.5 shrink-0 text-ink-600" aria-hidden="true" />
-      <p><strong class="font-semibold">This form goes live at launch.</strong> Your details look fine, but nothing was sent.</p>
-    </div>
   </div>
 </form>
+</>
+) : contact.phone && (
+<div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+  <div>
+    <h2 class={heading}>{cta.call}</h2>
+    <a
+      href={contact.phoneHref}
+      class="mt-2 inline-flex min-h-11 items-center rounded-lg text-3xl font-extrabold tracking-tight text-ink-900 transition hover:text-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:text-5xl"
+    >{contact.phone}</a>
+  </div>
+  <a href={contact.whatsappHref} target="_blank" rel="noopener" class="btn btn-primary self-start lg:self-auto">
+    <MessageCircle size={18} aria-hidden="true" />WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+  </a>
+</div>
+)}
 
 <script>
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
@@ -117,23 +128,19 @@ const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -tran
     const buttonLabel = button.querySelector<HTMLElement>('[data-label]')!;
     const select = form.querySelector<HTMLSelectElement>('#cf-interest')!;
     const title = document.querySelector<HTMLElement>('[data-cf-title]');
-    const { mode, ctaCall = '', ctaDemo = '', ctaIntroduce = '' } = form.dataset;
+    const { ctaCall = '', ctaDemo = '' } = form.dataset;
     const aliases: Record<string, string> = JSON.parse(form.dataset.aliases || '{}');
     const defaultTitle = title?.textContent ?? '';
 
-    // Heading and submit label follow the chosen topic: products ask for a demo, careers for an intro.
+    // Heading and submit label follow the chosen topic: products ask for a demo.
     let submitLabel = ctaCall;
     const updateIntent = () => {
       const opt = select.selectedOptions[0];
-      const kind = opt?.dataset.kind;
-      const slug = opt?.dataset.slug;
       let heading = defaultTitle;
       submitLabel = ctaCall;
-      if (kind === 'product') {
+      if (opt?.dataset.kind === 'product') {
         heading = `Request a ${opt.dataset.short ?? opt.textContent} demo`;
         submitLabel = ctaDemo;
-      } else if (slug === 'careers') {
-        heading = submitLabel = ctaIntroduce;
       }
       if (title) title.textContent = heading;
       buttonLabel.textContent = submitLabel;
@@ -180,7 +187,7 @@ const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -tran
     };
     form.addEventListener('input', recheck);
 
-    const show = (state: 'success' | 'error' | 'offline' | null) => {
+    const show = (state: 'success' | 'error' | null) => {
       status.querySelectorAll<HTMLElement>('[data-state]').forEach((s) => {
         const on = s.dataset.state === state;
         s.classList.toggle('hidden', !on);
@@ -207,11 +214,6 @@ const chevron = 'pointer-events-none absolute top-1/2 right-4 mt-1 h-4 w-4 -tran
         return;
       }
       summary.textContent = '';
-
-      if (mode === 'offline') {
-        show('offline');
-        return;
-      }
 
       setLoading(true);
       try {

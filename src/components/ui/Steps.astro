@@ -1,87 +1,68 @@
 ---
 // The one numbered-steps component. Horizontal with a connector line on lg (rows of 3–4 past
-// 5 steps), a vertical rail below lg. `vertical` forces the rail at every width.
-// Usage: <Steps steps={howWeWork} />  ·  <Steps tone="dark" steps={c.steps} />  ·  <Steps vertical steps={next} />
-// tags: plain strings, or { label, path } links (paths under /products/ get the product dot).
-import { Clock3 } from '@lucide/astro';
+// 5 steps), a vertical rail below lg.
+// Usage: <Steps steps={howWeWork} />  ·  <Steps tone="dark" steps={c.steps} />
+// tags: plain strings, or { label, path } links.
 import { href } from '../../data/site';
 
 type Tag = string | { label: string; path: string };
 interface Props {
-  steps: { title: string; text: string; icon?: any; duration?: string; tags?: Tag[] }[];
+  steps: { title: string; text: string; tags?: Tag[] }[];
   tone?: 'light' | 'dark';
-  vertical?: boolean;
   class?: string;
 }
-const { steps, tone = 'light', vertical = false, class: className = '' } = Astro.props;
+const { steps, tone = 'light', class: className = '' } = Astro.props;
 const dark = tone === 'dark';
 const n = steps.length;
 const perRow = n <= 5 ? n : n % 3 === 0 ? 3 : 4;
 const lgCols = ({ 1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4', 5: 'lg:grid-cols-5' } as Record<number, string>)[perRow];
-const row = !vertical;
 
 const c = dark
   ? {
       badge: 'bg-brand-600 text-white',
       line: 'bg-white/15',
-      icon: 'bg-white/10 text-brand-200 ring-white/15',
       title: 'text-white',
       text: 'text-ink-300',
-      chip: 'bg-white/10 text-ink-100 ring-white/15',
       tag: 'bg-white/[0.06] text-ink-100 ring-white/15',
       tagLink: 'hover:bg-white/10 hover:text-white',
     }
   : {
       badge: 'bg-brand-50 text-brand-700 ring-1 ring-brand-100',
       line: 'bg-ink-200',
-      icon: 'bg-white text-brand-600 ring-ink-100 shadow-sm shadow-ink-900/5',
       title: 'text-ink-900',
       text: 'text-ink-600',
-      chip: 'bg-ink-50 text-ink-700 ring-ink-100',
       tag: 'bg-white text-ink-700 ring-ink-200',
       tagLink: 'hover:bg-brand-50 hover:text-brand-700 hover:ring-brand-200',
     };
-const isProduct = (t: Tag) => typeof t !== 'string' && t.path.startsWith('/products/');
 ---
 
-<ol class={`relative grid gap-y-8 ${row ? `lg:gap-x-6 lg:gap-y-12 ${lgCols}` : ''} ${className}`}>
+<ol class={`relative grid gap-y-8 lg:gap-x-6 lg:gap-y-12 ${lgCols} ${className}`}>
   {steps.map((s, i) => {
     const last = i === n - 1;
     const rowEnd = (i + 1) % perRow === 0;
     return (
-      <li class={`reveal relative flex gap-4 ${row ? 'lg:flex-col lg:gap-0' : ''}`} style={`--d: ${(i % perRow) * 90}ms`}>
+      <li class={`reveal relative flex gap-4 lg:flex-col lg:gap-0`} style={`--d: ${(i % perRow) * 90}ms`}>
         {!last && (
-          <span aria-hidden="true" class={`absolute top-12 -bottom-6 left-5 w-px ${c.line} ${row ? 'lg:hidden' : ''}`}></span>
+          <span aria-hidden="true" class={`absolute top-12 -bottom-6 left-5 w-px ${c.line} lg:hidden`}></span>
         )}
-        {row && !last && !rowEnd && (
+        {!last && !rowEnd && (
           <span aria-hidden="true" class={`absolute top-5 -right-2 left-14 hidden h-px lg:block ${c.line}`}></span>
         )}
         <span class={`relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold tabular-nums ${c.badge}`}>
           {String(i + 1).padStart(2, '0')}
         </span>
-        <div class={`min-w-0 flex-1 pt-1.5 ${row ? 'lg:pt-5' : ''}`}>
-          {s.icon && (
-            <span class={`mb-4 hidden h-11 w-11 place-items-center rounded-xl ring-1 ${row ? 'lg:grid' : ''} ${c.icon}`}>
-              <s.icon size={20} stroke-width={1.8} />
-            </span>
-          )}
+        <div class={`min-w-0 flex-1 pt-1.5 lg:pt-5`}>
           <h3 class={`text-lg leading-snug font-bold ${c.title}`}>{s.title}</h3>
-          {s.duration && (
-            <p class={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${c.chip}`}>
-              <Clock3 size={12} aria-hidden="true" />{s.duration}
-            </p>
-          )}
           <p class={`mt-2 text-[0.95rem] leading-relaxed ${c.text}`}>{s.text}</p>
           {s.tags && s.tags.length > 0 && (
             <ul class="mt-4 flex flex-wrap gap-2">
               {s.tags.map((t) => {
                 const label = typeof t === 'string' ? t : t.label;
-                const dot = <span class={`h-1.5 w-1.5 rounded-full ${isProduct(t) ? 'bg-saffron-500' : 'bg-brand-400'}`} aria-hidden="true"></span>;
                 return (
                   <li>
                     {typeof t === 'string'
-                      ? <span class={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 ${c.tag}`}>{dot}{label}</span>
-                      : <a href={href(t.path)} class={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 transition ${c.tag} ${c.tagLink}`}>{dot}{label}</a>}
+                      ? <span class={`inline-flex items-center rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 ${c.tag}`}>{label}</span>
+                      : <a href={href(t.path)} class={`inline-flex items-center rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 transition ${c.tag} ${c.tagLink}`}>{label}</a>}
                   </li>
                 );
               })}

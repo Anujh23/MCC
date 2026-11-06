@@ -4,14 +4,11 @@ import {
   SquareKanban, Landmark, FileCheck, MapPin, IdCard,
   Banknote, ShoppingBag, Building, Stethoscope, Rocket,
   Info, Briefcase, Newspaper, Mail,
-  PhoneCall, FileText, LifeBuoy,
 } from '@lucide/astro';
 
 export const site = {
   name: 'Manka Commerce & Consultancy',
   shortName: 'Manka',
-  // Home H1 only. Don't reuse it elsewhere.
-  tagline: 'We build the software your business runs on.',
   description:
     'Manka Commerce & Consultancy builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip verification for growing businesses.',
   // The only public contact detail is the mobile number (owner's choice: no email, LinkedIn,
@@ -28,6 +25,7 @@ const real = (v: string) => (isPlaceholder(v) ? null : v);
 export const contact = {
   phone: real(site.phone),
   phoneHref: real(site.phone) ? `tel:${site.phone.replace(/\s/g, '')}` : null,
+  whatsappHref: real(site.phone) ? `https://wa.me/${site.phone.replace(/\D/g, '')}` : null,
   formKey: real(site.formAccessKey),
 };
 
@@ -66,16 +64,11 @@ export const contactHref = (interest?: string) => href(contactPath(interest));
 export const cta = {
   call: 'Book a free call',
   demo: 'Request a demo',
-  api: 'See the API',
-  how: 'How it works',
-  introduce: 'Introduce yourself',
   explore: (name: string) => `Explore ${name}`,
 };
 
 // Hidden sections. Flip to true once the owner supplies the real content.
 export const flags = { founderStory: false, team: false };
-
-export const productStatus = 'Now onboarding first clients';
 
 // icon is a Lucide Astro component: render with <item.icon size={20} />
 // short: the product name to use in running copy ("Explore BSA", "Request a BSA demo").
@@ -105,11 +98,11 @@ export const industries: NavItem[] = [
   { title: 'Startups & SMEs', slug: 'startups-smes', blurb: 'Your first tech team, without the hiring.', icon: Rocket },
 ];
 
-export const company: NavItem[] = [
-  { title: 'About Us', slug: 'about', blurb: 'Who we are and how we work.', icon: Info },
-  { title: 'Careers', slug: 'careers', blurb: 'No open roles right now.', icon: Briefcase },
-  { title: 'Insights', slug: 'insights', blurb: 'Notes from the work.', icon: Newspaper },
-  { title: 'Contact', slug: 'contact', blurb: 'Talk to an engineer, not a salesperson.', icon: Mail },
+export const company: Omit<NavItem, 'blurb'>[] = [
+  { title: 'About', slug: 'about', icon: Info },
+  { title: 'Careers', slug: 'careers', icon: Briefcase },
+  { title: 'Insights', slug: 'insights', icon: Newspaper },
+  { title: 'Contact', slug: 'contact', icon: Mail },
 ];
 
 export const nav = [
@@ -130,11 +123,11 @@ export const interests: Interest[] = [
 
 // The 5-step engagement process. Used on home and the services index via ui/Steps.
 export const howWeWork = [
-  { icon: PhoneCall, title: 'Free call', text: 'Thirty minutes with an engineer on the problem and the systems you already run.' },
-  { icon: FileText, title: 'Written quote', text: 'Scope, timeline and one fixed price in ₹, before any work starts.' },
-  { icon: CodeXml, title: 'Build with demos', text: 'Short cycles, each ending in a demo on a link you can try yourself.' },
-  { icon: Rocket, title: 'Launch', text: 'Data migration, training and go-live.' },
-  { icon: LifeBuoy, title: 'Support', text: 'The same team fixes bugs and makes changes after launch.' },
+  { title: 'Free call', text: 'Thirty minutes with an engineer on the problem and the systems you already run.' },
+  { title: 'Written quote', text: 'Scope, timeline and one fixed price in ₹, before any work starts.' },
+  { title: 'Build with demos', text: 'Short cycles, each ending in a demo on a link you can try yourself.' },
+  { title: 'Launch', text: 'Data migration, training and go-live.' },
+  { title: 'Support', text: 'The same team fixes bugs and makes changes after launch.' },
 ];
 
 // Cards for ui/RelatedCards from product and service slugs, in the order given.

@@ -6,8 +6,8 @@ import MapsMockup from './MapsMockup.astro';
 import CrmMockup from './CrmMockup.astro';
 import HrmsMockup from './HrmsMockup.astro';
 
-interface Props { slug: string; float?: boolean }
-const { slug, float = true } = Astro.props;
+interface Props { slug: string }
+const { slug } = Astro.props;
 const map: Record<string, any> = {
   'bank-statement-analyser': BsaMockup,
   'payslip-checker': PayslipMockup,
@@ -18,4 +18,4 @@ const map: Record<string, any> = {
 const Mockup = map[slug];
 ---
 
-{Mockup && <Mockup float={float} />}
+{Mockup && <Mockup />}

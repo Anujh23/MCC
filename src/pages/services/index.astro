@@ -16,7 +16,6 @@ const description =
   'Website, CRM, HR and payroll, data and analytics, and custom software development for Indian SMEs and lenders. One team from scoping to support.';
 const crumbs = [{ label: 'Services' }];
 const path = '/services/';
-
 ---
 
 <Base
@@ -27,42 +26,26 @@ const path = '/services/';
   <PageHero
     title="Websites to loan workflows, built by one accountable team"
     highlight="one accountable team"
-    intro="Websites, CRMs, HR and payroll, dashboards and integrations, from the team that builds our lending products."
     breadcrumbs={crumbs}
   >
     <Fragment slot="actions">
       <a href={contactHref()} class="btn btn-primary group px-6 py-3 text-base">
         {cta.call}<ArrowRight size={18} class="transition group-hover:translate-x-0.5" aria-hidden="true" />
       </a>
-      <a href="#all-services" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">Browse services</a>
     </Fragment>
     <Fragment slot="aside"><ServiceMap /></Fragment>
   </PageHero>
 
-  <Section
-    id="all-services"
-    eyebrow="What we do"
-    title="Five services, each with depth behind it"
-    highlight="depth behind it"
-  >
+  <Section title="Five services, each with depth behind it" highlight="depth behind it">
     <ServicesBento />
   </Section>
 
-  <Section
-    tone="dark"
-    eyebrow="How we work"
-    title="From first call to support, the same five steps"
-  >
+  <Section tone="dark" title="From first call to support, the same five steps">
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0 opacity-60"></div>
     <Steps tone="dark" steps={howWeWork} class="relative" />
   </Section>
 
-  <Section
-    tone="muted"
-    eyebrow="Engagement models"
-    title="Three ways to work with us"
-    intro="Every engagement starts with a written quote."
-  >
+  <Section tone="muted" title="Three ways to work with us">
     <EngagementModels />
   </Section>
 

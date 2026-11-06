@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import { BookOpen, Landmark, FileCheck, SquareKanban } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/ui/PageHero.astro';
 import CtaBand from '../../components/ui/CtaBand.astro';
@@ -11,16 +10,10 @@ const posts = (await getCollection('insights', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const featured = posts.find((p) => p.data.featured) ?? posts[0];
 const rest = posts.filter((p) => p !== featured);
-const topics = [...new Set(posts.flatMap((p) => p.data.tags))];
 const crumbs = [{ label: 'Insights' }];
 const description =
   'Practical notes on lending technology, underwriting checks, document verification and business software from the engineers at Manka.';
 
-const themes = [
-  { icon: Landmark, title: 'Underwriting', text: 'Bank statements and cash flow.' },
-  { icon: FileCheck, title: 'Document checks', text: 'Catching edited payslips and statements.' },
-  { icon: SquareKanban, title: 'Systems', text: 'What to build, buy or connect.' },
-];
 ---
 
 <Base
@@ -31,33 +24,8 @@ const themes = [
   <PageHero
     title="Notes from the work, written for operators."
     highlight="written for operators."
-    intro="Plain-language articles on underwriting, document checks and business software."
     breadcrumbs={crumbs}
   >
-    <div slot="aside" class="hidden lg:block">
-      <div class="relative mx-auto max-w-md">
-        <div class="card-dark p-6">
-          <div class="flex items-center gap-3">
-            <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-saffron-400 ring-1 ring-white/15"><BookOpen size={20} aria-hidden="true" /></span>
-            <div>
-              <p class="text-sm font-semibold text-white">What we write about</p>
-              <p class="text-xs text-ink-400">{posts.length} articles so far</p>
-            </div>
-          </div>
-          <ul class="mt-6 space-y-3">
-            {themes.map((t) => (
-              <li class="flex gap-3 rounded-xl bg-white/[0.04] p-3.5 ring-1 ring-white/10">
-                <t.icon size={18} class="mt-0.5 shrink-0 text-brand-300" aria-hidden="true" />
-                <span>
-                  <span class="block text-sm font-semibold text-white">{t.title}</span>
-                  <span class="mt-0.5 block text-xs leading-relaxed text-ink-400">{t.text}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
   </PageHero>
 
   <section class="relative bg-white py-16 lg:py-24">
@@ -66,15 +34,7 @@ const themes = [
 
       {rest.length > 0 && (
         <>
-          <div class="reveal mt-16 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p class="eyebrow">Latest</p>
-              <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">More articles</h2>
-            </div>
-            <ul class="flex flex-wrap gap-2" aria-label="Topics covered">
-              {topics.map((t) => <li class="rounded-full bg-ink-50 px-3 py-1 text-xs font-medium text-ink-600 ring-1 ring-ink-100">{t}</li>)}
-            </ul>
-          </div>
+          <h2 class="reveal mt-16 text-3xl font-extrabold sm:text-4xl">More articles</h2>
           <div class={`mt-10 grid gap-6 md:grid-cols-2 ${rest.length >= 3 ? 'lg:grid-cols-3' : ''}`}>
             {rest.map((post, i) => <PostCard post={post} delay={i * 100} />)}
           </div>
@@ -83,8 +43,5 @@ const themes = [
     </div>
   </section>
 
-  <CtaBand
-    title="Working on something similar?"
-    text="Bring it to a 30-minute call. We’ll tell you plainly what it would take."
-  />
+  <CtaBand title="Working on something similar?" />
 </Base>

@@ -43,17 +43,11 @@
 
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* animate-marquee: infinite horizontal scroll (duplicate the list once inside the track) */
-  --animate-marquee: marquee 45s linear infinite;
-  /* animate-float: gentle bob, 3 loops then rest (WCAG 2.2.2: nothing moves for more than ~5s unasked) */
-  --animate-float: float 6s ease-in-out 3;
   /* animate-glow: slow breathing for background glows, 3 loops then rest */
   --animate-glow: glow 8s ease-in-out 3;
   /* animate-bar: bar-chart bars growing from the bottom (set --h on the bar) */
   --animate-bar: bar 1.2s var(--ease-out-expo) both;
 
-  @keyframes marquee { to { transform: translateX(-50%); } }
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   @keyframes glow { 0%, 100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.08); } }
   @keyframes bar { from { height: 0; } to { height: var(--h, 100%); } }
 }
@@ -74,19 +68,6 @@
 @utility btn-primary {
   @apply bg-brand-600 text-white shadow-sm shadow-brand-600/30 hover:bg-brand-700;
 }
-@utility btn-ghost {
-  @apply bg-white text-ink-900 ring-1 ring-ink-200 hover:bg-ink-50;
-}
-/* Section label. Light/muted sections: plain brand text. Dark sections and heroes: eyebrow-pill.
-   The empty saffron dot span older markup puts inside .eyebrow is hidden. */
-@utility eyebrow {
-  @apply inline-block text-sm font-semibold text-brand-700;
-  & > span:empty { display: none; }
-}
-@utility eyebrow-pill {
-  @apply inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-ink-100 uppercase ring-1 ring-white/15;
-}
-
 /* Cards. card / card-dark are static. card-link / card-dark-link add the hover lift and are
    only for an <a> card or a card with a stretched link: a lift on anything else is a false affordance. */
 @utility card {
@@ -113,20 +94,9 @@
   background-image: linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
   background-size: 48px 48px;
 }
-@utility bg-grid-light {
-  background-image: linear-gradient(rgb(11 21 48 / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(11 21 48 / 0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-@utility bg-dots {
-  background-image: radial-gradient(rgb(11 21 48 / 0.12) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-/* Fade edges of a pattern/marquee */
+/* Fade the top and bottom edges of a pattern */
 @utility mask-fade-y {
   mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
-}
-@utility mask-fade-x {
-  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
 }
 
 /* Gradient text: saffron on dark, blue only on light (every stop ≥ 4.7:1). Hero H1 + at most one H2 per page. */

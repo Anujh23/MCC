@@ -1,16 +1,8 @@
 ---
-import { ArrowRight, MapPin, KeyRound, ClipboardList, LifeBuoy } from '@lucide/astro';
+import { ArrowRight } from '@lucide/astro';
 import { href, contactHref, cta } from '../../data/site';
 import MockBsa from './MockBsa.astro';
 import MockPayslip from './MockPayslip.astro';
-import MockCrm from './MockCrm.astro';
-
-const trust = [
-  { icon: MapPin, title: 'Built in India', text: 'For Indian lending and payroll' },
-  { icon: KeyRound, title: 'You own the code', text: 'On custom builds' },
-  { icon: ClipboardList, title: 'Written quote', text: 'One fixed price in ₹' },
-  { icon: LifeBuoy, title: 'Support after go-live', text: 'From the same team' },
-];
 ---
 
 <section class="relative overflow-hidden bg-ink-950 text-white">
@@ -21,10 +13,7 @@ const trust = [
   <div class="container-page relative grid items-center gap-14 pt-10 pb-12 sm:pt-20 sm:pb-14 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pt-24 lg:pb-20">
     <!-- Copy -->
     <div>
-      <span class="eyebrow-pill">
-        <span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Software &amp; lending tools · Built in India
-      </span>
-      <h1 class="mt-5 text-[2.6rem] leading-[1.04] font-extrabold tracking-[-0.03em] text-white sm:mt-6 sm:text-6xl lg:text-[4.25rem]">
+      <h1 class="text-[2.6rem] leading-[1.04] font-extrabold tracking-[-0.03em] text-white sm:text-6xl lg:text-[4.25rem]">
         We build the software your business <span class="text-gradient-saffron">runs on.</span>
       </h1>
       <p class="mt-5 max-w-xl text-base leading-relaxed text-ink-300 sm:mt-6 sm:text-lg">
@@ -36,59 +25,23 @@ const trust = [
         </a>
         <a href={href('/products/')} class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">Explore products</a>
       </div>
-      <p class="reveal mt-4 text-sm text-ink-400" style="--d: 160ms">Free 30-minute call with an engineer.</p>
-
-      <!-- Trust strip, mobile: straight under the CTAs (the collage is hidden below sm) -->
-      <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-white/10 pt-5 sm:hidden">
-        {trust.map((t) => (
-          <li class="flex items-start gap-2.5">
-            <span class="mt-0.5 text-saffron-400" aria-hidden="true"><t.icon size={16} stroke-width={1.9} /></span>
-            <span class="min-w-0 text-[13px] leading-snug">
-              <span class="block font-semibold text-white">{t.title}</span>
-              <span class="block text-ink-400">{t.text}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
     </div>
 
     <!-- Product UI composition (sm and up) -->
     <div class="reveal relative mx-auto hidden w-full max-w-[34rem] sm:block xl:mx-0 xl:max-w-none" style="--d: 200ms">
       <div class="pointer-events-none absolute inset-x-6 top-10 bottom-10 rounded-full bg-brand-500/25 blur-3xl"></div>
 
-      <div class="relative xl:h-[37rem]">
+      <div class="relative xl:h-[36rem]">
         <!-- BSA: main window -->
-        <div class="relative z-10 xl:absolute xl:top-28 xl:left-0 xl:w-[24rem]">
+        <div class="relative z-10 xl:absolute xl:top-0 xl:left-0 xl:w-[24rem]">
           <MockBsa />
         </div>
 
-        <!-- CRM: top right (desktop only) -->
-        <div class="absolute -top-4 -right-8 z-20 hidden w-48 xl:block">
-          <MockCrm mini />
-        </div>
-
         <!-- Payslip: bottom right -->
-        <div class="relative z-30 -mt-16 -mr-4 ml-auto w-[80%] max-w-[17rem] xl:absolute xl:-right-8 xl:-bottom-10 xl:mt-0 xl:mr-0 xl:w-[15.5rem]">
+        <div class="relative z-30 -mt-4 -mr-4 ml-auto w-[80%] max-w-[17rem] xl:absolute xl:right-0 xl:bottom-0 xl:mt-0 xl:mr-0 xl:w-[15.5rem]">
           <MockPayslip />
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Trust strip (sm and up) -->
-  <div class="relative hidden border-t border-white/10 bg-white/[0.02] sm:block">
-    <ul class="container-page grid grid-cols-2 lg:grid-cols-4">
-      {trust.map((t, i) => (
-        <li class={`reveal flex items-center gap-3 py-6 ${i % 2 ? 'border-l border-white/10 pl-6' : 'pr-2'} ${i > 1 ? 'border-t border-white/10 lg:border-t-0' : ''} ${i === 2 ? 'lg:border-l lg:pl-6' : ''}`} style={`--d: ${i * 80}ms`}>
-          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-saffron-400 ring-1 ring-white/10" aria-hidden="true">
-            <t.icon size={17} stroke-width={1.9} />
-          </span>
-          <span class="min-w-0">
-            <span class="block text-sm font-semibold text-white">{t.title}</span>
-            <span class="block text-xs text-ink-400">{t.text}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
   </div>
 </section>

@@ -1,18 +1,14 @@
 ---
 // Standard page section with optional heading block.
 // Title highlight: pass `highlight="words"` and those words get the gradient (max one gradient H2 per page).
-// Eyebrow: plain brand text on light/muted, a pill on dark.
 interface Props {
-  eyebrow?: string;
   title?: string;
   highlight?: string;
-  intro?: string;
   tone?: 'light' | 'muted' | 'dark';
-  align?: 'left' | 'center';
   id?: string;
   class?: string;
 }
-const { eyebrow, title, highlight, intro, tone = 'light', align = 'left', id, class: className = '' } = Astro.props;
+const { title, highlight, tone = 'light', id, class: className = '' } = Astro.props;
 
 const toneClass = {
   light: 'bg-white',
@@ -26,14 +22,10 @@ const [before, after] = highlight && title?.includes(highlight) ? title.split(hi
 <section id={id} class={`relative overflow-x-clip py-20 lg:py-28 ${toneClass} ${className}`}>
   <div class="container-page relative">
     {title && (
-      <div class={`reveal mb-12 max-w-3xl lg:mb-16 ${align === 'center' ? 'mx-auto text-center' : ''}`}>
-        {eyebrow && (dark
-          ? <span class="eyebrow-pill"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>{eyebrow}</span>
-          : <p class="eyebrow">{eyebrow}</p>)}
-        <h2 class={`text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem] ${eyebrow ? (dark ? 'mt-4' : 'mt-3') : ''} ${dark ? 'text-white' : ''}`}>
+      <div class="reveal mb-12 max-w-3xl lg:mb-16">
+        <h2 class={`text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem] ${dark ? 'text-white' : ''}`}>
           {before}{after !== undefined && <span class={dark ? 'text-gradient-saffron' : 'text-gradient-brand'}>{highlight}</span>}{after}
         </h2>
-        {intro && <p class={`mt-4 text-lg leading-relaxed ${dark ? 'text-ink-300' : 'text-ink-600'}`}>{intro}</p>}
       </div>
     )}
     <slot />

@@ -11,10 +11,8 @@ const { items } = Astro.props;
   {items.map((item, i) => (
     <li class="reveal flex w-[82%] shrink-0 snap-start flex-col rounded-2xl bg-white p-6 ring-1 ring-ink-100 sm:w-auto lg:p-7" style={`--d: ${(i % 3) * 90}ms`}>
       <IconBadge icon={item.icon} tone={i % 3 === 0 ? 'saffron' : 'brand'} />
-      <p class="mt-5 text-xs font-bold tracking-wide text-brand-700 uppercase">{item.term}</p>
-      <h3 class="mt-1 text-lg font-bold">{item.title}</h3>
-      <p class="mt-2 flex-1 text-[0.95rem] leading-relaxed text-ink-600">{item.text}</p>
-      <p class="mt-5 inline-flex self-start rounded-lg bg-ink-50 px-3 py-1.5 font-mono text-xs text-ink-700 ring-1 ring-ink-100">{item.sample}</p>
+      <h3 class="mt-5 text-lg font-bold">{item.title}</h3>
+      <p class="mt-2 text-[0.95rem] leading-relaxed text-ink-600">{item.text}</p>
     </li>
   ))}
 </ul>

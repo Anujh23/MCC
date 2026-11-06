@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
-import { CalendarDays, Clock, ChevronDown } from '@lucide/astro';
+import { ChevronDown } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/ui/CtaBand.astro';
 import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
@@ -23,8 +23,6 @@ const { title, description, date, tags, product, related } = post.data;
 const path = `/insights/${post.id}/`;
 const crumbs = [{ label: 'Insights', path: '/insights/' }, { label: title }];
 
-const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
-const minutes = post.data.readingTime ?? Math.max(1, Math.round(words / 200));
 const dateLabel = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 const toc = headings.filter((h) => h.depth === 2);
 
@@ -58,19 +56,9 @@ const others = (await getCollection('insights', ({ data, id }) => !data.draft &&
         <Breadcrumbs items={crumbs} class="-mt-2 max-sm:[&_li:last-child]:hidden" />
 
         <div class="max-w-4xl">
-          <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
-            {tags.map((t) => <li class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-ink-100 ring-1 ring-white/15">{t}</li>)}
-          </ul>
-          <h1 class="mt-5 text-3xl leading-[1.12] font-extrabold text-white sm:text-5xl lg:text-[3.4rem]">{title}</h1>
+          <h1 class="mt-6 text-3xl leading-[1.12] font-extrabold text-white sm:text-5xl lg:text-[3.4rem]">{title}</h1>
           <p class="mt-6 max-w-3xl text-lg leading-relaxed text-ink-300">{description}</p>
-          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink-400">
-            <span class="inline-flex items-center gap-2">
-              <span class="grid h-8 w-8 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white" aria-hidden="true">M</span>
-              <span class="text-ink-200">Our team</span>
-            </span>
-            <span class="inline-flex items-center gap-1.5"><CalendarDays size={15} aria-hidden="true" /><time datetime={date.toISOString()}>{dateLabel}</time></span>
-            <span class="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden="true" />{minutes} min read</span>
-          </div>
+          <time datetime={date.toISOString()} class="mt-6 block text-sm text-ink-400">{dateLabel}</time>
         </div>
       </div>
     </header>
@@ -135,9 +123,5 @@ const others = (await getCollection('insights', ({ data, id }) => !data.draft &&
     </section>
   )}
 
-  <CtaBand
-    title="Want this built into your workflow?"
-    text="We turn checklists like this one into software your team uses on every file."
-    interest={product}
-  />
+  <CtaBand title="Want this built into your workflow?" interest={product} />
 </Base>

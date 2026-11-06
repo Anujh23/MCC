@@ -6,14 +6,10 @@ import { href } from '../../data/site';
 
 interface Props {
   items: { label: string; path?: string }[];
-  tone?: 'dark' | 'light';
   class?: string;
 }
-const { items, tone = 'dark', class: className = '' } = Astro.props;
+const { items, class: className = '' } = Astro.props;
 const trail = [{ label: 'Home', path: '/' }, ...items];
-const link = tone === 'dark' ? 'text-ink-400 hover:text-white' : 'text-ink-600 hover:text-brand-700';
-const current = tone === 'dark' ? 'text-ink-200' : 'font-medium text-ink-900';
-const sep = tone === 'dark' ? 'text-ink-500' : 'text-ink-300';
 ---
 
 <nav aria-label="Breadcrumb" class={className}>
@@ -22,10 +18,10 @@ const sep = tone === 'dark' ? 'text-ink-500' : 'text-ink-300';
       const last = i === trail.length - 1;
       return (
         <li class="flex items-center gap-x-2">
-          {i > 0 && <span aria-hidden="true" class={sep}>/</span>}
+          {i > 0 && <span aria-hidden="true" class="text-ink-500">/</span>}
           {last || !c.path
-            ? <span aria-current={last ? 'page' : undefined} class={`inline-block py-2 ${current}`}>{c.label}</span>
-            : <a href={href(c.path)} class={`inline-block py-2 transition ${link}`}>{c.label}</a>}
+            ? <span aria-current={last ? 'page' : undefined} class="inline-block py-2 text-ink-200">{c.label}</span>
+            : <a href={href(c.path)} class="inline-block py-2 text-ink-400 transition hover:text-white">{c.label}</a>}
         </li>
       );
     })}

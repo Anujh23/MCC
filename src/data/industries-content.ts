@@ -6,7 +6,6 @@ export type Status = 'ok' | 'warn' | 'info';
 export type IndustryContent = {
   metaTitle: string;
   metaDescription: string;
-  eyebrow: string;
   /** Short name for tight spots like the industries index hero cards */
   short: string;
   headline: string;
@@ -15,23 +14,18 @@ export type IndustryContent = {
   /** Small demo card shown in the hero (sample data only) */
   heroCard: {
     title: string;
-    subtitle: string;
+    subtitle?: string;
     /** `short` is the label used on the industries index hero card */
     rows: { label: string; short?: string; value: string; status: Status }[];
     footer: { label: string; value: string };
   };
-  /** Short bullets for the industries index */
-  focus: string[];
   pairs: { challenge: string; help: string }[];
   deepDive?: {
-    eyebrow: string;
     title: string;
-    intro: string;
-    items: { icon: any; term: string; title: string; text: string; sample: string }[];
+    items: { icon: any; title: string; text: string }[];
   };
   workflow: {
     title: string;
-    intro: string;
     steps: { title: string; text: string; tools: { label: string; path: string }[] }[];
   };
   services: string[];
@@ -56,7 +50,6 @@ export const industriesContent: Record<string, IndustryContent> = {
     metaTitle: 'Software for NBFCs & Lenders: Lead to Collections',
     metaDescription:
       'Lending software for NBFCs and DSAs: lead management, bank statement analysis, payslip checks, FOIR rules, field verification and collections.',
-    eyebrow: 'NBFC & lending',
     short: 'NBFC & lending',
     headline: 'Lending software, from first lead to last EMI',
     highlight: 'last EMI',
@@ -74,7 +67,6 @@ export const industriesContent: Record<string, IndustryContent> = {
       ],
       footer: { label: 'Rules engine', value: 'Refer to credit: 1 flag' },
     },
-    focus: ['Bank statement analysis', 'Payslip checks and FOIR', 'Field verification', 'Collections'],
     pairs: [
       { challenge: 'Credit reads 30-page statements line by line.', help: 'BSA works out ABB, salary credits, EMIs and bounces, and flags edits.' },
       { challenge: 'Payslips get edited before they reach you.', help: 'Payslip Checker matches net pay with bank credits and flags tampering.' },
@@ -82,21 +74,18 @@ export const industriesContent: Record<string, IndustryContent> = {
       { challenge: 'Collections teams call the wrong accounts.', help: 'Daily DPD lists, priority scoring and route-planned visits.' },
     ],
     deepDive: {
-      eyebrow: 'Underwriting',
       title: 'The checks we automate, the way your policy defines them',
-      intro: 'Each check follows your credit policy, and every result is stored with the data behind it.',
       items: [
-        { icon: Calculator, term: 'FOIR', title: 'Fixed obligations to income', text: 'Verified income against existing EMIs.', sample: 'e.g. 41% against a 55% cap' },
-        { icon: Wallet, term: 'ABB', title: 'Average bank balance', text: 'On the dates your policy specifies.', sample: 'e.g. ₹38,200 over 6 months' },
-        { icon: Repeat, term: 'Bounces', title: 'Cheque, ECS and NACH returns', text: 'Counted by month and reason.', sample: 'e.g. 1 NACH return in month 4' },
-        { icon: Gauge, term: 'Bureau', title: 'Bureau pulls', text: 'Through your own bureau membership, parsed into the file.', sample: 'e.g. 742, no DPD in 24 months' },
-        { icon: MapPin, term: 'FI', title: 'Field verification', text: 'GPS, time and photos against the declared address.', sample: 'e.g. 0.4 km from declared address' },
-        { icon: HandCoins, term: 'Collections', title: 'Buckets and PTP', text: 'Allocation, promise-to-pay and UPI payment links.', sample: 'e.g. 1–30 DPD bucket, PTP on the 12th' },
+        { icon: Calculator, title: 'FOIR', text: 'Fixed obligations against verified income.' },
+        { icon: Wallet, title: 'ABB', text: 'Average bank balance on the dates your policy specifies.' },
+        { icon: Repeat, title: 'Bounces', text: 'Cheque, ECS and NACH returns, by month and reason.' },
+        { icon: Gauge, title: 'Bureau', text: 'Pulled through your own bureau membership, parsed into the file.' },
+        { icon: MapPin, title: 'Field verification', text: 'GPS, time and photos against the declared address.' },
+        { icon: HandCoins, title: 'Collections', text: 'Buckets, promise-to-pay and UPI payment links.' },
       ],
     },
     workflow: {
       title: 'Where we fit in your loan journey',
-      intro: 'Use the whole chain or only the pieces you need next to your LMS.',
       steps: [
         { title: 'Lead capture', text: 'Every source in one queue, deduped on PAN and mobile.', tools: [T.crm] },
         { title: 'Bank statement analysis', text: 'ABB, salary, EMIs, bounces and tamper flags.', tools: [T.bsa] },
@@ -119,14 +108,12 @@ export const industriesContent: Record<string, IndustryContent> = {
     metaTitle: 'Retail & E-commerce Software: Stores & Inventory',
     metaDescription:
       'Online stores with UPI checkout, inventory sync across outlets and marketplaces, tax invoicing and customer analytics for Indian retailers.',
-    eyebrow: 'Retail & e-commerce',
     short: 'Retail',
     headline: 'Run your store, online and off, from one set of numbers',
     highlight: 'online and off',
     intro: 'Online stores, inventory sync, distributor ordering and customer analytics for brands and retailers.',
     heroCard: {
       title: 'Today at a glance',
-      subtitle: 'Sample store',
       rows: [
         { label: 'Orders (web + store)', short: 'Orders today', value: '128', status: 'ok' },
         { label: 'Paid by UPI', value: '71%', status: 'info' },
@@ -136,7 +123,6 @@ export const industriesContent: Record<string, IndustryContent> = {
       ],
       footer: { label: 'Tax invoices', value: 'All 128 generated' },
     },
-    focus: ['Online stores', 'Inventory sync', 'Invoicing', 'Customer analytics'],
     pairs: [
       { challenge: 'Stock differs between the shop, the website and marketplaces.', help: 'One inventory that syncs everywhere, with low-stock alerts.' },
       { challenge: 'Customers drop off at checkout on their phones.', help: 'A fast mobile checkout with UPI, cards and COD rules.' },
@@ -145,7 +131,6 @@ export const industriesContent: Record<string, IndustryContent> = {
     ],
     workflow: {
       title: 'From catalogue to repeat order',
-      intro: 'The order flow we usually build.',
       steps: [
         { title: 'Catalogue', text: 'Managed once, published everywhere.', tools: [T.web] },
         { title: 'Order and payment', text: 'Web, counter and marketplace orders in one list.', tools: [T.custom] },
@@ -168,14 +153,12 @@ export const industriesContent: Record<string, IndustryContent> = {
     metaTitle: 'Real Estate CRM: Leads & Site-Visit Tracking',
     metaDescription:
       'Real estate CRM for developers and brokers: portal leads in one queue, site-visit scheduling with geo-tagged check-ins and channel partner tracking.',
-    eyebrow: 'Real estate',
     short: 'Real estate',
     headline: 'From portal lead to site visit to booking, without the leaks',
     highlight: 'without the leaks',
     intro: 'Portal and ad leads in one place, assigned fast, with site visits and bookings tracked to handover.',
     heroCard: {
       title: 'Site visits · Saturday',
-      subtitle: 'Sample project',
       rows: [
         { label: '10:30 · 2 BHK, Tower B', short: '10:30 · Tower B', value: 'Confirmed', status: 'ok' },
         { label: '11:45 · 3 BHK, Tower A', value: 'Pickup arranged', status: 'info' },
@@ -185,7 +168,6 @@ export const industriesContent: Record<string, IndustryContent> = {
       ],
       footer: { label: 'Uncalled leads', value: '0 over 15 min' },
     },
-    focus: ['Portal lead capture', 'Site-visit tracking', 'Unit inventory', 'Channel partners'],
     pairs: [
       { challenge: 'Portal and ad leads arrive in five different inboxes.', help: 'One CRM queue within minutes, deduped by phone.' },
       { challenge: 'Hot leads go cold before anyone calls.', help: 'Auto-assignment and a call-within-15-minutes rule.' },
@@ -194,7 +176,6 @@ export const industriesContent: Record<string, IndustryContent> = {
     ],
     workflow: {
       title: 'The sales journey, step by step',
-      intro: 'How an enquiry moves to booking.',
       steps: [
         { title: 'Enquiry', text: 'Every lead captured with its source.', tools: [T.crm, T.web] },
         { title: 'Qualification call', text: 'Budget, location and timeline.', tools: [T.crm] },
@@ -216,14 +197,12 @@ export const industriesContent: Record<string, IndustryContent> = {
     metaTitle: 'Clinic & Hospital Software: Appointments to Billing',
     metaDescription:
       'Clinic and hospital software for India: appointments with tokens, patient records, billing and TPA claims, pharmacy stock with expiry tracking.',
-    eyebrow: 'Healthcare',
     short: 'Healthcare',
     headline: 'Clinic and hospital workflows that free up the front desk',
     highlight: 'the front desk',
     intro: 'Appointments, patient records, billing and pharmacy stock for clinics and small hospitals.',
     heroCard: {
       title: 'OPD queue · Morning',
-      subtitle: 'Sample clinic',
       rows: [
         { label: 'Token 14 · General OPD', short: 'Token 14', value: 'In consultation', status: 'ok' },
         { label: 'Token 15 · General OPD', value: 'Next, alert sent', status: 'info' },
@@ -233,7 +212,6 @@ export const industriesContent: Record<string, IndustryContent> = {
       ],
       footer: { label: 'Bills today', value: 'Cash + UPI matched' },
     },
-    focus: ['Appointments and tokens', 'Patient records', 'Billing and TPA', 'Pharmacy stock'],
     pairs: [
       { challenge: 'Patients wait in a crowded lobby.', help: 'Token booking, with a WhatsApp message when their turn is close.' },
       { challenge: 'Patient history is scattered across paper files.', help: 'One record per patient, found by phone number.' },
@@ -242,7 +220,6 @@ export const industriesContent: Record<string, IndustryContent> = {
     ],
     workflow: {
       title: 'A patient visit, end to end',
-      intro: 'The flow we build for outpatient clinics.',
       steps: [
         { title: 'Booking', text: 'Online, phone or walk-in.', tools: [T.web, T.custom] },
         { title: 'Registration', text: 'Patient found by phone, token issued.', tools: [T.custom] },
@@ -264,14 +241,12 @@ export const industriesContent: Record<string, IndustryContent> = {
     metaTitle: 'Software for Startups & SMEs: MVPs & Internal Tools',
     metaDescription:
       'A tech team for startups and SMEs without the hiring: websites, MVPs, internal tools, integrations and investor-ready MIS.',
-    eyebrow: 'Startups & SMEs',
     short: 'Startups & SMEs',
     headline: 'Your first tech team, without the hiring',
     highlight: 'without the hiring',
     intro: 'Websites, MVPs, internal tools and dashboards for teams not ready to hire engineers.',
     heroCard: {
       title: 'MVP plan',
-      subtitle: 'Sample project',
       rows: [
         { label: 'Scope written and signed off', short: 'Scope signed', value: 'Done', status: 'ok' },
         { label: 'Clickable prototype', value: 'Done', status: 'ok' },
@@ -281,7 +256,6 @@ export const industriesContent: Record<string, IndustryContent> = {
       ],
       footer: { label: 'Code', value: 'In your repository' },
     },
-    focus: ['MVPs', 'Internal tools', 'Integrations', 'MIS and dashboards'],
     pairs: [
       { challenge: 'You need an MVP but can’t hire engineers yet.', help: 'A small team that builds the smallest useful version in weeks.' },
       { challenge: 'Operations run on WhatsApp groups and Excel.', help: 'A simple internal tool your team will use every day.' },
@@ -290,7 +264,6 @@ export const industriesContent: Record<string, IndustryContent> = {
     ],
     workflow: {
       title: 'From idea to a product you can sell',
-      intro: 'How a first build usually runs.',
       steps: [
         { title: 'Idea and scope', text: 'The smallest version that proves it.', tools: [T.custom] },
         { title: 'Prototype', text: 'Screens to show customers first.', tools: [T.web] },

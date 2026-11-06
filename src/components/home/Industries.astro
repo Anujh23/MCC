@@ -1,24 +1,12 @@
 ---
 import { ArrowRight } from '@lucide/astro';
 import { industries, href } from '../../data/site';
-
-const builds: Record<string, string[]> = {
-  'nbfc-lending': ['Loan origination', 'BSA & payslip checks', 'Collections app', 'Portfolio MIS'],
-  'retail-ecommerce': ['Online store', 'Inventory', 'Invoicing', 'Customer analytics'],
-  'real-estate': ['Lead CRM', 'Site-visit tracking', 'Payment schedules'],
-  healthcare: ['Patient records', 'Billing', 'Appointments'],
-  'startups-smes': ['MVPs', 'Internal tools', 'Company website'],
-};
 ---
 
 <section class="relative bg-white py-14 sm:py-20 lg:py-28">
   <div class="container-page grid gap-8 sm:gap-12 lg:grid-cols-[0.9fr_1.4fr] lg:gap-16">
     <div class="reveal lg:sticky lg:top-28 lg:self-start">
-      <p class="eyebrow">Industries</p>
-      <h2 class="mt-3 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Deepest in lending. Careful everywhere else.</h2>
-      <p class="mt-4 text-lg leading-relaxed text-ink-600">
-        Lending is where a wrong number costs real money. The same care goes into every sector.
-      </p>
+      <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Deepest in lending. Careful everywhere else.</h2>
     </div>
 
     <div>
@@ -26,19 +14,12 @@ const builds: Record<string, string[]> = {
         {industries.map((ind, i) => (
           <li class="reveal border-b border-ink-100" style={`--d: ${i * 70}ms`}>
             <a href={href(`/industries/${ind.slug}/`)} class="group -mx-3 flex gap-4 rounded-2xl px-3 py-4 transition hover:bg-ink-50 focus-visible:outline-2 focus-visible:outline-brand-500 sm:gap-6 sm:py-7">
-              <span class="hidden w-8 pt-1 text-sm font-semibold text-ink-500 tabular-nums sm:block" aria-hidden="true">0{i + 1}</span>
               <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-950 text-saffron-400 transition group-hover:bg-brand-600 group-hover:text-white" aria-hidden="true">
                 <ind.icon size={20} stroke-width={1.8} />
               </span>
               <span class="min-w-0 flex-1">
-                <span class="flex items-center gap-2">
-                  <span class="text-lg font-bold text-ink-900 sm:text-xl">{ind.title}</span>
-                  {i === 0 && <span class="rounded-full bg-saffron-50 px-2 py-0.5 text-[11px] font-bold tracking-wide text-saffron-700 uppercase ring-1 ring-saffron-100">Core</span>}
-                </span>
+                <span class="block text-lg font-bold text-ink-900 sm:text-xl">{ind.title}</span>
                 <span class="mt-1 block text-sm leading-relaxed text-ink-600">{ind.blurb}</span>
-                <span class="mt-3 hidden flex-wrap gap-1.5 sm:flex">
-                  {builds[ind.slug]?.map((b) => <span class="rounded-md bg-white px-2 py-1 text-[11px] font-medium text-ink-600 ring-1 ring-ink-100">{b}</span>)}
-                </span>
               </span>
               <span class="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-500 ring-1 ring-ink-200 transition group-hover:bg-ink-950 group-hover:text-white group-hover:ring-ink-950" aria-hidden="true">
                 <ArrowRight size={16} class="transition group-hover:translate-x-0.5" />

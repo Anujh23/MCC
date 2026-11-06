@@ -10,11 +10,10 @@ import Breadcrumbs from '../ui/Breadcrumbs.astro';
 interface Props {
   title: string;
   description: string;
-  intro: string;
   updated: string;
   sections: { id: string; title: string }[];
 }
-const { title, description, intro, updated, sections } = Astro.props;
+const { title, description, updated, sections } = Astro.props;
 ---
 
 <Base title={title} description={description} noindex>
@@ -24,7 +23,6 @@ const { title, description, intro, updated, sections } = Astro.props;
     <div class="container-page relative py-12 lg:py-16">
       <Breadcrumbs items={[{ label: title }]} class="-mt-2" />
       <h1 class="mt-4 text-4xl font-extrabold text-white sm:text-5xl">{title}</h1>
-      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-ink-300">{intro}</p>
       <p class="mt-4 text-sm text-ink-400">Last updated: {updated}</p>
       <div class="mt-6 flex max-w-3xl gap-3 rounded-2xl bg-saffron-50 p-4 text-sm leading-relaxed text-ink-900 ring-1 ring-saffron-100 sm:p-5" role="note">
         <TriangleAlert size={20} class="mt-0.5 shrink-0 text-saffron-700" aria-hidden="true" />

@@ -16,12 +16,6 @@ const crumbs = [{ label: 'About' }];
 const description =
   'Manka Commerce & Consultancy is an Indian IT services and products company building CRMs, HR systems, websites, data tools and lending software.';
 
-const promises = [
-  { icon: MessagesSquare, k: 'You talk to', v: 'the engineer building it' },
-  { icon: KeyRound, k: 'You own', v: 'the code and IP on custom builds' },
-  { icon: LifeBuoy, k: 'You keep', v: 'us around after go-live' },
-];
-
 const values = [
   { icon: MessageSquareText, title: 'Plain speaking', text: 'We tell you what it will cost and how long it will take, even when the answer is “don’t build this”.' },
   { icon: Compass, title: 'Learn the business first', text: 'The workflow decides the screens, not the other way round.' },
@@ -48,28 +42,13 @@ const principles = [
       <a href={contactHref()} class="btn btn-primary px-6 py-3 text-base">{cta.call}<ArrowRight size={18} aria-hidden="true" /></a>
       <a href="#how-we-work" class="btn bg-white/10 px-6 py-3 text-base text-white ring-1 ring-white/20 hover:bg-white/15">How we work</a>
     </Fragment>
-    <div slot="aside" class="relative mx-auto w-full max-w-md">
-      <div class="pointer-events-none absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-brand-600/30 to-transparent blur-2xl"></div>
-      <ul class="relative space-y-3">
-        {promises.map((p, i) => (
-          <li class={`card-dark flex items-center gap-4 p-5 ${i === 1 ? 'sm:ml-10' : ''} ${i === 2 ? 'sm:ml-4' : ''}`}>
-            <IconBadge icon={p.icon} tone="dark" />
-            <span>
-              <span class="block text-xs font-semibold tracking-[0.14em] text-ink-400 uppercase">{p.k}</span>
-              <span class="mt-0.5 block text-lg font-semibold text-white">{p.v}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
   </PageHero>
 
   <!-- Our story -->
   <Section tone="light">
     <div class={flags.founderStory ? 'grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16' : 'max-w-3xl'}>
       <div class="reveal">
-        <p class="eyebrow">Our story</p>
-        <h2 class="mt-3 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">
+        <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">
           Software should fit the business, <span class="text-gradient-brand">not the other way round.</span>
         </h2>
         <div class="mt-8 space-y-5 text-lg leading-relaxed text-ink-600">
@@ -92,55 +71,16 @@ const principles = [
     </div>
   </Section>
 
-  <!-- Mission -->
-  <section class="relative overflow-hidden bg-ink-950 py-20 text-white lg:py-28">
-    <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
-    <div class="animate-glow pointer-events-none absolute top-1/2 left-1/2 h-[30rem] w-[50rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-600/25 blur-3xl"></div>
-    <div class="container-page relative">
-      <div class="reveal mx-auto max-w-4xl text-center">
-        <span class="eyebrow-pill"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Our mission</span>
-        <p class="mt-8 text-2xl leading-snug font-bold text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.2]">
-          Give growing Indian businesses software that fits how they work,{' '}
-          <span class="text-gradient-saffron">built by engineers they can talk to,</span>{' '}
-          and owned by them outright.
-        </p>
-      </div>
-      <div class="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-3">
-        {[
-          { t: 'Fits the work', d: 'Designed around your real process.' },
-          { t: 'Easy to reach', d: 'A direct line to the people who build it.' },
-          { t: 'Yours to keep', d: 'Code and docs handed over on custom builds.' },
-        ].map((x, i) => (
-          <div class="reveal card-dark text-center sm:text-left" style={`--d: ${i * 100}ms`}>
-            <p class="font-semibold text-white">{x.t}</p>
-            <p class="mt-1.5 text-sm leading-relaxed text-ink-300">{x.d}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Values (bento) -->
-  <Section tone="muted" eyebrow="What we value" title="Four things we won’t trade away.">
-    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+  <Section tone="muted" title="Four things we won’t trade away.">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {values.map((v, i) => (
-        i === 0 ? (
-          <div class="reveal relative overflow-hidden rounded-2xl bg-brand-700 p-8 text-white md:col-span-2 lg:col-span-3 lg:p-10" style={`--d: ${i * 80}ms`}>
-            <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
-            <div class="pointer-events-none absolute -right-16 -bottom-20 h-64 w-64 rounded-full bg-saffron-500/25 blur-3xl"></div>
-            <div class="relative">
-              <IconBadge icon={v.icon} tone="dark" size="lg" />
-              <h3 class="mt-6 text-2xl text-white sm:text-3xl">{v.title}</h3>
-              <p class="mt-3 max-w-xl text-lg leading-relaxed text-brand-100">{v.text}</p>
-            </div>
-          </div>
-        ) : (
-          <div class="reveal card" style={`--d: ${i * 80}ms`}>
-            <IconBadge icon={v.icon} tone={i % 2 ? 'brand' : 'saffron'} />
-            <h3 class="mt-5 text-lg">{v.title}</h3>
+        <div class="reveal card flex gap-4 sm:block" style={`--d: ${i * 80}ms`}>
+          <IconBadge icon={v.icon} />
+          <div>
+            <h3 class="text-lg sm:mt-5">{v.title}</h3>
             <p class="mt-2 text-[0.95rem] leading-relaxed text-ink-600">{v.text}</p>
           </div>
-        )
+        </div>
       ))}
     </div>
   </Section>
@@ -149,8 +89,7 @@ const principles = [
   <Section tone="light" id="how-we-work">
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
       <div class="reveal lg:sticky lg:top-28 lg:self-start">
-        <p class="eyebrow">How we work</p>
-        <h2 class="mt-3 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Four promises, written into every project.</h2>
+        <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl lg:text-[2.75rem]">Four promises, written into every project.</h2>
       </div>
       <ul class="space-y-4">
         {principles.map((p, i) => (
@@ -167,26 +106,22 @@ const principles = [
   </Section>
 
   <!-- What we do -->
-  <Section tone="dark" eyebrow="What we do" title="Services for what’s unique. Products for what isn’t.">
+  <Section tone="dark" title="Services for what’s unique. Products for what isn’t.">
     <div class="grid gap-6 lg:grid-cols-2">
       {[
-        { label: 'Services', base: '/services', items: services, note: 'Built to your spec.' },
-        { label: 'Products', base: '/products', items: products, note: 'Ready to deploy.' },
+        { label: 'Services', base: '/services', items: services },
+        { label: 'Products', base: '/products', items: products },
       ].map((group, gi) => (
         <div class="reveal rounded-3xl bg-white/[0.03] p-6 ring-1 ring-white/10 sm:p-8" style={`--d: ${gi * 120}ms`}>
           <h3 class="text-xl text-white">{group.label}</h3>
-          <p class="mt-1 text-sm text-ink-400">{group.note}</p>
-          <ul class="mt-6 divide-y divide-white/10">
+          <ul class="mt-4 divide-y divide-white/10">
             {group.items.map((item) => (
               <li>
                 <a href={href(`${group.base}/${item.slug}/`)} class="group flex items-center gap-4 py-4">
                   <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10 transition group-hover:bg-brand-600 group-hover:text-white">
                     <item.icon size={19} stroke-width={1.75} />
                   </span>
-                  <span class="min-w-0 flex-1">
-                    <span class="block font-semibold text-white">{item.title}</span>
-                    <span class="mt-0.5 block text-sm text-ink-400">{item.blurb}</span>
-                  </span>
+                  <span class="min-w-0 flex-1 font-semibold text-white">{item.title}</span>
                   <ArrowRight size={18} class="shrink-0 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-white" aria-hidden="true" />
                 </a>
               </li>
@@ -198,7 +133,7 @@ const principles = [
   </Section>
 
   {flags.team && (
-    <Section tone="muted" eyebrow="The team" title="The people you’ll work with." intro="Profiles of our engineers and analysts are on their way.">
+    <Section tone="muted" title="The people you’ll work with.">
       {/* TODO: real people only (name, role, photo, one line on their work). No stock photos or invented names. */}
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (

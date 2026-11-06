@@ -11,17 +11,11 @@ const { items } = Astro.props;
     <li class="reveal overflow-hidden rounded-2xl bg-white ring-1 ring-ink-100" style={`--d: ${(i % 2) * 100}ms`}>
       <div class="flex gap-3 p-5 pb-3 sm:gap-4 sm:p-6 sm:pb-5">
         <CircleAlert size={20} class="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" />
-        <div>
-          <p class="hidden text-xs font-semibold tracking-wide text-ink-500 uppercase sm:block">Sound familiar?</p>
-          <p class="text-base leading-snug font-bold text-ink-900 sm:mt-1.5 sm:text-lg"><span class="sr-only">Problem: </span>{item.problem}</p>
-        </div>
+        <p class="text-base leading-snug font-bold text-ink-900 sm:text-lg"><span class="sr-only">Problem: </span>{item.problem}</p>
       </div>
       <div class="flex gap-3 p-5 pt-0 sm:gap-4 sm:border-t sm:border-ink-100 sm:bg-ink-50/70 sm:p-6 sm:pt-5">
         <CircleCheck size={20} class="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
-        <div>
-          <p class="sr-only text-xs font-semibold tracking-wide text-ink-500 uppercase sm:not-sr-only">What we build</p>
-          <p class="leading-relaxed text-ink-600 sm:mt-1.5">{item.fix}</p>
-        </div>
+        <p class="leading-relaxed text-ink-600"><span class="sr-only">What we build: </span>{item.fix}</p>
       </div>
     </li>
   ))}

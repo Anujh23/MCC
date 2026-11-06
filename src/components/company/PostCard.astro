@@ -1,7 +1,6 @@
 ---
 // Insights card. variant="featured" renders the large dark card used at the top of /insights.
 import type { CollectionEntry } from 'astro:content';
-import { ArrowRight, Clock, CalendarDays } from '@lucide/astro';
 import { href } from '../../data/site';
 
 interface Props {
@@ -10,57 +9,27 @@ interface Props {
   delay?: number;
 }
 const { post, variant = 'default', delay = 0 } = Astro.props;
-const { title, description, date, tags } = post.data;
-const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
-const minutes = post.data.readingTime ?? Math.max(1, Math.round(words / 200));
-const dateLabel = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+const { title, description } = post.data;
 const url = href(`/insights/${post.id}/`);
 // Focus shows as an outline on the whole card (box-shadow rings vanish in forced-colours mode).
 ---
 
 {variant === 'featured' ? (
-  <article class="reveal group relative overflow-hidden rounded-3xl bg-ink-950 text-white ring-1 ring-ink-900 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-saffron-400" style={`--d: ${delay}ms`}>
+  <article class="reveal relative overflow-hidden rounded-3xl bg-ink-950 text-white ring-1 ring-ink-900 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-saffron-400" style={`--d: ${delay}ms`}>
     <div class="bg-grid mask-fade-y pointer-events-none absolute inset-0"></div>
     <div class="animate-glow pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-brand-600/40 blur-3xl"></div>
-    <div class="relative grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:p-14">
-      <div>
-        <span class="eyebrow-pill"><span class="h-1.5 w-1.5 rounded-full bg-saffron-500" aria-hidden="true"></span>Featured</span>
-        <h2 class="mt-5 text-2xl leading-tight font-extrabold text-white sm:text-4xl">
-          <a href={url} class="after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-hidden">{title}</a>
-        </h2>
-        <p class="mt-4 max-w-2xl text-base leading-relaxed text-ink-300 sm:text-lg">{description}</p>
-      </div>
-      <div class="flex flex-col gap-6 lg:items-end">
-        <ul class="flex flex-wrap gap-2 lg:justify-end">
-          {tags.map((t) => <li class="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-ink-200 ring-1 ring-white/10">{t}</li>)}
-        </ul>
-        <div class="flex items-center gap-5 text-sm text-ink-400">
-          <span class="inline-flex items-center gap-1.5"><CalendarDays size={15} aria-hidden="true" />{dateLabel}</span>
-          <span class="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden="true" />{minutes} min read</span>
-        </div>
-        <span class="btn btn-primary w-fit group-hover:bg-brand-500" aria-hidden="true">
-          Read the article <ArrowRight size={16} class="transition group-hover:translate-x-0.5" />
-        </span>
-      </div>
+    <div class="relative max-w-3xl p-6 sm:p-10 lg:p-14">
+      <h2 class="text-2xl leading-tight font-extrabold text-white sm:text-4xl">
+        <a href={url} class="after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-hidden">{title}</a>
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-ink-300 sm:text-lg">{description}</p>
     </div>
   </article>
 ) : (
-  <article class="reveal card-link group relative flex h-full flex-col p-7 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-brand-500" style={`--d: ${delay}ms`}>
-    <ul class="flex flex-wrap gap-2">
-      {tags.slice(0, 2).map((t) => <li class="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">{t}</li>)}
-    </ul>
-    <h3 class="mt-5 text-xl leading-snug font-bold">
+  <article class="reveal card-link relative flex h-full flex-col p-7 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-brand-500" style={`--d: ${delay}ms`}>
+    <h3 class="text-xl leading-snug font-bold">
       <a href={url} class="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-hidden">{title}</a>
     </h3>
-    <p class="mt-3 flex-1 text-[0.95rem] leading-relaxed text-ink-600">{description}</p>
-    <div class="mt-6 flex items-center justify-between border-t border-ink-100 pt-5 text-sm text-ink-500">
-      <span class="flex items-center gap-4">
-        <span>{dateLabel}</span>
-        <span class="inline-flex items-center gap-1.5"><Clock size={14} aria-hidden="true" />{minutes} min</span>
-      </span>
-      <span class="grid h-9 w-9 place-items-center rounded-full bg-ink-50 text-ink-700 ring-1 ring-ink-100 transition group-hover:bg-brand-600 group-hover:text-white group-hover:ring-brand-600" aria-hidden="true">
-        <ArrowRight size={16} />
-      </span>
-    </div>
+    <p class="mt-3 text-[0.95rem] leading-relaxed text-ink-600">{description}</p>
   </article>
 )}

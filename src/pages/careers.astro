@@ -2,8 +2,8 @@
 // No open roles right now. When hiring starts, list the roles here (replace the empty panel).
 // Layout: the shared dark PageHero, stretched to fill the viewport below the header so the page
 // flows straight into the dark footer with no white gap. The aside is an honest empty state:
-// an openings list with zero entries and faint placeholder rows (aria-hidden, no fake data).
-import { Briefcase, Inbox } from '@lucide/astro';
+// an openings list with faint placeholder rows (aria-hidden, no fake data).
+import { Briefcase } from '@lucide/astro';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/ui/PageHero.astro';
 import IconBadge from '../components/ui/IconBadge.astro';
@@ -22,26 +22,20 @@ const ghostRows = [
   description="There are no open roles right now. When we are hiring, the openings will be listed on this page."
   schema={breadcrumbList(crumbs, '/careers/')}
 >
-  <div class="[&>section]:flex [&>section]:min-h-[calc(100dvh-4rem)] [&>section]:items-center [&_h1+p]:text-pretty">
+  <div class="[&>section]:flex [&>section]:min-h-[calc(100dvh-4rem)] [&>section]:items-center">
     <PageHero
       title="No open roles right now."
       highlight="right now."
-      intro="We aren’t hiring at the moment. When we are, the openings will be listed here."
       breadcrumbs={crumbs}
     >
       <div slot="aside" class="mx-auto w-full max-w-md lg:mr-0">
         <div class="card-dark overflow-hidden p-0 shadow-2xl shadow-black/40">
-          <div class="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
-            <div class="flex items-center gap-3">
-              <IconBadge icon={Briefcase} tone="dark" />
-              <h2 class="text-base font-semibold text-white">Open roles</h2>
-            </div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-ink-300 ring-1 ring-white/10">
-              <span class="h-1.5 w-1.5 rounded-full bg-ink-400" aria-hidden="true"></span>0 listed
-            </p>
+          <div class="flex items-center gap-3 border-b border-white/10 px-5 py-4">
+            <IconBadge icon={Briefcase} tone="dark" />
+            <h2 class="text-base font-semibold text-white">Open roles</h2>
           </div>
 
-          <div class="relative px-5 py-5">
+          <div class="px-5 py-5">
             <ul class="space-y-3 [mask-image:linear-gradient(to_bottom,#000_50%,transparent)]" aria-hidden="true">
               {ghostRows.map((r) => (
                 <li class={`flex items-center justify-between gap-4 rounded-xl border border-dashed border-white/10 px-4 py-3.5 ${r.o}`}>
@@ -55,13 +49,6 @@ const ghostRows = [
                 </li>
               ))}
             </ul>
-
-            <div class="absolute inset-0 grid place-items-center px-6">
-              <div class="flex flex-col items-center rounded-2xl bg-ink-950/80 px-6 py-5 text-center ring-1 ring-white/10 backdrop-blur-sm">
-                <Inbox size={22} stroke-width={1.75} class="text-saffron-400" aria-hidden="true" />
-                <p class="mt-2.5 text-sm font-semibold text-white">Nothing listed yet</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

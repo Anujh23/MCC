@@ -1,5 +1,5 @@
 ---
-// The one FAQ: native <details> in a single card. With `title`, it gets a side header (h2, intro).
+// The one FAQ: native <details> in a single card. With `title`, it gets a side header (h2).
 // Without `title` it's just the card, for use under a Section heading or in an aside. Keep it to 4 items.
 // Usage: <Section tone="muted"><Faq title="Questions about CRM builds" items={c.faqs} /></Section>
 import { Plus } from '@lucide/astro';
@@ -7,23 +7,18 @@ import { Plus } from '@lucide/astro';
 interface Props {
   items: { q: string; a: string }[];
   title?: string;
-  /** Words in the title to render with the brand gradient. Max one gradient H2 per page. */
-  highlight?: string;
-  intro?: string;
   /** Index of the item that starts open; -1 for none. */
   open?: number;
 }
-const { items, title, highlight, intro, open = 0 } = Astro.props;
-const [before, after] = highlight && title?.includes(highlight) ? title.split(highlight) : [title, undefined];
+const { items, title, open = 0 } = Astro.props;
 ---
 
 <div class={title ? 'grid gap-10 lg:grid-cols-[0.8fr_1.4fr] lg:gap-16' : ''}>
   {title && (
     <div class="reveal lg:sticky lg:top-28 lg:self-start">
       <h2 class="text-3xl leading-tight font-extrabold sm:text-4xl">
-        {before}{after !== undefined && <span class="text-gradient-brand">{highlight}</span>}{after}
+        {title}
       </h2>
-      {intro && <p class="mt-4 text-lg leading-relaxed text-ink-600">{intro}</p>}
     </div>
   )}
   <div class="reveal divide-y divide-ink-100 rounded-2xl bg-white px-5 ring-1 ring-ink-100 sm:px-8" style={title ? '--d: 120ms' : undefined}>
