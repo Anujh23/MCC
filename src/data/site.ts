@@ -15,7 +15,7 @@ export const site = {
   // CIN, legal name or address on the site). Read via `contact`.
   phone: '+91 95871 13160',
   // Free key from https://web3forms.com (contact form posts there, works on GitHub Pages)
-  formAccessKey: 'YOUR_WEB3FORMS_ACCESS_KEY',
+  formAccessKey: '515a7807-4479-4f61-a455-bcb63ca4c4a0',
 };
 
 // Placeholder values come back as null, so the UI can hide them until they're real.
