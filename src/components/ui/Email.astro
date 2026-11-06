@@ -1,0 +1,6 @@
+---
+// The public email as text that wraps after "@" on narrow screens (<wbr> doesn't change copy-paste).
+import { contact } from '../../data/site';
+const [user, domain] = (contact.email ?? '').split('@');
+---
+{contact.email && <>{user}@<wbr />{domain}</>}

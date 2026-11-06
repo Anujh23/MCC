@@ -11,9 +11,10 @@ export const site = {
   shortName: 'Manka',
   description:
     'Manka Commerce & Consultancy builds CRMs, HR systems, websites and lending tools like bank statement analysis and payslip verification for growing businesses.',
-  // The only public contact detail is the mobile number (owner's choice: no email, LinkedIn,
-  // CIN, legal name or address on the site). Read via `contact`.
+  // Public contact details: mobile and contact@ only (owner's choice: no LinkedIn, CIN, legal name
+  // or address; operations@ stays private). Read via `contact`.
   phone: '+91 95871 13160',
+  email: 'contact@mankacommerceandconsultancy.co.in',
   // Free key from https://web3forms.com (contact form posts there, works on GitHub Pages)
   formAccessKey: '515a7807-4479-4f61-a455-bcb63ca4c4a0',
 };
@@ -26,6 +27,8 @@ export const contact = {
   phone: real(site.phone),
   phoneHref: real(site.phone) ? `tel:${site.phone.replace(/\s/g, '')}` : null,
   whatsappHref: real(site.phone) ? `https://wa.me/${site.phone.replace(/\D/g, '')}` : null,
+  email: real(site.email),
+  emailHref: real(site.email) ? `mailto:${site.email}` : null,
   formKey: real(site.formAccessKey),
 };
 

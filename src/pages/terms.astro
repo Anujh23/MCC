@@ -1,5 +1,6 @@
 ---
 // Draft: needs review by a legal professional before launch (the page says so).
+import Email from '../components/ui/Email.astro';
 import LegalPage from '../components/company/LegalPage.astro';
 import { site, contact, href, contactHref } from '../data/site';
 
@@ -77,7 +78,7 @@ const sections = [
   <section id="contact">
     <h2>10. Contact</h2>
     <p>
-      Questions? Use the <a href={contactHref('other')}>contact form</a>{contact.phone ? <> or call <a href={contact.phoneHref}>{contact.phone}</a></> : null}.
+      Questions? Use the <a href={contactHref('other')}>contact form</a>{contact.email ? <>, email <a href={contact.emailHref}><Email /></a></> : null}{contact.phone ? <> or call <a href={contact.phoneHref}>{contact.phone}</a></> : null}.
     </p>
   </section>
 </LegalPage>

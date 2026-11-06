@@ -18,6 +18,7 @@ export const organization = () => ({
   description: site.description,
   areaServed: INDIA,
   ...(contact.phone ? { telephone: contact.phone } : {}),
+  ...(contact.email ? { email: contact.email } : {}),
 });
 
 export const website = () => ({

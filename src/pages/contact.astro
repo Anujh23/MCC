@@ -3,6 +3,7 @@ import { MessageCircle } from '@lucide/astro';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
 import ContactForm from '../components/company/ContactForm.astro';
+import Email from '../components/ui/Email.astro';
 import { contact } from '../data/site';
 import { breadcrumbList } from '../data/schema';
 
@@ -48,6 +49,9 @@ const aside = Boolean(contact.formKey && contact.phone);
                 <a href={contact.whatsappHref} target="_blank" rel="noopener" class="btn mt-4 bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15">
                   <MessageCircle size={16} aria-hidden="true" />WhatsApp<span class="sr-only"> (opens in a new tab)</span>
                 </a>
+              )}
+              {contact.email && (
+                <a href={contact.emailHref} class="mt-6 block rounded-lg text-sm font-semibold text-ink-200 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"><Email /></a>
               )}
             </div>
           </aside>

@@ -1,7 +1,8 @@
 ---
-// Compact footer: logo, phone, the main pages. Per-item lists live in the header nav.
-import { Phone } from '@lucide/astro';
+// Compact footer: logo, phone, email, the main pages. Per-item lists live in the header nav.
+import { Phone, Mail } from '@lucide/astro';
 import Logo from './Logo.astro';
+import Email from './ui/Email.astro';
 import { site, contact, href } from '../data/site';
 
 const links = [
@@ -23,6 +24,11 @@ const year = new Date().getFullYear();
       {contact.phone && (
         <a href={contact.phoneHref} class="inline-flex items-center gap-2 py-2 text-sm font-semibold text-white hover:text-brand-200">
           <Phone size={15} class="text-saffron-400" aria-hidden="true" />{contact.phone}
+        </a>
+      )}
+      {contact.email && (
+        <a href={contact.emailHref} class="inline-flex min-w-0 items-center gap-2 py-2 text-sm font-semibold text-white hover:text-brand-200">
+          <Mail size={15} class="shrink-0 text-saffron-400" aria-hidden="true" /><span><Email /></span>
         </a>
       )}
     </div>
