@@ -9,10 +9,11 @@ interface Props {
   type?: 'email' | 'password' | 'text' | 'number';
   autocomplete: string;
   minlength?: number;
-  /** Lowest allowed value, for type="number". */
+  /** Lowest allowed value and step, for type="number" (step 0.01 = rupees and paise). */
   min?: number;
+  step?: number;
 }
-const { name, label, type = 'text', autocomplete, minlength, min } = Astro.props;
+const { name, label, type = 'text', autocomplete, minlength, min, step } = Astro.props;
 const id = `f-${name}`;
 const password = type === 'password';
 ---
@@ -30,7 +31,8 @@ const password = type === 'password';
       {autocomplete}
       {minlength}
       {min}
-      inputmode={type === 'number' ? 'numeric' : undefined}
+      {step}
+      inputmode={type === 'number' ? (step && step < 1 ? 'decimal' : 'numeric') : undefined}
       maxlength={password ? 256 : 254}
       required
       spellcheck="false"

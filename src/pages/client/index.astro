@@ -19,6 +19,7 @@ const textBtn = 'inline-flex min-h-11 items-center rounded px-2 text-sm font-sem
   <AuthShell title="Welcome" pending wide>
     <p slot="band" class="mt-2 flex flex-wrap items-center gap-x-3 text-sm text-ink-300">
       <span data-email class="break-all"></span>
+      <a href={href('/admin/')} data-admin-link hidden class={`${textBtn} -mx-2 text-white focus-visible:outline-brand-300`}>Admin</a>
       <button type="button" data-logout class={`${textBtn} -mx-2 text-white focus-visible:outline-brand-300`}>Log out</button>
     </p>
 
@@ -164,6 +165,7 @@ const textBtn = 'inline-flex min-h-11 items-center rounded px-2 text-sm font-sem
     title.textContent = `Welcome, ${r.data.name}`;
     title.classList.remove('invisible');
     $('[data-email]').textContent = email;
+    $('[data-admin-link]').hidden = !r.data.is_admin;
     $('[data-balance]').textContent = rupees(r.data.balance_paise);
     $('[data-test-balance]').textContent = rupees(r.data.test_balance_paise);
     renderKeys(r.data.keys);
