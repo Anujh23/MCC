@@ -1,0 +1,11 @@
+---
+// Small text link on the client pages ("Forgot password?", "Back to log in"). Path goes through href().
+import { href } from '../../data/site';
+
+interface Props {
+  to: string;
+}
+const { to } = Astro.props;
+---
+
+<a href={href(to)} class="inline-flex min-h-6 items-center justify-self-center rounded text-sm font-semibold text-brand-700 hover:underline focus-visible:outline-2 focus-visible:outline-brand-500"><slot /></a>

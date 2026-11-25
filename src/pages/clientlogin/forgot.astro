@@ -1,0 +1,39 @@
+---
+import Base from '../../layouts/Base.astro';
+import AuthShell from '../../components/client/AuthShell.astro';
+import AuthForm from '../../components/client/AuthForm.astro';
+import Field from '../../components/client/Field.astro';
+import AuthLink from '../../components/client/AuthLink.astro';
+---
+
+<Base title="Reset password" description="Get a link to reset your client account password." noindex actions={false}>
+  <AuthShell title="Reset password">
+    <AuthForm id="forgot-form" submit="Send reset link">
+      <Field name="email" label="Email" type="email" autocomplete="username" />
+      <AuthLink slot="after" to="/clientlogin/">Back to log in</AuthLink>
+    </AuthForm>
+
+    <div id="forgot-sent" class="hidden gap-5 text-center" role="status">
+      <p class="text-ink-900">If <strong data-email class="font-semibold break-all"></strong> has an account, a reset link is on its way.</p>
+      <AuthLink to="/clientlogin/">Back to log in</AuthLink>
+    </div>
+  </AuthShell>
+</Base>
+
+<script>
+  import { api, handleForm } from '../../scripts/client-api';
+
+  const form = document.getElementById('forgot-form') as HTMLFormElement;
+  const sent = document.getElementById('forgot-sent')!;
+  let email = '';
+
+  handleForm(
+    form,
+    (v) => api('/auth/forgot', { email: (email = v.email.trim()) }),
+    () => {
+      sent.querySelector('[data-email]')!.textContent = email;
+      form.classList.add('hidden');
+      sent.classList.replace('hidden', 'grid');
+    },
+  );
+</script>

@@ -2,6 +2,8 @@
 import Logo from './Logo.astro';
 import { nav, href, contactHref, cta } from '../data/site';
 
+// `actions`: the Log in link + Book a free call button. Off on the client pages (/clientlogin/, /client/).
+const { actions = true } = Astro.props;
 const itemHref = (base: string, slug: string) => href(`${base}/${slug}`);
 const norm = (p: string) => p.replace(/\/+$/, '') || '/';
 const here = norm(Astro.url.pathname);
@@ -61,7 +63,12 @@ const panelId = (label: string) => `dd-${label.toLowerCase()}`;
     </nav>
 
     <div class="flex items-center gap-2">
-      <a href={contactHref()} class="btn btn-primary max-sm:px-3.5 max-sm:text-[0.8125rem]">{cta.call}</a>
+      {actions && (
+        <>
+          <a href={href('/clientlogin/')} class="hidden min-h-11 items-center rounded-full px-3.5 text-sm font-medium text-ink-700 transition hover:bg-ink-50 hover:text-ink-900 sm:inline-flex">Log in</a>
+          <a href={contactHref()} class="btn btn-primary max-sm:px-3.5 max-sm:text-[0.8125rem]">{cta.call}</a>
+        </>
+      )}
       <button
         id="menu-toggle"
         type="button"
@@ -105,7 +112,12 @@ const panelId = (label: string) => `dd-${label.toLowerCase()}`;
           </ul>
         </details>
       ))}
-      <a href={contactHref()} class="btn btn-primary mt-4 w-full">{cta.call}</a>
+      {actions && (
+        <>
+          <a href={href('/clientlogin/')} class="flex min-h-12 items-center border-b border-ink-100 py-3 text-base font-semibold text-ink-900">Log in</a>
+          <a href={contactHref()} class="btn btn-primary mt-4 w-full">{cta.call}</a>
+        </>
+      )}
     </nav>
   </div>
 </header>

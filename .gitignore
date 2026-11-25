@@ -27,3 +27,9 @@ pnpm-debug.log*
 public/_t-*.html
 # OG render intermediate (scripts/og/render.sh)
 scripts/og/_raw.png
+
+# Business documents (Udyam, GST, invoices) stay local, never in the repo
+/*.pdf
+
+photo_1.jpeg
+photo.jpeg

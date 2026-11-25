@@ -1,0 +1,68 @@
+---
+// Labelled input for the client forms. type="password" adds a show/hide button.
+// slot="aside" sits at the right of the label row (e.g. "Forgot password?").
+import { Eye, EyeOff } from '@lucide/astro';
+
+interface Props {
+  name: string;
+  label: string;
+  type?: 'email' | 'password' | 'text' | 'number';
+  autocomplete: string;
+  minlength?: number;
+  /** Lowest allowed value, for type="number". */
+  min?: number;
+}
+const { name, label, type = 'text', autocomplete, minlength, min } = Astro.props;
+const id = `f-${name}`;
+const password = type === 'password';
+---
+
+<div>
+  <div class="flex items-baseline justify-between gap-3">
+    <label for={id} class="text-sm font-semibold text-ink-900">{label}</label>
+    <slot name="aside" />
+  </div>
+  <div class="relative mt-2">
+    <input
+      {id}
+      {name}
+      {type}
+      {autocomplete}
+      {minlength}
+      {min}
+      inputmode={type === 'number' ? 'numeric' : undefined}
+      maxlength={password ? 256 : 254}
+      required
+      spellcheck="false"
+      autocapitalize="none"
+      class:list={[
+        'block w-full rounded-xl border border-ink-400 bg-white px-4 py-3 text-base text-ink-900 transition focus:border-brand-600 focus:ring-2 focus:ring-brand-500/30 focus:outline-hidden',
+        password && 'pr-12',
+      ]}
+    />
+    {password && (
+      <button
+        type="button"
+        data-reveal
+        aria-label="Show password"
+        aria-pressed="false"
+        aria-controls={id}
+        class="group absolute top-1/2 right-1 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-lg text-ink-500 transition hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-500"
+      >
+        <Eye size={18} class="group-aria-pressed:hidden" aria-hidden="true" />
+        <EyeOff size={18} class="hidden group-aria-pressed:block" aria-hidden="true" />
+      </button>
+    )}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-reveal]').forEach((btn) => {
+    const input = document.getElementById(btn.getAttribute('aria-controls')!) as HTMLInputElement;
+    btn.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.setAttribute('aria-pressed', String(show));
+    });
+  });
+</script>

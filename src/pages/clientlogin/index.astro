@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import AuthShell from '../../components/client/AuthShell.astro';
+import AuthForm from '../../components/client/AuthForm.astro';
+import Field from '../../components/client/Field.astro';
+import AuthLink from '../../components/client/AuthLink.astro';
+import { href } from '../../data/site';
+---
+
+<Base title="Client login" description="Log in to your client account." noindex actions={false}>
+  <AuthShell title="Log in">
+    <AuthForm id="login-form" submit="Log in" data-next={href('/client/')}>
+      <Field name="email" label="Email" type="email" autocomplete="username" />
+      <Field name="password" label="Password" type="password" autocomplete="current-password">
+        <AuthLink slot="aside" to="/clientlogin/forgot/">Forgot password?</AuthLink>
+      </Field>
+    </AuthForm>
+  </AuthShell>
+</Base>
+
+<script>
+  import { api, handleForm } from '../../scripts/client-api';
+
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  const next = form.dataset.next!;
+
+  // Already logged in: skip the form.
+  api('/auth/me').then((r) => r.ok && location.replace(next));
+
+  handleForm(form, ({ email, password }) => api('/auth/login', { email, password }), () => location.assign(next));
+</script>

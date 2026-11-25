@@ -1,0 +1,42 @@
+---
+// Landing page for the emailed link: /clientlogin/reset/?token=…
+import Base from '../../layouts/Base.astro';
+import AuthShell from '../../components/client/AuthShell.astro';
+import AuthForm from '../../components/client/AuthForm.astro';
+import Field from '../../components/client/Field.astro';
+import AuthLink from '../../components/client/AuthLink.astro';
+import { href } from '../../data/site';
+---
+
+<Base title="Set a new password" description="Set a new password for your client account." noindex actions={false}>
+  <AuthShell title="Set a new password">
+    <AuthForm id="reset-form" submit="Save password">
+      <Field name="password" label="New password" type="password" autocomplete="new-password" minlength={10} />
+      <AuthLink slot="after" to="/clientlogin/forgot/">Request a new link</AuthLink>
+    </AuthForm>
+
+    <div id="reset-done" class="hidden gap-5 text-center" role="status">
+      <p class="text-ink-900">Password saved.</p>
+      <a href={href('/clientlogin/')} class="btn btn-primary w-full py-3 text-base">Log in</a>
+    </div>
+  </AuthShell>
+</Base>
+
+<script>
+  import { api, handleForm } from '../../scripts/client-api';
+
+  const form = document.getElementById('reset-form') as HTMLFormElement;
+  const done = document.getElementById('reset-done')!;
+  // Keep the token out of the address bar and history once read.
+  const token = new URLSearchParams(location.search).get('token') ?? '';
+  history.replaceState(null, '', location.pathname);
+
+  handleForm(
+    form,
+    ({ password }) => api('/auth/reset', { token, password }),
+    () => {
+      form.classList.add('hidden');
+      done.classList.replace('hidden', 'grid');
+    },
+  );
+</script>
