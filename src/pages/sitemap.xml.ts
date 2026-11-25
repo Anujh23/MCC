@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import { services, products, industries } from '../data/site';
 import { abs } from '../data/schema';
 
-const pages = ['/', '/about/', '/careers/', '/contact/', '/services/', '/products/', '/industries/', '/insights/'];
+const pages = ['/', '/about/', '/careers/', '/contact/', '/services/', '/products/', '/industries/', '/insights/', '/docs/'];
 
 export const GET: APIRoute = async () => {
   const posts = await getCollection('insights', ({ data }) => !data.draft);

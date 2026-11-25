@@ -1,0 +1,134 @@
+---
+// Developer docs for the product APIs, in the same console frame as the client app (AppShell, public mode):
+// sidebar of sections, then per section the explanation on the left and the request / response code on the right
+// (stacked below xl). Content: src/data/api-content.ts. Planned APIs aren't listed.
+import AppShell from '../../components/client/AppShell.astro';
+import { apiBase, apiErrors, apiProducts, curl } from '../../data/api-content';
+import { href } from '../../data/site';
+
+const nav = [
+  { label: 'Getting started', items: [{ label: 'Authentication', href: '#authentication' }, { label: 'Errors', href: '#errors' }] },
+  { label: 'APIs', items: apiProducts.map((p) => ({ label: p.title, href: `#${p.name}` })) },
+];
+const json = (v: unknown) => JSON.stringify(v, null, 2);
+const section = 'scroll-mt-20 grid grid-cols-1 gap-6 border-t border-ink-200 py-10 first-of-type:border-t-0 first-of-type:pt-0 xl:grid-cols-2 xl:gap-10';
+const h2 = 'text-xl font-bold text-ink-900';
+const code = 'rounded-xs bg-ink-100 px-1.5 py-0.5 font-mono text-[0.85em] text-ink-900';
+const table = 'w-full border border-ink-200 bg-white text-sm';
+const th = 'border-b border-ink-200 bg-ink-50 px-3 py-2 text-left text-xs font-semibold text-ink-500';
+const td = 'border-t border-ink-100 px-3 py-2 align-top';
+---
+
+<AppShell title="API docs" description="Request and response formats for the PAN, GSTIN, IFSC and Maps APIs." public {nav} wide>
+  <div class="text-sm leading-relaxed text-ink-600 sm:text-[0.95rem]">
+
+    <section id="authentication" class={section}>
+      <div class="min-w-0 space-y-4">
+        <h2 class={h2}>Authentication</h2>
+        <p>Send your API key in the <code class={code}>Authorization</code> header. Get your key in the <a href={href('/client/developers/')} class="font-semibold text-brand-700 underline underline-offset-4">dashboard</a>.</p>
+        <p>Each call is paid from your prepaid balance.</p>
+        <p><code class={code}>GET /v1/ping</code> checks your key. It isn’t charged.</p>
+      </div>
+      <div class="min-w-0 space-y-4">
+        <figure><figcaption class="cap">Request</figcaption><pre class="code"><code>{`curl ${apiBase}/v1/ping \\\n  -H "Authorization: Bearer YOUR_KEY"`}</code></pre></figure>
+        <figure><figcaption class="cap">Response</figcaption><pre class="code"><code>{json({ id: 'call_1041', ok: true, client: 'Your company' })}</code></pre></figure>
+      </div>
+    </section>
+
+    <section id="errors" class={section}>
+      <div class="min-w-0 space-y-4">
+        <h2 class={h2}>Errors</h2>
+        <p>Only <code class={code}>200</code> responses are charged.</p>
+        <div class="overflow-x-auto">
+          <table class={table}>
+            <thead><tr><th class={th}>Error</th><th class={th}>When</th></tr></thead>
+            <tbody>
+              {apiErrors.map((e) => (
+                <tr>
+                  <td class={`${td} font-mono whitespace-nowrap text-ink-900`}><span class="text-ink-500 tabular-nums">{e.status}</span> {e.code}</td>
+                  <td class={td}>{e.when}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="min-w-0">
+        <figure><figcaption class="cap">Response</figcaption><pre class="code"><code>{json({ error: { code: 'not_found', message: 'IFSC not found.' }, id: 'call_1046' })}</code></pre></figure>
+      </div>
+    </section>
+
+    {apiProducts.map((p) => (
+      <section id={p.name} class={section}>
+        <div class="min-w-0 space-y-4">
+          <h2 class={h2}>{p.title}</h2>
+          <p class="flex flex-wrap items-center gap-2 font-mono text-sm text-ink-900">
+            <span class="rounded-xs bg-brand-50 px-1.5 py-0.5 text-xs font-bold text-brand-700">{p.method}</span>{p.path}
+          </p>
+          <p>{p.summary}</p>
+          <div class="overflow-x-auto">
+            <table class={table}>
+              <thead><tr><th class={th}>Field</th><th class={th}>Type</th><th class={th}>Rules</th></tr></thead>
+              <tbody>
+                {p.fields.map((f) => (
+                  <tr><td class={`${td} font-mono text-ink-900`}>{f.name}</td><td class={td}>{f.type}</td><td class={td}>{f.doc}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {p.values && (
+            <dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
+              {Object.entries(p.values).map(([k, vs]) => (
+                <>
+                  <dt class="font-mono text-ink-900">{k}</dt>
+                  <dd class="font-mono break-words">{vs.join(' · ')}</dd>
+                </>
+              ))}
+            </dl>
+          )}
+          <p class="text-ink-500">{p.limits}</p>
+          {p.result && (
+            <>
+              <p class="flex flex-wrap items-center gap-2 border-t border-ink-200 pt-4 font-mono text-sm text-ink-900">
+                <span class="rounded-xs bg-brand-50 px-1.5 py-0.5 text-xs font-bold text-brand-700">{p.result.method}</span>{p.result.path}
+              </p>
+              <p>{p.result.summary}</p>
+            </>
+          )}
+        </div>
+        <div class="min-w-0 space-y-4">
+          <figure><figcaption class="cap">Request</figcaption><pre class="code"><code>{curl(p)}</code></pre></figure>
+          <figure><figcaption class="cap">Response</figcaption><pre class="code"><code>{json(p.response)}</code></pre></figure>
+          {p.result && (
+            <>
+              <figure><figcaption class="cap">Request</figcaption><pre class="code"><code>{`curl ${apiBase}${p.result.path.replace(/\{\w+\}/, p.result.example)} \\\n  -H "Authorization: Bearer YOUR_KEY"`}</code></pre></figure>
+              <figure><figcaption class="cap">Response</figcaption><pre class="code"><code>{json(p.result.response)}</code></pre></figure>
+            </>
+          )}
+        </div>
+      </section>
+    ))}
+  </div>
+</AppShell>
+
+<style>
+  /* Code panels: a dark label strip over the block, sharp corners. */
+  .cap {
+    border-radius: 2px 2px 0 0;
+    background: var(--color-ink-900);
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-ink-300);
+  }
+  .code {
+    overflow-x: auto;
+    border-radius: 0 0 2px 2px;
+    background: var(--color-ink-950);
+    padding: 1rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--color-ink-100);
+  }
+</style>

@@ -1,0 +1,161 @@
+---
+// Console frame for the client app (/client/*, /admin/) and the public docs (/docs/): left sidebar, a 56px top bar
+// and the page title, all on one left edge. On phones the sidebar slides in.
+// - Client pages: sidebar = Home, one section per API group (apiProducts + apiPlanned in src/data/api-content.ts,
+//   in apiGroups order), Developers, Admin for admins; top bar = account menu, filled from GET /auth/me
+//   (a 401 goes to the login page).
+// - `public` (docs): sidebar = the page's own `nav`; top bar = Log in, or Dashboard when signed in; indexable.
+import { BookOpen, Building, Code, ChevronDown, FileText, House, IdCard, KeyRound, Landmark, MapPin, Menu, ReceiptText, Users, X } from '@lucide/astro';
+import Base from '../../layouts/Base.astro';
+import Logo from '../Logo.astro';
+import { ui } from './ui';
+import { apiGroups, apiPlanned, apiProducts } from '../../data/api-content';
+import { href } from '../../data/site';
+
+type NavItem = { label: string; href: string; icon?: typeof Code };
+type NavSection = { label?: string; admin?: boolean; items: NavItem[] };
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Admin-only page: the content stays hidden until /auth/me confirms an admin; anyone else goes to Home.
+   *  (The data is protected by the API, which answers 403 to non-admins; this keeps the page itself unseen.) */
+  admin?: boolean;
+  /** Public page (docs): no login needed, Log in / Dashboard in the top bar, sidebar from `nav`. */
+  public?: boolean;
+  nav?: NavSection[];
+  /** Wider content column (docs: text and code side by side). */
+  wide?: boolean;
+}
+const { title, description = 'Your client account.', admin = false, public: isPublic = false, nav, wide = false } = Astro.props;
+
+const ICONS: Record<string, typeof Code> = { pan: IdCard, gstin: Building, ifsc: Landmark, bsa: FileText, payslip: ReceiptText, maps: MapPin };
+const apis = [...apiProducts, ...apiPlanned];
+const clientNav: NavSection[] = [
+  { items: [{ label: 'Home', href: href('/client/'), icon: House }] },
+  ...apiGroups.map((g) => ({
+    label: g,
+    items: apis.filter((p) => p.group === g).map((p) => ({ label: p.title, href: href(`/client/api/${p.name}/`), icon: ICONS[p.name] ?? Code })),
+  })),
+  {
+    label: 'Developers',
+    items: [
+      { label: 'API key', href: href('/client/developers/'), icon: KeyRound },
+      { label: 'Docs', href: href('/docs/'), icon: BookOpen },
+    ],
+  },
+  { label: 'Admin', admin: true, items: [{ label: 'Clients', href: href('/admin/'), icon: Users }] },
+];
+const sections = nav ?? clientNav;
+const logoHref = href(isPublic ? '/' : '/client/');
+const here = Astro.url.pathname;
+const item =
+  'flex min-h-10 items-center gap-3 border-l-2 border-transparent px-3 text-sm font-medium text-ink-700 transition hover:bg-ink-50 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:border-brand-600 aria-[current=page]:bg-brand-50 aria-[current=page]:font-semibold aria-[current=page]:text-brand-700';
+---
+
+<Base title={title} {description} noindex={!isPublic} app>
+  <div data-shell data-login={href('/clientlogin/')} data-home={href('/client/')} data-public={isPublic ? '' : undefined} class="flex-1 bg-ink-50 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <aside
+      data-sidebar
+      aria-label={isPublic ? 'Docs' : 'Account'}
+      class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-ink-200 bg-white transition-transform data-open:translate-x-0 max-lg:invisible data-open:visible motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-dvh lg:w-auto lg:translate-x-0"
+    >
+      <div class="flex h-14 shrink-0 items-center justify-between border-b border-ink-200 px-4">
+        <a href={logoHref} aria-label="Home" class="rounded-xs"><Logo /></a>
+        <button type="button" data-close-menu aria-label="Close menu" class="grid h-10 w-10 place-items-center rounded-xs text-ink-500 hover:bg-ink-50 lg:hidden"><X size={20} aria-hidden="true" /></button>
+      </div>
+      <nav class="flex-1 overflow-y-auto py-3">
+        {sections.map((s) => (
+          <div data-admin-only={s.admin ? '' : undefined} hidden={s.admin}>
+            {s.label && <p class="px-4 pt-5 pb-1.5 text-xs font-semibold text-ink-500">{s.label}</p>}
+            <ul class="grid gap-0.5">
+              {s.items.map((i) => (
+                <li>
+                  <a href={i.href} aria-current={here === i.href ? 'page' : undefined} class={item}>
+                    {i.icon && <i.icon size={17} aria-hidden="true" class="shrink-0" />}{i.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </aside>
+    <button type="button" data-scrim hidden aria-label="Close menu" class="fixed inset-0 z-40 bg-ink-950/40 lg:hidden"></button>
+
+    <div class="flex min-h-dvh min-w-0 flex-col">
+      <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-ink-200 bg-white px-4 sm:px-6 lg:px-8">
+        <button type="button" data-open-menu aria-label="Menu" aria-expanded="false" class="-ml-2 grid h-10 w-10 place-items-center rounded-xs text-ink-700 hover:bg-ink-50 lg:hidden"><Menu size={20} aria-hidden="true" /></button>
+        <a href={logoHref} aria-label="Home" class="rounded-xs lg:hidden"><Logo mark /></a>
+        {isPublic ? (
+          <a href={href('/clientlogin/')} data-public-link data-dashboard={href('/client/')} class={`${ui.secondary} ml-auto`}>Log in</a>
+        ) : (
+          <>
+            <button type="button" popovertarget="account-menu" class="ml-auto flex min-h-10 items-center gap-2 rounded-xs px-2 text-sm text-ink-700 transition hover:bg-ink-50 focus-visible:outline-2 focus-visible:outline-brand-500">
+              <span data-initial class="grid h-8 w-8 place-items-center rounded-xs bg-brand-600 text-sm font-bold text-white"></span>
+              <span data-account-email class="hidden max-w-56 truncate sm:block"></span>
+              <ChevronDown size={16} aria-hidden="true" class="text-ink-500" />
+              <span class="sr-only">Account</span>
+            </button>
+            <div id="account-menu" popover class="inset-auto top-[3.75rem] right-4 m-0 w-60 rounded-xs border border-ink-200 bg-white p-1 shadow-lg sm:right-6 lg:right-8">
+              <p data-account-email class="truncate border-b border-ink-100 px-3 py-2.5 text-sm text-ink-500 sm:hidden"></p>
+              <button type="button" data-logout class="flex min-h-10 w-full items-center rounded-xs px-3 text-left text-sm font-semibold text-rose-700 hover:bg-ink-50 focus-visible:outline-2 focus-visible:outline-brand-500">Log out</button>
+            </div>
+          </>
+        )}
+      </header>
+
+      <main id="main" tabindex="-1" data-admin-gate={admin ? '' : undefined} class="flex-1 px-4 py-6 focus:outline-hidden data-admin-gate:invisible sm:px-6 lg:px-8 lg:py-8">
+        <div class={wide ? 'max-w-6xl' : 'max-w-5xl'}>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h1 class="text-2xl font-bold text-ink-900">{title}</h1>
+            <slot name="actions" />
+          </div>
+          <div class="mt-6"><slot /></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { api } from '../../scripts/client-api';
+
+  const shell = document.querySelector<HTMLElement>('[data-shell]')!;
+  const sidebar = shell.querySelector<HTMLElement>('[data-sidebar]')!;
+  const scrim = shell.querySelector<HTMLElement>('[data-scrim]')!;
+  const opener = shell.querySelector<HTMLElement>('[data-open-menu]')!;
+
+  function setMenu(open: boolean) {
+    sidebar.toggleAttribute('data-open', open);
+    scrim.hidden = !open;
+    opener.setAttribute('aria-expanded', String(open));
+    if (open) sidebar.querySelector<HTMLElement>('nav a')?.focus();
+  }
+  opener.addEventListener('click', () => setMenu(true));
+  scrim.addEventListener('click', () => setMenu(false));
+  shell.querySelector('[data-close-menu]')!.addEventListener('click', () => setMenu(false));
+  sidebar.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', () => setMenu(false))); // docs anchors stay on the page
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && sidebar.hasAttribute('data-open') && setMenu(false));
+
+  api('/auth/me').then((r) => {
+    if (shell.hasAttribute('data-public')) {
+      const link = shell.querySelector<HTMLAnchorElement>('[data-public-link]')!;
+      if (r.ok) [link.textContent, link.href] = ['Dashboard', link.dataset.dashboard!];
+      return;
+    }
+    if (r.status === 401) return location.replace(shell.dataset.login!);
+    if (!r.ok) return;
+    const gate = shell.querySelector('[data-admin-gate]');
+    if (gate && !r.data.is_admin) return location.replace(shell.dataset.home!);
+    gate?.removeAttribute('data-admin-gate');
+    shell.querySelector('[data-initial]')!.textContent = (r.data.name || r.data.email).trim().charAt(0).toUpperCase();
+    shell.querySelectorAll('[data-account-email]').forEach((el) => (el.textContent = r.data.email));
+    shell.querySelectorAll<HTMLElement>('[data-admin-only]').forEach((el) => (el.hidden = !r.data.is_admin));
+  });
+
+  shell.querySelector('[data-logout]')?.addEventListener('click', async () => {
+    await api('/auth/logout', {});
+    location.replace(shell.dataset.login!);
+  });
+</script>

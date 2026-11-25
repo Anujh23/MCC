@@ -9,11 +9,13 @@ interface Props {
   type?: 'email' | 'password' | 'text' | 'number';
   autocomplete: string;
   minlength?: number;
-  /** Lowest allowed value and step, for type="number" (step 0.01 = rupees and paise). */
+  /** Range and step, for type="number" (step 0.01 = rupees and paise). */
   min?: number;
+  max?: number;
   step?: number;
+  placeholder?: string;
 }
-const { name, label, type = 'text', autocomplete, minlength, min, step } = Astro.props;
+const { name, label, type = 'text', autocomplete, minlength, min, max, step, placeholder } = Astro.props;
 const id = `f-${name}`;
 const password = type === 'password';
 ---
@@ -31,14 +33,16 @@ const password = type === 'password';
       {autocomplete}
       {minlength}
       {min}
+      {max}
       {step}
+      {placeholder}
       inputmode={type === 'number' ? (step && step < 1 ? 'decimal' : 'numeric') : undefined}
       maxlength={password ? 256 : 254}
       required
       spellcheck="false"
       autocapitalize="none"
       class:list={[
-        'block w-full rounded-xl border border-ink-400 bg-white px-4 py-3 text-base text-ink-900 transition focus:border-brand-600 focus:ring-2 focus:ring-brand-500/30 focus:outline-hidden',
+        'block w-full rounded-xs border border-ink-300 bg-white px-3 py-2.5 text-base text-ink-900 transition placeholder:text-ink-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/25 focus:outline-hidden',
         password && 'pr-12',
       ]}
     />
@@ -49,7 +53,7 @@ const password = type === 'password';
         aria-label="Show password"
         aria-pressed="false"
         aria-controls={id}
-        class="group absolute top-1/2 right-1 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-lg text-ink-500 transition hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-500"
+        class="group absolute top-1/2 right-0.5 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xs text-ink-500 transition hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-500"
       >
         <Eye size={18} class="group-aria-pressed:hidden" aria-hidden="true" />
         <EyeOff size={18} class="hidden group-aria-pressed:block" aria-hidden="true" />

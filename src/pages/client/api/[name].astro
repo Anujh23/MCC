@@ -1,0 +1,179 @@
+---
+// One page per API (/client/api/{name}/): Try it (POST /account/try/{name}, paid from the balance)
+// and the API's endpoint + curl. Pages come from src/data/api-content.ts; planned APIs get an empty page.
+// Maps API also lists its link requests (GET /account/locations): status and the coordinates once shared.
+import AppShell from '../../../components/client/AppShell.astro';
+import AuthForm from '../../../components/client/AuthForm.astro';
+import Field from '../../../components/client/Field.astro';
+import { ui } from '../../../components/client/ui';
+import { apiPlanned, apiProducts, curl, type ApiProduct } from '../../../data/api-content';
+import { href } from '../../../data/site';
+
+export function getStaticPaths() {
+  return [
+    ...apiProducts.map((p) => ({ params: { name: p.name }, props: { title: p.title, p } })),
+    ...apiPlanned.map((p) => ({ params: { name: p.name }, props: { title: p.title, p: null } })),
+  ];
+}
+const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
+---
+
+<AppShell title={title}>
+  {p ? (
+    <div id="api" data-name={p.name} class="grid grid-cols-1 gap-4 aria-busy:invisible lg:grid-cols-2 lg:items-start" aria-busy="true">
+      <section class={ui.card} aria-labelledby="try-title">
+        <div class={ui.cardHead}><h2 id="try-title" class={ui.h2}>Try it</h2></div>
+        <div class="p-4 sm:p-5">
+          <AuthForm id="try" submit={p.verb}>
+            {p.fields.map((f) => (
+              <Field name={f.name} label={f.label} type={f.type === 'number' ? 'number' : 'text'} autocomplete="off" placeholder={`e.g. ${f.example}`} />
+            ))}
+            <p data-cost class="rounded-xs border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 empty:hidden"></p>
+          </AuthForm>
+          <dl data-result hidden class="mt-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-ink-100 pt-4 text-sm"></dl>
+        </div>
+      </section>
+
+      <section class={ui.card} aria-labelledby="api-title">
+        <div class={ui.cardHead}>
+          <h2 id="api-title" class={ui.h2}>API</h2>
+          <a href={href(`/docs/#${p.name}`)} class={`${ui.link} -mr-2 text-brand-700`}>Docs</a>
+        </div>
+        <div class="space-y-4 p-4 sm:p-5">
+          <p class="text-sm text-ink-600">{p.summary}</p>
+          <p class="flex flex-wrap items-center gap-2 font-mono text-sm text-ink-900">
+            <span class="rounded-xs bg-brand-50 px-1.5 py-0.5 text-xs font-bold text-brand-700">{p.method}</span>{p.path}
+          </p>
+          <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>{curl(p)}</code></pre>
+        </div>
+      </section>
+
+      {p.name === 'maps' && (
+        <section class={`${ui.card} lg:col-span-2`} aria-labelledby="req-title">
+          <div class={ui.cardHead}><h2 id="req-title" class={ui.h2}>Requests</h2></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-ink-50"><tr><th class={ui.th}>Reference</th><th class={ui.th}>Status</th><th class={ui.th}>Location</th><th class={ui.th}>When</th></tr></thead>
+              <tbody data-requests></tbody>
+            </table>
+          </div>
+          <p data-requests-empty class="border-t border-ink-100 px-4 py-6 text-sm text-ink-500 sm:px-5">No requests yet.</p>
+        </section>
+      )}
+    </div>
+  ) : (
+    <section class={`${ui.card} px-5 py-8 text-sm text-ink-500`}>Coming soon.</section>
+  )}
+</AppShell>
+
+<script>
+  import { api, handleForm } from '../../../scripts/client-api';
+  import { ui } from '../../../components/client/ui';
+
+  const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel)!;
+  const box = document.querySelector<HTMLElement>('#api'); // null on a planned API's page
+  const rupees = (paise: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(paise / 100);
+  // Response field → label: "holder_type" → "Holder type", "data_as_of" → "Data as of", "micr" → "MICR".
+  const ACRONYMS = new Set(['pan', 'gstin', 'ifsc', 'micr', 'upi', 'neft', 'rtgs', 'imps', 'url']);
+  const LABELS: Record<string, string> = { accuracy_m: 'Accuracy (m)', lat: 'Latitude', lng: 'Longitude' };
+  const label = (k: string) => {
+    if (LABELS[k]) return LABELS[k];
+    const s = k.split('_').map((w) => (ACRONYMS.has(w) ? w.toUpperCase() : w)).join(' ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const when = (iso: string) =>
+    new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
+
+  // A value with a Copy button (the Maps API link the client sends on).
+  function copyable(text: string) {
+    const wrap = document.createElement('div');
+    wrap.className = 'flex items-start gap-2';
+    const code = document.createElement('code');
+    code.className = 'min-w-0 flex-1 rounded-xs bg-ink-50 p-2 font-mono text-xs font-normal break-all text-ink-900';
+    code.textContent = text;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = ui.secondary;
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied';
+      } catch {
+        getSelection()?.selectAllChildren(code); // clipboard blocked: the link is selected, Ctrl+C works
+      }
+    });
+    wrap.append(code, btn);
+    return wrap;
+  }
+
+  type Loc = { request: string; reference: string; status: string; url: string | null; lat: number | null; lng: number | null; accuracy_m: number | null; located_at: string | null; expires_at: string };
+  const STATUS: Record<string, string> = { pending: 'Waiting', done: 'Shared', expired: 'Expired' };
+
+  // Maps API: the client's link requests, newest first.
+  async function loadRequests() {
+    const body = document.querySelector('[data-requests]');
+    if (!body) return;
+    const r = await api('/account/locations');
+    if (!r.ok) return;
+    const rows: Loc[] = r.data;
+    body.replaceChildren(
+      ...rows.map((x) => {
+        const tr = document.createElement('tr');
+        const cells: [string, string][] = [
+          [x.reference, ''],
+          [STATUS[x.status] ?? x.status, ''],
+          x.lat === null ? ['—', 'text-ink-400'] : [`${x.lat}, ${x.lng} (±${Math.round(x.accuracy_m ?? 0)} m)`, 'font-mono text-xs whitespace-nowrap'],
+          x.located_at ? [when(x.located_at), 'tabular-nums'] : [`Expires ${when(x.expires_at)}`, 'tabular-nums text-ink-500'],
+        ];
+        cells.forEach(([text, extra]) => {
+          const td = document.createElement('td');
+          td.className = `border-t border-ink-100 px-4 py-3 align-top sm:px-5 ${extra}`;
+          td.textContent = text;
+          tr.append(td);
+        });
+        return tr;
+      }),
+    );
+    $('[data-requests-empty]').hidden = rows.length > 0;
+  }
+
+  if (box) {
+    const name = box.dataset.name!;
+    const result = $('[data-result]');
+    const costNote = $('[data-cost]');
+
+    // Where the next call is paid from, from the latest balances.
+    const refresh = async () => {
+      const r = await api('/account');
+      if (r.status === 401) return; // AppShell sends the visitor to the login page
+      box.removeAttribute('aria-busy');
+      if (!r.ok) return;
+      const price = r.data.prices?.[name];
+      costNote.textContent =
+        price === undefined ? '' : `${rupees(price)} will be deducted from your balance.`;
+    };
+
+    handleForm($<HTMLFormElement>('#try'), (values) => api(`/account/try/${name}`, values), async (r) => {
+      const { id: _id, ...fields } = r.data;
+      result.replaceChildren(
+        ...Object.entries(fields).filter(([, v]) => v !== null).flatMap(([k, v]) => {
+          const dt = document.createElement('dt');
+          dt.className = 'text-ink-500';
+          dt.textContent = label(k);
+          const dd = document.createElement('dd');
+          dd.className = 'font-semibold break-words text-ink-900';
+          dd.textContent = typeof v === 'boolean' ? (v ? 'Yes' : 'No') : typeof v === 'object' ? JSON.stringify(v) : String(v);
+          if (k === 'url') dd.replaceChildren(copyable(String(v))); // Maps API: the link to send
+          return [dt, dd];
+        }),
+      );
+      result.hidden = false;
+      result.scrollIntoView({ block: 'nearest' });
+      await Promise.all([refresh(), loadRequests()]);
+    });
+
+    refresh();
+    loadRequests();
+  }
+</script>

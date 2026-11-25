@@ -5,6 +5,7 @@ import AuthShell from '../../components/client/AuthShell.astro';
 import AuthForm from '../../components/client/AuthForm.astro';
 import Field from '../../components/client/Field.astro';
 import AuthLink from '../../components/client/AuthLink.astro';
+import { ui } from '../../components/client/ui';
 import { href } from '../../data/site';
 ---
 
@@ -17,7 +18,7 @@ import { href } from '../../data/site';
 
     <div id="reset-done" class="hidden gap-5 text-center" role="status">
       <p class="text-ink-900">Password saved.</p>
-      <a href={href('/clientlogin/')} class="btn btn-primary w-full py-3 text-base">Log in</a>
+      <a href={href('/clientlogin/')} class={`${ui.primary} min-h-11 w-full`}>Log in</a>
     </div>
   </AuthShell>
 </Base>

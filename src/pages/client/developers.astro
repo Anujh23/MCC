@@ -1,0 +1,90 @@
+---
+// API key: one per client. Generate shows the full key once; Regenerate replaces it (the old one stops working).
+// The key comes from GET /account, POST /account/keys makes a new one.
+import { Copy } from '@lucide/astro';
+import AppShell from '../../components/client/AppShell.astro';
+import { ui } from '../../components/client/ui';
+import { API } from '../../scripts/client-api';
+---
+
+<AppShell title="API key" description="Your API key.">
+  <section id="key" class={`${ui.card} aria-busy:invisible`} aria-busy="true" aria-label="API key">
+    <p data-key-error role="alert" class={`${ui.error} m-4 sm:m-5`}></p>
+
+    <div class="flex items-center gap-4 px-4 py-4 sm:px-5">
+      <p data-meta class="flex min-w-0 flex-1 flex-wrap gap-x-3 text-sm text-ink-500">
+        <code data-prefix class="font-mono text-ink-900"></code><span data-used class="whitespace-nowrap"></span>
+      </p>
+      <button type="button" data-generate class={ui.primary} data-primary={ui.primary} data-secondary={ui.secondary}>Generate</button>
+    </div>
+
+    <div data-newkey hidden class="mx-4 mb-4 rounded-xs border border-emerald-200 bg-emerald-50 p-4 sm:mx-5">
+      <p class="text-sm font-semibold text-emerald-900">Copy this key now. It won’t be shown again.</p>
+      <div class="mt-2 flex items-start gap-2">
+        <code data-newkey-value class="min-w-0 flex-1 rounded-xs border border-emerald-200 bg-white px-3 py-2 font-mono text-sm break-all text-ink-900"></code>
+        <button type="button" data-copy class={ui.secondary}><Copy size={16} aria-hidden="true" /><span data-copy-label>Copy</span></button>
+      </div>
+    </div>
+
+    <div class="border-t border-ink-200 p-4 sm:p-5">
+      <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>curl {API}/v1/ping \
+  -H "Authorization: Bearer YOUR_KEY"</code></pre>
+    </div>
+  </section>
+</AppShell>
+
+<script>
+  import { api, type Result } from '../../scripts/client-api';
+
+  type Key = { id: number; prefix: string; created_at: string; last_used_at: string | null };
+
+  const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel)!;
+  const box = $('#key');
+  const error = $('[data-key-error]');
+  const generate = $<HTMLButtonElement>('[data-generate]');
+  const when = (iso: string) =>
+    new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
+  let key: Key | null = null;
+
+  function fail(r: Result, fallback: string) {
+    if (r.status === 401) return; // AppShell sends the visitor to the login page
+    box.removeAttribute('aria-busy');
+    error.textContent = typeof r.data?.detail === 'string' ? r.data.detail : fallback;
+  }
+
+  async function load() {
+    const r = await api('/account');
+    if (!r.ok) return fail(r, 'Could not load your key. Refresh the page.');
+    key = r.data.key;
+    $('[data-prefix]').textContent = key ? `${key.prefix}…` : 'No key yet';
+    $('[data-used]').textContent = key ? (key.last_used_at ? `Used ${when(key.last_used_at)}` : 'Not used yet') : '';
+    generate.textContent = key ? 'Regenerate' : 'Generate';
+    generate.className = key ? generate.dataset.secondary! : generate.dataset.primary!; // Regenerate is the quieter action
+    box.removeAttribute('aria-busy');
+  }
+
+  generate.addEventListener('click', async () => {
+    if (key && !confirm('Regenerate your API key? The current one stops working.')) return;
+    generate.disabled = true;
+    error.textContent = '';
+    const r = await api('/account/keys', {});
+    generate.disabled = false;
+    if (!r.ok) return fail(r, 'Could not create the key. Try again.');
+    $('[data-newkey-value]').textContent = r.data.key;
+    $('[data-copy-label]').textContent = 'Copy';
+    $('[data-newkey]').hidden = false;
+    await load();
+  });
+
+  $('[data-copy]').addEventListener('click', async () => {
+    const code = $('[data-newkey-value]');
+    try {
+      await navigator.clipboard.writeText(code.textContent ?? '');
+      $('[data-copy-label]').textContent = 'Copied';
+    } catch {
+      getSelection()?.selectAllChildren(code); // clipboard blocked: key is selected, Ctrl+C works
+    }
+  });
+
+  load();
+</script>

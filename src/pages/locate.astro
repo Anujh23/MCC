@@ -1,0 +1,99 @@
+---
+// Maps API link page (/locate/?t=…): the person a client sent the link to shares their phone's GPS fix, once.
+// Unbranded on purpose (no logo, no site nav): it carries the client's name, not ours. API: GET/POST /locate/{token}.
+import { MapPin } from '@lucide/astro';
+import Base from '../layouts/Base.astro';
+import { ui } from '../components/client/ui';
+---
+
+<Base title="Share location" description="Share your current location." noindex app>
+  <main id="main" class="grid flex-1 place-items-center bg-ink-50 px-4 py-10">
+    <div id="locate" class="w-full max-w-sm rounded-xs border border-ink-200 bg-white p-6 text-center">
+      <MapPin size={28} aria-hidden="true" class="mx-auto text-brand-600" />
+      <h1 data-title class="mt-3 text-xl font-bold text-ink-900">Share your location</h1>
+      <p data-text class="mt-2 text-sm text-ink-600 empty:hidden"></p>
+      <button type="button" data-share hidden class={`${ui.primary} mt-6 min-h-11 w-full`}>Share location</button>
+      <p data-error role="alert" class={`${ui.error} mt-4 text-left`}></p>
+    </div>
+  </main>
+</Base>
+
+<script>
+  import { api } from '../scripts/client-api';
+
+  const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
+  const token = new URLSearchParams(location.search).get('t') ?? '';
+  const share = $<HTMLButtonElement>('[data-share]');
+  const error = $('[data-error]');
+
+  function show(title: string, text: string) {
+    $('[data-title]').textContent = title;
+    $('[data-text]').textContent = text;
+    share.hidden = true;
+  }
+
+  const ENDED: Record<string, [string, string]> = {
+    done: ['Location already shared', 'You can close this page.'],
+    expired: ['Link expired', 'Ask for a new link.'],
+  };
+
+  // Best GPS fix within 15 s; stops early once it's within 30 m.
+  function fix(): Promise<GeolocationPosition> {
+    return new Promise((resolve, reject) => {
+      let best: GeolocationPosition | null = null;
+      const finish = () => {
+        navigator.geolocation.clearWatch(watch);
+        clearTimeout(timer);
+        best ? resolve(best) : reject(new Error('No location fix.'));
+      };
+      const watch = navigator.geolocation.watchPosition(
+        (p) => {
+          if (!best || p.coords.accuracy < best.coords.accuracy) best = p;
+          if (p.coords.accuracy <= 30) finish();
+        },
+        (e) => {
+          if (e.code !== e.PERMISSION_DENIED) return; // keep waiting on timeouts / weak signal
+          navigator.geolocation.clearWatch(watch);
+          clearTimeout(timer);
+          reject(e);
+        },
+        { enableHighAccuracy: true, maximumAge: 0 },
+      );
+      const timer = setTimeout(finish, 15_000);
+    });
+  }
+
+  async function start() {
+    if (!token) return show('Link not valid', 'Check the link you were sent.');
+    const r = await api(`/locate/${encodeURIComponent(token)}`);
+    if (r.status === 404) return show('Link not valid', 'Check the link you were sent.');
+    if (!r.ok) return show('Something went wrong', 'Refresh the page to try again.');
+    if (ENDED[r.data.status]) return show(...ENDED[r.data.status]);
+    $('[data-text]').textContent = `${r.data.requester} is asking for your current location.`;
+    share.hidden = false;
+  }
+
+  share.addEventListener('click', async () => {
+    error.textContent = '';
+    if (!('geolocation' in navigator)) return void (error.textContent = 'This browser can’t share location. Try another browser.');
+    share.disabled = true;
+    share.textContent = 'Getting your location…';
+    try {
+      const p = await fix();
+      const r = await api(`/locate/${encodeURIComponent(token)}`, { lat: p.coords.latitude, lng: p.coords.longitude, accuracy_m: p.coords.accuracy });
+      if (r.ok) return show('Location shared', 'You can close this page.');
+      if (r.status === 409) return show(...ENDED.done);
+      if (r.status === 410) return show(...ENDED.expired);
+      error.textContent = 'Could not send your location. Try again.';
+    } catch (e) {
+      error.textContent =
+        e instanceof GeolocationPositionError
+          ? 'Location is off for this page. Turn it on in your browser settings, then try again.'
+          : 'Could not get your location. Move to an open area and try again.';
+    }
+    share.disabled = false;
+    share.textContent = 'Share location';
+  });
+
+  start();
+</script>

@@ -15,8 +15,10 @@ interface Props {
   imageAlt?: string;
   type?: 'website' | 'article';
   published?: Date;
-  /** Header Log in link + "Book a free call" button. Off on the client pages. */
+  /** Header Log in link + "Book a free call" button. Off on the login pages. */
   actions?: boolean;
+  /** Logged-in app (/client/*, /admin/): no site header, <main> or footer; AppShell draws its own. */
+  app?: boolean;
   /** Extra JSON-LD nodes from src/data/schema.ts, merged into one @graph with Organization + WebSite. */
   schema?: object | object[];
 }
@@ -30,6 +32,7 @@ const {
   published,
   schema,
   actions = true,
+  app = false,
 } = Astro.props;
 
 // " | Manka" only while the whole title still fits in 60 characters.
@@ -74,9 +77,13 @@ const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
   </head>
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60]">Skip to content</a>
-    <Header {actions} />
-    <main id="main" tabindex="-1" class="flex-1 focus:outline-hidden"><slot /></main>
-    <Footer />
+    {app ? <slot /> : (
+      <>
+        <Header {actions} />
+        <main id="main" tabindex="-1" class="flex-1 focus:outline-hidden"><slot /></main>
+        <Footer />
+      </>
+    )}
 
     <script>
       // Scroll reveal for any element with class="reveal"

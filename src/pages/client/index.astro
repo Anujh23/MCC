@@ -1,157 +1,86 @@
 ---
-// Client dashboard: balance + recharge, API keys, transactions. Data from GET /account (session cookie).
-// Recharge is manual for now: the client sends the amount on WhatsApp/email, we credit it with the API's CLI.
-import { Copy, Plus, Wallet } from '@lucide/astro';
-import Base from '../../layouts/Base.astro';
-import AuthShell from '../../components/client/AuthShell.astro';
+// Home: balance + recharge, transactions. Data from GET /account (session cookie).
+// Each API has its own page (/client/api/{name}/), keys are on /client/developers/.
+// Recharge is manual for now: the client sends the amount on WhatsApp/email, we credit it from Admin.
+import { Plus } from '@lucide/astro';
+import AppShell from '../../components/client/AppShell.astro';
 import Field from '../../components/client/Field.astro';
-import { contact, href } from '../../data/site';
-import { API } from '../../scripts/client-api';
-
-const card = 'rounded-3xl bg-white p-5 shadow-xl shadow-ink-900/[0.06] ring-1 ring-ink-100 sm:p-7';
-const h2 = 'text-lg font-extrabold text-ink-900';
-const ghost = 'btn text-ink-900 ring-1 ring-ink-200 hover:bg-ink-50';
-// Small text buttons: 44px tap target on phones, compact from sm up. Callers add colour and a negative margin.
-const textBtn = 'inline-flex min-h-11 items-center rounded px-2 text-sm font-semibold hover:underline focus-visible:outline-2 sm:min-h-6';
+import { ui } from '../../components/client/ui';
+import { contact } from '../../data/site';
 ---
 
-<Base title="Your account" description="Your client account." noindex actions={false}>
-  <AuthShell title="Welcome" pending wide>
-    <p slot="band" class="mt-2 flex flex-wrap items-center gap-x-3 text-sm text-ink-300">
-      <span data-email class="break-all"></span>
-      <a href={href('/admin/')} data-admin-link hidden class={`${textBtn} -mx-2 text-white focus-visible:outline-brand-300`}>Admin</a>
-      <button type="button" data-logout class={`${textBtn} -mx-2 text-white focus-visible:outline-brand-300`}>Log out</button>
-    </p>
+<AppShell title="Home">
+  <div id="home" class="grid grid-cols-1 gap-4 aria-busy:invisible" aria-busy="true">
+    <p data-load-error role="alert" class={ui.error}></p>
 
-    <div id="dash" data-login={href('/clientlogin/')} class="grid gap-5 aria-busy:invisible lg:grid-cols-[20rem_1fr] lg:items-start" aria-busy="true">
-      <section class={card} aria-labelledby="balance-title">
-        <h2 id="balance-title" class="flex items-center gap-2 text-sm font-semibold text-ink-500"><Wallet size={16} aria-hidden="true" />Balance</h2>
-        <p data-balance class="mt-1 text-4xl font-extrabold tracking-tight text-ink-900 tabular-nums">₹0.00</p>
-        <p class="mt-1 text-sm text-ink-500">Test credit <span data-test-balance class="font-semibold text-ink-700 tabular-nums">₹0.00</span></p>
-        <button type="button" data-recharge class="btn btn-primary mt-5 w-full py-3 text-base"><Plus size={17} aria-hidden="true" />Recharge</button>
-      </section>
+    <section class={`${ui.card} flex items-end justify-between gap-4 p-5`} aria-labelledby="balance-title">
+      <div>
+        <h2 id="balance-title" class="text-sm font-medium text-ink-500">Balance</h2>
+        <p data-balance class="mt-1 text-3xl font-bold tracking-tight text-ink-900 tabular-nums">₹0.00</p>
+      </div>
+      <button type="button" data-recharge class={ui.primary}><Plus size={16} aria-hidden="true" />Recharge</button>
+    </section>
 
-      <section class={card} aria-labelledby="keys-title">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="keys-title" class={h2}>API keys</h2>
-          <div class="flex gap-2">
-            <button type="button" data-new="test" class={ghost}>New test key</button>
-            <button type="button" data-new="live" class="btn btn-primary">New live key</button>
-          </div>
-        </div>
-        <p data-keys-error role="alert" class="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-900 ring-1 ring-rose-200 empty:hidden"></p>
+    <section class={ui.card} aria-labelledby="tx-title">
+      <div class={ui.cardHead}><h2 id="tx-title" class={ui.h2}>Transactions</h2></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-ink-50"><tr><th class={ui.th}>Date</th><th class={ui.th}>Description</th><th class={`${ui.th} text-right`}>Amount</th></tr></thead>
+          <tbody data-entries></tbody>
+        </table>
+      </div>
+      <p data-entries-empty class="border-t border-ink-100 px-4 py-6 text-sm text-ink-500 sm:px-5">No transactions yet.</p>
+    </section>
+  </div>
 
-        <div data-newkey hidden class="mt-4 rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
-          <p class="text-sm font-semibold text-emerald-900">Copy this key now. It won’t be shown again.</p>
-          <div class="mt-2 flex items-start gap-2">
-            <code data-newkey-value class="min-w-0 flex-1 rounded-lg bg-white px-3 py-2 font-mono text-sm break-all text-ink-900 ring-1 ring-emerald-200"></code>
-            <button type="button" data-copy class={`${ghost} shrink-0 bg-white`}><Copy size={16} aria-hidden="true" /><span data-copy-label>Copy</span></button>
-          </div>
-        </div>
+  <template data-entry-row>
+    <tr>
+      <td class={`${ui.td} whitespace-nowrap`}><span data-date class="text-ink-900"></span><span data-time class="block text-xs text-ink-500"></span></td>
+      <td class={ui.td}><span data-what class="font-medium text-ink-900"></span><span data-note class="block text-xs break-words text-ink-500"></span></td>
+      <td data-amount class={`${ui.td} text-right font-semibold whitespace-nowrap tabular-nums`}></td>
+    </tr>
+  </template>
 
-        <ul data-keys class="mt-4 divide-y divide-ink-100"></ul>
-        <p data-keys-empty class="mt-4 text-sm text-ink-500">No keys yet.</p>
-
-        <pre class="mt-6 overflow-x-auto rounded-xl bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>curl {API}/v1/ping \
-  -H "Authorization: Bearer YOUR_KEY"</code></pre>
-      </section>
-
-      <section class={`${card} lg:col-span-2`} aria-labelledby="tx-title">
-        <h2 id="tx-title" class={h2}>Transactions</h2>
-        <ul data-entries class="mt-3 divide-y divide-ink-100"></ul>
-        <p data-entries-empty class="mt-3 text-sm text-ink-500">No transactions yet.</p>
-      </section>
-    </div>
-
-    <template data-key-row>
-      <li class="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
-        <code data-prefix class="font-mono text-sm text-ink-900"></code>
-        <span data-mode class="rounded-full px-2 py-0.5 text-xs font-semibold"></span>
-        <span data-used class="text-xs text-ink-500 sm:ml-auto"></span>
-        <button type="button" data-revoke class={`${textBtn} -mr-2 ml-auto text-rose-700 focus-visible:outline-brand-500 sm:ml-0`}>Delete</button>
-      </li>
-    </template>
-
-    <template data-entry-row>
-      <li class="flex items-baseline gap-3 py-3">
-        <div class="min-w-0 flex-1">
-          <p data-what class="font-semibold text-ink-900"></p>
-          <p data-when class="text-xs break-words text-ink-500"></p>
-        </div>
-        <p data-amount class="font-semibold tabular-nums"></p>
-      </li>
-    </template>
-
-    <dialog data-recharge-dialog aria-labelledby="recharge-title" class="m-auto w-[min(28rem,calc(100%-2rem))] rounded-3xl p-0 shadow-2xl backdrop:bg-ink-950/60">
-      <form data-recharge-form class="grid gap-5 p-6" novalidate data-wa={contact.whatsappHref} data-mail={contact.email}>
-        <h2 id="recharge-title" class="text-xl font-extrabold text-ink-900">Recharge</h2>
-        <Field name="amount" label="Amount (₹)" type="number" autocomplete="off" min={100} />
-        <p class="text-sm text-ink-600">We’ll share payment details and add the amount to your balance once it’s paid.</p>
-        <button type="submit" class="btn btn-primary w-full py-3 text-base">Continue on WhatsApp</button>
-        <div class="flex items-center justify-between">
-          <button type="button" data-mail-instead class={`${textBtn} -ml-2 text-brand-700 focus-visible:outline-brand-500`}>Email instead</button>
-          <button type="button" data-close class={`${textBtn} -mr-2 text-ink-600 focus-visible:outline-brand-500`}>Cancel</button>
-        </div>
-      </form>
-    </dialog>
-  </AuthShell>
-</Base>
+  <dialog data-recharge-dialog aria-labelledby="recharge-title" class={ui.dialog}>
+    <form data-recharge-form class="grid gap-5 p-6" novalidate data-wa={contact.whatsappHref} data-mail={contact.email}>
+      <h2 id="recharge-title" class="text-lg font-bold text-ink-900">Recharge</h2>
+      <Field name="amount" label="Amount (₹)" type="number" autocomplete="off" min={100} />
+      <p class="text-sm text-ink-600">We’ll share payment details and add the amount to your balance once it’s paid.</p>
+      <button type="submit" class={`${ui.primary} min-h-11 w-full`}>Continue on WhatsApp</button>
+      <div class="flex items-center justify-between">
+        <button type="button" data-mail-instead class={`${ui.link} -ml-2 text-brand-700`}>Email instead</button>
+        <button type="button" data-close class={`${ui.link} -mr-2 text-ink-600`}>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+</AppShell>
 
 <script>
-  import { api, type Result } from '../../scripts/client-api';
+  import { api } from '../../scripts/client-api';
 
-  type Key = { id: number; prefix: string; mode: 'test' | 'live'; created_at: string; last_used_at: string | null };
   type Entry = { amount_paise: number; balance_after_paise: number; kind: string; note: string; created_at: string };
 
   const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel)!;
-  const dash = $('#dash');
-  const login = dash.dataset.login!;
+  const home = $('#home');
   const rupees = (paise: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(paise / 100);
-  const when = (iso: string) =>
-    new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
+  const date = (iso: string) => new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso));
+  const time = (iso: string) => new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
   const LABEL: Record<string, string> = { recharge: 'Recharge', usage: 'API call', refund: 'Refund', adjustment: 'Adjustment' };
-  const keysError = $('[data-keys-error]');
   let email = '';
 
-  // Session gone → back to login. Anything else → show the page with the message in the keys card.
-  function fail(r: Result, fallback: string) {
-    if (r.status === 401) return location.replace(login);
-    dash.removeAttribute('aria-busy');
-    $('[data-title]').classList.remove('invisible');
-    keysError.textContent = typeof r.data?.detail === 'string' ? r.data.detail : fallback;
-  }
-
-  function row(tpl: string) {
-    return ($<HTMLTemplateElement>(tpl).content.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement;
-  }
-
-  function renderKeys(keys: Key[]) {
-    const list = $('[data-keys]');
-    list.replaceChildren(
-      ...keys.map((k) => {
-        const li = row('[data-key-row]');
-        $('[data-prefix]', li).textContent = `${k.prefix}…`;
-        const mode = $('[data-mode]', li);
-        mode.textContent = k.mode === 'live' ? 'Live' : 'Test';
-        mode.classList.add(...(k.mode === 'live' ? ['bg-brand-50', 'text-brand-700'] : ['bg-ink-100', 'text-ink-700']));
-        $('[data-used]', li).textContent = k.last_used_at ? `Used ${when(k.last_used_at)}` : 'Not used yet';
-        $('[data-revoke]', li).addEventListener('click', () => revoke(k));
-        return li;
-      }),
-    );
-    $('[data-keys-empty]').hidden = keys.length > 0;
-  }
-
   function renderEntries(entries: Entry[]) {
+    const tpl = $<HTMLTemplateElement>('[data-entry-row]').content.firstElementChild as HTMLElement;
     $('[data-entries]').replaceChildren(
       ...entries.map((e) => {
-        const li = row('[data-entry-row]');
-        $('[data-what]', li).textContent = e.kind === 'recharge' ? LABEL.recharge : `${LABEL[e.kind] ?? e.kind}${e.note ? `: ${e.note}` : ''}`;
-        $('[data-when]', li).textContent = [when(e.created_at), e.kind === 'recharge' ? e.note : ''].filter(Boolean).join(' · ');
-        const amt = $('[data-amount]', li);
+        const tr = tpl.cloneNode(true) as HTMLElement;
+        $('[data-date]', tr).textContent = date(e.created_at);
+        $('[data-time]', tr).textContent = time(e.created_at);
+        $('[data-what]', tr).textContent = LABEL[e.kind] ?? e.kind;
+        $('[data-note]', tr).textContent = e.note;
+        const amt = $('[data-amount]', tr);
         amt.textContent = `${e.amount_paise > 0 ? '+' : '−'}${rupees(Math.abs(e.amount_paise))}`;
         amt.classList.add(e.amount_paise > 0 ? 'text-emerald-700' : 'text-ink-900');
-        return li;
+        return tr;
       }),
     );
     $('[data-entries-empty]').hidden = entries.length > 0;
@@ -159,82 +88,37 @@ const textBtn = 'inline-flex min-h-11 items-center rounded px-2 text-sm font-sem
 
   async function load() {
     const r = await api('/account');
-    if (!r.ok) return fail(r, 'Could not load your account. Refresh the page.');
+    if (r.status === 401) return; // AppShell sends the visitor to the login page
+    home.removeAttribute('aria-busy');
+    if (!r.ok) return void ($('[data-load-error]').textContent = 'Could not load your account. Refresh the page.');
     email = r.data.email;
-    const title = $('[data-title]');
-    title.textContent = `Welcome, ${r.data.name}`;
-    title.classList.remove('invisible');
-    $('[data-email]').textContent = email;
-    $('[data-admin-link]').hidden = !r.data.is_admin;
     $('[data-balance]').textContent = rupees(r.data.balance_paise);
-    $('[data-test-balance]').textContent = rupees(r.data.test_balance_paise);
-    renderKeys(r.data.keys);
     renderEntries(r.data.entries);
-    dash.removeAttribute('aria-busy');
-  }
-
-  // --- API keys
-  const newKey = $('[data-newkey]');
-
-  document.querySelectorAll<HTMLButtonElement>('[data-new]').forEach((btn) =>
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      keysError.textContent = '';
-      const r = await api('/account/keys', { mode: btn.dataset.new });
-      btn.disabled = false;
-      if (!r.ok) return fail(r, 'Could not create the key. Try again.');
-      $('[data-newkey-value]').textContent = r.data.key;
-      $('[data-copy-label]').textContent = 'Copy';
-      newKey.hidden = false;
-      await load();
-    }),
-  );
-
-  $('[data-copy]').addEventListener('click', async () => {
-    const code = $('[data-newkey-value]');
-    try {
-      await navigator.clipboard.writeText(code.textContent ?? '');
-      $('[data-copy-label]').textContent = 'Copied';
-    } catch {
-      getSelection()?.selectAllChildren(code); // clipboard blocked: key is selected, Ctrl+C works
-    }
-  });
-
-  async function revoke(k: Key) {
-    if (!confirm(`Delete ${k.prefix}…? Anything using this key will stop working.`)) return;
-    const r = await api(`/account/keys/${k.id}/revoke`, {});
-    if (!r.ok) return fail(r, 'Could not delete the key. Try again.');
-    await load();
   }
 
   // --- Recharge (manual for now: WhatsApp or email with the amount)
-  const dialog = $<HTMLDialogElement>('[data-recharge-dialog]');
-  const form = $<HTMLFormElement>('[data-recharge-form]');
+  const recharge = $<HTMLDialogElement>('[data-recharge-dialog]');
+  const form = $<HTMLFormElement>('[data-recharge-form]', recharge);
   const amount = $<HTMLInputElement>('#f-amount');
   const message = () => `Recharge request\nAccount: ${email}\nAmount: ₹${amount.value}`;
 
   $('[data-recharge]').addEventListener('click', () => {
     form.reset(); // fresh amount every time, however it was closed last
-    dialog.showModal();
+    recharge.showModal();
   });
-  $('[data-close]').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
+  $('[data-close]', recharge).addEventListener('click', () => recharge.close());
+  recharge.addEventListener('click', (e) => e.target === recharge && recharge.close());
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!form.reportValidity()) return;
     window.open(`${form.dataset.wa}?text=${encodeURIComponent(message())}`, '_blank', 'noopener');
-    dialog.close();
+    recharge.close();
   });
-  $('[data-mail-instead]').addEventListener('click', () => {
+  $('[data-mail-instead]', recharge).addEventListener('click', () => {
     if (!form.reportValidity()) return;
     location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent('Recharge request')}&body=${encodeURIComponent(message())}`;
-    dialog.close();
-  });
-
-  $('[data-logout]').addEventListener('click', async () => {
-    await api('/auth/logout', {});
-    location.replace(login);
+    recharge.close();
   });
 
   load();
