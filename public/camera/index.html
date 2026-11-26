@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>Location Verification</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #161616;
+    --surface-2: #1f1f1f;
+    --ink: #ffffff;
+    --ink-soft: #a1a1aa;
+    --accent: #fb923c;
+    --accent-deep: #c2410c;
+    --success: #22c55e;
+    --error: #ef4444;
+    --border: #2a2a2a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  /* ========== SCREEN: WELCOME ========== */
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  #welcome {
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(251, 146, 60, 0.15), transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(194, 65, 12, 0.1), transparent 50%),
+      var(--bg);
+  }
+
+  .welcome-card {
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .icon-wrap {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 24px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 32px rgba(251, 146, 60, 0.3);
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .lead {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .perms-list {
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .perm-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .perm-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .perm-text { font-size: 14px; }
+  .perm-text strong { display: block; margin-bottom: 2px; }
+  .perm-text span { color: var(--ink-soft); font-size: 12px; }
+
+  button {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: transform 0.15s, opacity 0.15s, background 0.15s;
+  }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .business-tag {
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  /* ========== SCREEN: CAMERA ========== */
+  #camera-screen { background: #000; }
+
+  #video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .camera-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .top-bar {
+    padding: 16px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .location-banner {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .mini-map {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: #0d1117;
+    align-self: center;
+  }
+  .loc-text { flex: 1; min-width: 0; }
+
+  .loc-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .loc-pulse {
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  }
+
+  .loc-address {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .loc-coords {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-family: 'Inter', monospace;
+  }
+
+  .bottom-controls {
+    padding: 24px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  .capture-btn {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px var(--ink);
+    position: relative;
+    transition: opacity 0.3s, transform 0.15s;
+  }
+
+  .capture-btn.not-ready {
+    opacity: 0.55;
+    border-color: rgba(251, 146, 60, 0.5);
+  }
+
+  .capture-btn.not-ready::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: var(--accent);
+    animation: spin 1s linear infinite;
+  }
+
+  .switch-cam-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spacer { width: 48px; }
+
+  /* ========== SCREEN: PREVIEW ========== */
+  #preview-screen { background: var(--bg); }
+
+  .preview-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .preview-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #preview-img {
+    max-width: 100%;
+    max-height: 55vh;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    object-fit: contain;
+  }
+
+  /* ---- Location check: big map + legend ---- */
+  .loc-check {
+    width: 100%;
+    max-width: 640px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .map-wrap { position: relative; }
+  #bigMap { height: 320px; background: #f2efe9; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    padding: 10px 16px; font-size: 12px; color: var(--ink-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -2px; margin-right: 6px; }
+  .loc-rows { padding: 12px 16px; font-size: 14px; display: grid; gap: 8px; }
+  .loc-rows .k { color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .loc-rows .v { word-break: break-word; }
+  .btn-gmaps {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 4px 16px 16px; padding: 13px; border-radius: 12px;
+    background: #1a73e8; color: #fff; font-size: 15px; font-weight: 600; text-decoration: none;
+  }
+
+  .preview-actions {
+    padding: 16px 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-share {
+    flex: 2;
+    background: #25D366;
+    color: white;
+    font-size: 15px;
+    padding: 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .share-hint {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .share-hint[hidden] { display: none; }
+  .share-hint b { color: var(--ink); font-weight: 600; }
+
+  .share-fallback {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .share-fallback[hidden] { display: none; }
+  .share-fallback span { flex: 1 1 100%; }
+  .share-fallback button {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .btn-download {
+    flex: 1;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 14px;
+    padding: 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+  }
+
+  /* ========== ERROR / LOADING ========== */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--error);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    z-index: 100;
+    display: none;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { display: block; animation: slideUp 0.3s ease; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .loading-overlay.show { display: flex; }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+
+  .loc-maps {
+    display: none;
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .loc-maps:active { opacity: 0.7; }
+  .acc-bar {
+    margin-top: 8px;
+    height: 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.12);
+    overflow: hidden;
+  }
+  .acc-bar i {
+    display: block;
+    height: 100%;
+    width: 4%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--error), var(--accent), var(--success));
+    transition: width 0.5s ease;
+  }
+  .loc-hint {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ========== WELCOME SCREEN ========== -->
+<div id="welcome" class="screen active">
+  <div class="welcome-card">
+    <div class="icon-wrap">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+    </div>
+    <div class="business-tag" id="businessTag">For Verification</div>
+    <h1>Capture your location</h1>
+    <p class="lead" id="welcomeMsg">Take a photo with your GPS coordinates and address automatically added to the image.</p>
+
+    <div class="perms-list">
+      <div class="perm-row">
+        <div class="perm-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <div class="perm-text">
+          <strong>Camera access</strong>
+          <span>To take the photo</span>
+        </div>
+      </div>
+      <div class="perm-row">
+        <div class="perm-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="perm-text">
+          <strong>Location access</strong>
+          <span>To stamp the photo with GPS</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="startBtn">
+      Start
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ========== CAMERA SCREEN ========== -->
+<div id="camera-screen" class="screen">
+  <video id="video" autoplay playsinline muted></video>
+  <div class="camera-overlay">
+    <div class="top-bar">
+      <div class="location-banner">
+        <canvas id="miniMap" class="mini-map" width="200" height="200"></canvas>
+        <div class="loc-text">
+          <div class="loc-status">
+            <span class="loc-pulse"></span>
+            <span id="locStatusText">Getting location…</span>
+          </div>
+          <div class="loc-address" id="locAddress">—</div>
+          <div class="loc-coords" id="locCoords">—</div>
+          <div class="acc-bar"><i id="accFill"></i></div>
+          <div class="loc-hint" id="locHint">Getting a precise fix…</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-controls">
+      <div class="spacer"></div>
+      <button class="capture-btn" id="captureBtn" aria-label="Take photo"></button>
+      <button class="switch-cam-btn" id="switchCamBtn" aria-label="Switch camera">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+          <path d="M21 3v5h-5"/>
+          <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+          <path d="M3 21v-5h5"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PREVIEW SCREEN ========== -->
+<div id="preview-screen" class="screen">
+  <div class="preview-header">
+    <button class="icon-btn" id="retakeBtn" aria-label="Retake">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+    </button>
+    <div class="preview-title">Your photo</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="preview-content">
+    <img id="preview-img" alt="Captured photo">
+
+    <div class="loc-check" id="locCheck">
+      <div class="map-wrap">
+        <div id="bigMap"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#ea4335"></i>Captured point</span>
+      </div>
+      <div class="loc-rows">
+        <div><div class="k">Address (nearest known)</div><div class="v" id="rowAddr">—</div></div>
+        <div><div class="k">Coordinates</div><div class="v" id="rowCoords">—</div></div>
+        <div><div class="k">Plus Code</div><div class="v" id="rowPlus">—</div></div>
+      </div>
+      <a class="btn-gmaps" id="btnGmaps" href="#" target="_blank" rel="noopener">Open in Maps</a>
+    </div>
+  </div>
+  <div class="share-hint" id="shareHint" hidden>
+    The address and location link are copied when you tap Share. In WhatsApp, tap <b>Add a caption</b> → <b>Paste</b>, then send.
+  </div>
+  <div class="share-fallback" id="shareFallback" hidden>
+    <span>Couldn't open the share sheet. Save the images, then attach them in WhatsApp.</span>
+    <button id="fbSave">Save photo + map</button>
+    <button id="fbWhatsApp">Open WhatsApp</button>
+  </div>
+  <div class="preview-actions">
+    <button class="btn-download" id="downloadBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Save
+    </button>
+    <button class="btn-share" id="shareBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      <span id="shareLabel">Share to WhatsApp</span>
+    </button>
+  </div>
+</div>
+
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingText">Processing…</div>
+</div>
+
+<script>
+  // ========== CONFIG ==========
+  const params = new URLSearchParams(window.location.search);
+  const business = params.get('biz') || 'Location Verification';
+  const phone = (params.get('phone') || '').replace(/\D/g, '');
+  const welcomeMsg = params.get('msg') || 'Take a photo with your GPS coordinates and address automatically added to the image.';
+
+  document.getElementById('businessTag').textContent = business;
+  document.getElementById('welcomeMsg').textContent = welcomeMsg;
+  document.title = business;
+
+  // ========== ELEMENTS ==========
+  const welcome = document.getElementById('welcome');
+  const camScreen = document.getElementById('camera-screen');
+  const prevScreen = document.getElementById('preview-screen');
+  const video = document.getElementById('video');
+  const startBtn = document.getElementById('startBtn');
+  const captureBtn = document.getElementById('captureBtn');
+  const switchCamBtn = document.getElementById('switchCamBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const previewImg = document.getElementById('preview-img');
+  const locStatusText = document.getElementById('locStatusText');
+  const locAddress = document.getElementById('locAddress');
+  const locCoords = document.getElementById('locCoords');
+  const accFill = document.getElementById('accFill');
+  const locHint = document.getElementById('locHint');
+  const miniMap = document.getElementById('miniMap');
+  const toast = document.getElementById('toast');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
+
+  // ========== STATE ==========
+  let stream = null;
+  let facingMode = 'environment';
+  let currentLocation = null;       // the fused best-estimate point
+  let locationWatchId = null;
+  let capturedBlob = null;
+  let capturedDataUrl = null;
+
+  // ---- Auto-precise GPS fusion ----
+  const READY_ACC = 20;             // metres — shutter unlocks at/below this
+  const MAX_WAIT = 45000;           // ms — auto-unlock with best fix after this (GPS cold start can take 30-60s)
+  let gpsSamples = [];              // rolling buffer of raw fixes
+  let preciseReady = false;
+  let lastGeoAcc = Infinity;        // accuracy at which we last geocoded
+  let maxWaitElapsed = false;
+  let maxWaitTimer = null;
+  let fixCount = 0;
+
+  // ---- Capture ----
+  let frozenCanvas = null;          // raw captured frame (before overlay)
+  let confirmedLocation = null;     // the GPS point stamped onto the photo
+  let shareMap = null;              // { dataUrl, blob } of the location map image
+  let shareMapPromise = null;
+  let shareImage = null;            // { dataUrl, blob } of the photo + map combined into one image
+  let shareImagePromise = null;
+  let shareMapToken = 0;            // bumps on every capture/retake so stale renders are ignored
+
+  // ---- Plus Code (Open Location Code), computed locally — no API ----
+  function encodePlusCode(lat, lng) {
+    const A = '23456789CFGHJMPQRVWX';
+    lat = Math.min(90, Math.max(-90, lat));
+    lng = ((lng % 360) + 540) % 360 - 180;
+    let latVal = lat + 90, lngVal = lng + 180;
+    if (latVal >= 180) latVal = 180 - 1e-10;
+    if (lngVal >= 360) lngVal = 0;
+    let code = '', latPrec = 20, lngPrec = 20;
+    for (let i = 0; i < 5; i++) {
+      const la = Math.min(19, Math.floor(latVal / latPrec));
+      const lo = Math.min(19, Math.floor(lngVal / lngPrec));
+      code += A[la] + A[lo];
+      latVal -= la * latPrec; lngVal -= lo * lngPrec;
+      latPrec /= 20; lngPrec /= 20;
+      if (i === 3) code += '+';
+    }
+    return code;
+  }
+  function plusCodeStr(lat, lng) {
+    try { return encodePlusCode(lat, lng); } catch (e) { return ''; }
+  }
+
+  function updateCaptureButtonState() {
+    // Unlock the shutter only once the fused fix is tight enough.
+    if (preciseReady) {
+      captureBtn.classList.remove('not-ready');
+    } else {
+      captureBtn.classList.add('not-ready');
+    }
+  }
+
+  // Fuse the buffered fixes into one best estimate: drop coarse early fixes,
+  // then inverse-variance weighted average (weight = 1/accuracy²) of the tightest
+  // samples — cancels jitter and tightens the point automatically.
+  function computeEstimate() {
+    const now = Date.now();
+    gpsSamples = gpsSamples.filter(s => now - s.t < 30000).slice(-25);
+    if (!gpsSamples.length) return null;
+    // Ignore the first (warm-up) reading once we have enough real fixes —
+    // the first callback is often a coarse/cached fix.
+    let pool = gpsSamples;
+    if (gpsSamples.length >= 3) {
+      const withoutFirst = gpsSamples.filter(s => !s.first);
+      if (withoutFirst.length) pool = withoutFirst;
+    }
+    const bestAcc = Math.min(...pool.map(s => s.acc));
+    const good = pool.filter(s => s.acc <= bestAcc * 1.6);
+    let sw = 0, slat = 0, slng = 0;
+    for (const s of good) {
+      const a = Math.max(s.acc, 1);        // guard against a 0-accuracy fix (NaN)
+      const w = 1 / (a * a);
+      sw += w; slat += w * s.lat; slng += w * s.lng;
+    }
+    return { lat: slat / sw, lng: slng / sw, acc: Math.round(bestAcc), samples: good.length };
+  }
+
+  // Accuracy (metres) -> 0-100% fill for the meter.
+  function accPct(acc) {
+    const p = (200 - acc) / (200 - 10) * 100;
+    return Math.max(4, Math.min(100, Math.round(p)));
+  }
+
+  // ---- Mini-map rendering (draws free CORS-clean tiles onto a canvas) ----
+  function lon2tileX(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
+  function lat2tileY(lat, z) {
+    const r = lat * Math.PI / 180;
+    return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+  }
+
+  // Rounded-rectangle path (canvas.roundRect isn't on every browser).
+  function roundRectPath(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // Map tiles: OpenStreetMap only, from the OSM France and OSM Germany community servers (keyless, CORS "*").
+  // tile.openstreetmap.org is NOT used: it policy-blocks third-party apps and serves its "Access blocked"
+  // image with HTTP 200, so failure is undetectable. Volunteer-run servers: keep use light, attribution visible.
+  const TILE_PROVIDERS = {
+    osmfr: { maxZoom: 19, attr: '© OpenStreetMap contributors',
+             url: (z, x, y) => `https://${'abc'[(x + y) % 3]}.tile.openstreetmap.fr/osmfr/${z}/${x}/${y}.png` },
+    osmde: { maxZoom: 19, attr: '© OpenStreetMap contributors',
+             url: (z, x, y) => `https://tile.openstreetmap.de/${z}/${x}/${y}.png` }
+  };
+  const TILE_CHAINS = { stamp: ['osmfr', 'osmde'], detail: ['osmfr', 'osmde'] };
+  // A slow provider is never cut off: after TILE_HEDGE the next provider is asked as well and
+  // whichever answers first wins (on 2G, aborting a half-loaded tile and restarting elsewhere
+  // just fails twice). A tile counts as failed only when every provider errored or TILE_GIVE_UP passed.
+  const TILE_HEDGE = 6000;
+  const TILE_GIVE_UP = 30000;
+  const TILE_CACHE_MAX = 200;
+
+  // Cache loaded tiles so pans/re-renders never refetch the same tile (speed + fair use).
+  // Resolves to an Image tagged with ._provider, or null if every provider failed.
+  const tileCache = new Map();   // "chain/z/x/y" -> Promise<Image|null>
+  function loadTile(zoom, tx, ty, chain = 'stamp') {
+    const key = `${chain}/${zoom}/${tx}/${ty}`;
+    if (tileCache.has(key)) return tileCache.get(key);
+    const providers = TILE_CHAINS[chain].filter(name => TILE_PROVIDERS[name].maxZoom >= zoom);
+    const p = new Promise(resolve => {
+      let settled = false, started = 0, failed = 0, hedgeTimer = null;
+      const finish = img => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(hedgeTimer);
+        clearTimeout(giveUpTimer);
+        resolve(img);
+      };
+      const giveUpTimer = setTimeout(() => finish(null), TILE_GIVE_UP);
+      const startNext = () => {
+        clearTimeout(hedgeTimer);
+        if (settled || started >= providers.length) return;
+        const name = providers[started++];
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.referrerPolicy = 'strict-origin-when-cross-origin';
+        img.onload = () => { img._provider = name; finish(img); };
+        img.onerror = () => {
+          failed++;
+          if (failed >= providers.length) finish(null);
+          else if (failed === started) startNext();       // nothing else in flight — don't wait for the hedge
+        };
+        img.src = TILE_PROVIDERS[name].url(zoom, tx, ty);
+        hedgeTimer = setTimeout(startNext, TILE_HEDGE);
+      };
+      if (providers.length) startNext(); else finish(null);
+    });
+    tileCache.set(key, p);
+    if (tileCache.size > TILE_CACHE_MAX) tileCache.delete(tileCache.keys().next().value);
+    p.then(img => { if (!img && tileCache.get(key) === p) tileCache.delete(key); });   // retry failures next time
+    return p;
+  }
+
+  // Draw a small rounded map centred on lat/lng into ctx at (dx,dy,size), with a Google-style pin.
+  async function renderMiniMap(ctx, dx, dy, size, lat, lng, zoom, radius, accM) {
+    zoom = zoom || 17;
+    radius = (radius == null) ? size * 0.11 : radius;
+    const TILE = 256;
+    const wpx = lon2tileX(lng, zoom) * TILE;
+    const wpy = lat2tileY(lat, zoom) * TILE;
+    const left = wpx - size / 2, top = wpy - size / 2;
+    const tx0 = Math.floor(left / TILE), tx1 = Math.floor((left + size - 1) / TILE);
+    const ty0 = Math.floor(top / TILE), ty1 = Math.floor((top + size - 1) / TILE);
+
+    ctx.save();
+    roundRectPath(ctx, dx, dy, size, size, radius);
+    ctx.clip();
+    ctx.fillStyle = '#e6ebf0'; ctx.fillRect(dx, dy, size, size);
+
+    const jobs = [];
+    for (let tx = tx0; tx <= tx1; tx++) {
+      for (let ty = ty0; ty <= ty1; ty++) {
+        jobs.push(loadTile(zoom, tx, ty).then(img => {
+          if (img) {
+            try { ctx.drawImage(img, dx + (tx * TILE - left), dy + (ty * TILE - top), TILE, TILE); } catch (e) {}
+          }
+        }));
+      }
+    }
+    await Promise.all(jobs);
+
+    // Accuracy circle (like Google Maps' blue halo): true position is anywhere inside it
+    if (accM > 0) {
+      const mPerPx = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, zoom);
+      const rPx = accM / mPerPx;
+      const bad = accM > READY_ACC;
+      ctx.beginPath();
+      ctx.arc(dx + size / 2, dy + size / 2, rPx, 0, Math.PI * 2);
+      ctx.fillStyle = bad ? 'rgba(239,68,68,0.18)' : 'rgba(66,133,244,0.18)';
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, size * 0.01);
+      ctx.strokeStyle = bad ? 'rgba(239,68,68,0.8)' : 'rgba(66,133,244,0.8)';
+      ctx.stroke();
+    }
+
+    // Required map attribution — tiny, bottom-right, inside the clipped card
+    const attrSize = Math.max(6, Math.round(size * 0.075));
+    ctx.font = `500 ${attrSize}px Inter, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.lineWidth = Math.max(1, attrSize * 0.18);
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.strokeText('© OpenStreetMap', dx + size - attrSize * 0.4, dy + size - attrSize * 0.5);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('© OpenStreetMap', dx + size - attrSize * 0.4, dy + size - attrSize * 0.5);
+    ctx.restore();
+
+    // Google-style pin with a soft ground shadow.
+    // Pin geometry: the TIP (cy + 1.75r) must sit exactly on the GPS point at the map centre
+    const r = Math.max(4, size * 0.12);
+    const cx = dx + size / 2, cy = dy + size / 2 - r * 1.75;
+    ctx.save();
+    // ground shadow
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + r * 1.75, r * 0.62, r * 0.22, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.30)';
+    ctx.fill();
+    // teardrop body (with drop shadow)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + r * 1.75);
+    ctx.bezierCurveTo(cx - r * 1.05, cy + r * 0.35, cx - r, cy - r * 0.7, cx, cy - r);
+    ctx.bezierCurveTo(cx + r, cy - r * 0.7, cx + r * 1.05, cy + r * 0.35, cx, cy + r * 1.75);
+    ctx.closePath();
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = r * 0.6;
+    ctx.shadowOffsetY = r * 0.15;
+    ctx.fillStyle = '#ea4335';
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = Math.max(1, size * 0.015);
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    // white centre dot
+    ctx.beginPath();
+    ctx.arc(cx, cy - r * 0.12, r * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Throttled live mini-map on the camera banner.
+  let lastMiniAt = 0, lastMiniLat = null, lastMiniLng = null;
+  function updateLiveMiniMap(lat, lng) {
+    if (!miniMap || !camScreen.classList.contains('active')) return;
+    const now = Date.now();
+    const moved = lastMiniLat == null || distMeters(lastMiniLat, lastMiniLng, lat, lng) > 20;
+    if (!moved && now - lastMiniAt < 8000) return;
+    lastMiniAt = now; lastMiniLat = lat; lastMiniLng = lng;
+    const mctx = miniMap.getContext('2d');
+    mctx.clearRect(0, 0, miniMap.width, miniMap.height);
+    renderMiniMap(mctx, 0, 0, miniMap.width, lat, lng, 17, null, currentLocation ? currentLocation.acc : 0);
+  }
+
+  // ---- Share map: a big "where is this" image sent along with the photo ----
+  const SHARE_W = 1080, SHARE_MAP_H = 1080;
+  const SHARE_SCALE = 2;         // tiles drawn at 2x so street labels stay readable on a phone
+  const SHARE_MAP_WAIT = 15000;  // ms the Save/Share buttons wait for the map before going without it
+
+  // Largest zoom (10–19) at which the accuracy circle's diameter fits in ~60% of the map width
+  function shareMapZoom(lat, acc) {
+    const mPerPxZ0 = 156543.03392 * Math.cos(lat * Math.PI / 180);
+    const fitPx = 0.6 * SHARE_W / SHARE_SCALE;
+    const z = Math.floor(Math.log2(mPerPxZ0 * fitPx / (2 * Math.max(acc || 0, 5))));
+    return Math.max(10, Math.min(19, z));
+  }
+
+  // Which tiles cover a w×h window centred on lat/lng, with tiles drawn `scale`× larger
+  function tileRange(lat, lng, zoom, scale, w, h) {
+    const S = 256 * scale;
+    const cxw = lon2tileX(lng, zoom) * S, cyw = lat2tileY(lat, zoom) * S;
+    const left = cxw - w / 2, top = cyw - h / 2;
+    return { S, cxw, cyw, left, top,
+             x0: Math.floor(left / S), x1: Math.floor((left + w - 1) / S),
+             y0: Math.floor(top / S), y1: Math.floor((top + h - 1) / S) };
+  }
+
+  // Close-zoom tiles are often rendered on demand by the tile server (~5s the first time), so
+  // warm them while the camera is open — the share map is then ready almost as soon as the photo.
+  let lastPrefetch = '';
+  function prefetchShareTiles(lat, lng, acc) {
+    // Only while framing the shot — after capture the GPS watch keeps running, and these tiles
+    // would compete for bandwidth with the share map and preview map on slow connections
+    if (!camScreen.classList.contains('active')) return;
+    const zoom = shareMapZoom(lat, acc);
+    const r = tileRange(lat, lng, zoom, SHARE_SCALE, SHARE_W, SHARE_MAP_H);
+    const key = `${zoom}/${r.x0}/${r.x1}/${r.y0}/${r.y1}`;
+    if (key === lastPrefetch) return;
+    lastPrefetch = key;
+    for (let tx = r.x0; tx <= r.x1; tx++) for (let ty = r.y0; ty <= r.y1; ty++) loadTile(zoom, tx, ty, 'detail');
+  }
+
+  // Draws the tiles covering a w×h window centred on lat/lng (caller clips). The tile origin is
+  // rounded to a whole pixel so neighbouring tiles butt together without hairline seams.
+  // Returns the centre in canvas pixels, the providers that actually served tiles, and whether
+  // every tile — in particular the one under the centre point — was drawn.
+  async function drawTileWindow(ctx, x, y, w, h, lat, lng, zoom, scale, chain) {
+    const { S, cxw, cyw, left, top, x0, x1, y0, y1 } = tileRange(lat, lng, zoom, scale, w, h);
+    const ox = Math.round(x - left), oy = Math.round(y - top);
+    const centreTx = Math.floor(cxw / S), centreTy = Math.floor(cyw / S);
+    const used = new Set();
+    let missing = 0, centreOk = false;
+    const jobs = [];
+    for (let tx = x0; tx <= x1; tx++) {
+      for (let ty = y0; ty <= y1; ty++) {
+        jobs.push(loadTile(zoom, tx, ty, chain).then(img => {
+          if (!img) { missing++; return; }
+          try {
+            ctx.drawImage(img, ox + tx * S, oy + ty * S, S, S);
+            used.add(img._provider);
+            if (tx === centreTx && ty === centreTy) centreOk = true;
+          } catch (e) { missing++; }
+        }));
+      }
+    }
+    await Promise.all(jobs);
+    return { cx: ox + cxw, cy: oy + cyw, used, complete: missing === 0, centreOk };
+  }
+
+  // Trims text with an ellipsis so it fits maxW in the context's current font
+  function fitText(ctx, text, maxW) {
+    if (ctx.measureText(text).width <= maxW) return text;
+    while (text.length > 1 && ctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
+    return text + '…';
+  }
+
+  function niceScaleBar(pxPerM, maxPx) {
+    const steps = [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+    let m = steps[0];
+    for (const s of steps) if (s * pxPerM <= maxPx) m = s;
+    return { px: m * pxPerM, label: m >= 1000 ? `${m / 1000} km` : `${m} m` };
+  }
+
+  // Street map zoomed to the accuracy circle + legend + scale bar, with address/coords/time
+  // underneath. Returns { dataUrl, blob } or null if no map tiles could be loaded (offline).
+  async function renderShareMap(loc) {
+    const W = SHARE_W, MH = SHARE_MAP_H, PAD = 48;
+    const zoom = shareMapZoom(loc.lat, loc.acc);
+    const mPerPx = 156543.03392 * Math.cos(loc.lat * Math.PI / 180) / Math.pow(2, zoom) / SHARE_SCALE;
+    try {
+      await Promise.all(['400 30px Inter', '500 26px Inter', '600 36px Inter', '700 26px Inter']
+        .map(f => document.fonts.load(f)));
+    } catch (e) {}
+
+    // Footer: text on the left, a large Maps QR on the right. The photo's own QR gets too small
+    // to scan once the combined image is shrunk by WhatsApp; this one stays big enough.
+    const QR = typeof qrcode === 'function' ? 300 : 0;
+    const footerTextW = W - PAD * 2 - (QR ? QR + 28 : 0);
+    const measure = document.createElement('canvas').getContext('2d');
+    measure.font = '600 36px Inter, sans-serif';
+    let addrLines = wrapText(measure, loc.address || 'Address not available', footerTextW);
+    if (addrLines.length > 3) { addrLines = addrLines.slice(0, 3); addrLines[2] += '…'; }
+    const footerH = Math.max(PAD + 30 + 22 + addrLines.length * 46 + 14 + 36 + 12 + 32 + PAD, QR + PAD);
+
+    const c = document.createElement('canvas');
+    c.width = W; c.height = MH + footerH;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+
+    // --- map ---
+    ctx.fillStyle = '#f2efe9';
+    ctx.fillRect(0, 0, W, MH);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, 0, W, MH); ctx.clip();
+    let tiles = await drawTileWindow(ctx, 0, 0, W, MH, loc.lat, loc.lng, zoom, SHARE_SCALE, 'detail');
+    if (!tiles.complete) {
+      // One more pass: loaded tiles come from cache instantly, failed ones are fetched again
+      tiles = await drawTileWindow(ctx, 0, 0, W, MH, loc.lat, loc.lng, zoom, SHARE_SCALE, 'detail');
+    }
+    ctx.restore();
+    // A map with a hole where the location is would mislead more than no map at all
+    if (!tiles.centreOk) { releaseCanvas(c); return null; }
+    const { cx, cy, used } = tiles;
+
+    const good = loc.acc != null && loc.acc <= READY_ACC;
+    const rgb = good ? '66,133,244' : '239,68,68';
+    if (loc.acc > 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, loc.acc / mPerPx, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${rgb},0.15)`;
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = `rgba(${rgb},0.9)`;
+      ctx.stroke();
+    }
+    // Captured point: red dot in a white ring
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(cx, cy, 17, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx, cy, 11, 0, Math.PI * 2);
+    ctx.fillStyle = '#ea4335'; ctx.fill();
+
+    // Legend, top-left
+    const legend = [['dot', 'Captured point']];
+    const LX = 24, LY = 24, LP = 18, ROW = 40, SW = 22;
+    ctx.font = '500 26px Inter, sans-serif';
+    const textW = Math.max(...legend.map(([, t]) => ctx.measureText(t).width));
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.25)';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = 'rgba(255,255,255,0.94)';
+    roundRectPath(ctx, LX, LY, LP + SW + 14 + textW + LP, LP * 2 + ROW * legend.length, 14);
+    ctx.fill();
+    ctx.restore();
+    ctx.textBaseline = 'middle';
+    legend.forEach(([kind, text], i) => {
+      const my = LY + LP + ROW * i + ROW / 2, sx = LX + LP + SW / 2;
+      ctx.beginPath(); ctx.arc(sx, my, SW / 2 - 1, 0, Math.PI * 2);
+      if (kind === 'dot') { ctx.fillStyle = '#ea4335'; ctx.fill(); }
+      else { ctx.fillStyle = `rgba(${rgb},0.3)`; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = `rgb(${rgb})`; ctx.stroke(); }
+      ctx.fillStyle = '#1f2937';
+      ctx.fillText(text, LX + LP + SW + 14, my);
+    });
+
+    // Scale bar, bottom-left (kept above the attribution strip)
+    const sb = niceScaleBar(1 / mPerPx, W * 0.28);
+    const sbBottom = MH - 46, bx = 36, by = sbBottom - 12;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    roundRectPath(ctx, 24, sbBottom - 54, sb.px + 24, 54, 10);
+    ctx.fill();
+    ctx.strokeStyle = '#1f2937';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(bx, by - 14); ctx.lineTo(bx, by); ctx.lineTo(bx + sb.px, by); ctx.lineTo(bx + sb.px, by - 14);
+    ctx.stroke();
+    ctx.fillStyle = '#1f2937';
+    ctx.font = '600 24px Inter, sans-serif';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(sb.label, bx + 8, by - 18);
+
+    // Attribution for whichever providers served tiles, bottom-right
+    const attr = [...new Set([...used].map(n => TILE_PROVIDERS[n].attr))].join(' · ');
+    let attrPx = 20;
+    do { ctx.font = `400 ${attrPx}px Inter, sans-serif`; } while (ctx.measureText(attr).width > W - 40 && --attrPx > 12);
+    const aw = Math.min(ctx.measureText(attr).width + 20, W);
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillRect(W - aw, MH - 34, aw, 34);
+    ctx.fillStyle = '#374151';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(attr, W - aw + 10, MH - 17);
+
+    // --- footer: business label, address, coords · accuracy · plus code, time ---
+    ctx.fillStyle = '#111111';
+    ctx.fillRect(0, MH, W, footerH);
+    ctx.textBaseline = 'top';
+    let y = MH + PAD;
+    ctx.fillStyle = '#fb923c';
+    ctx.font = '700 26px Inter, sans-serif';
+    ctx.fillText(fitText(ctx, business.toUpperCase(), footerTextW), PAD, y);
+    y += 30 + 22;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 36px Inter, sans-serif';
+    for (const line of addrLines) { ctx.fillText(line, PAD, y); y += 46; }
+    y += 14;
+    let x = PAD;
+    const seg = (text, color, font) => {
+      ctx.font = font || '400 30px Inter, sans-serif';
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+      x += ctx.measureText(text).width;
+    };
+    seg(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`, '#cbd5e1');
+    if (loc.acc != null) {
+      seg('  ·  ', '#cbd5e1');
+      seg(`±${loc.acc} m`, good ? '#4ade80' : '#f87171', '700 30px Inter, sans-serif');
+    }
+    y += 36 + 12;
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '400 28px Inter, sans-serif';
+    ctx.fillText(fitText(ctx, `${plusCodeStr(loc.lat, loc.lng)}  ·  ${formatTime(loc.ts)}`, footerTextW), PAD, y);
+
+    if (QR) {
+      ctx.textBaseline = 'alphabetic';
+      drawMapsQr(ctx, W - PAD - QR, MH + (footerH - QR) / 2, QR, loc.lat, loc.lng);
+    }
+
+    let dataUrl = c.toDataURL('image/jpeg', 0.9);
+    dataUrl = embedExifGps(dataUrl, loc);
+    const blob = await (await fetch(dataUrl)).blob();
+    return { dataUrl, blob, canvas: c };   // composeShareImage draws from it, then releases it
+  }
+
+  // ---- One image to share: the stamped photo and the location map side by side (or stacked) ----
+  // Two separate images can't be sent in a fixed order from one tap, so they go as one picture.
+  const COMBINED_LONG = 2048;   // px on the long side; WhatsApp shrinks anything bigger anyway
+  const COMBINED_GAP = 16;
+
+  // Built from the in-memory photo and map canvases. Re-loading the photo from its JPEG and
+  // drawing that left the photo half empty on iPhones (Safari can report a big image as loaded
+  // before its pixels are ready), so nothing is re-decoded here.
+  async function composeShareImage(photoCanvas, mapCanvas, loc) {
+    try {
+      const ap = photoCanvas.width / photoCanvas.height, am = mapCanvas.width / mapCanvas.height;
+      // Pick the layout that leaves the map widest once the whole picture fits COMBINED_LONG:
+      // side by side suits portrait photos, stacked suits landscape ones
+      const sideMapW = am / Math.max(ap + am, 1);
+      const stackMapW = 1 / Math.max(1, 1 / ap + 1 / am);
+      const G = COMBINED_GAP;
+      let W, H, photoRect, mapRect;
+      if (sideMapW >= stackMapW) {
+        const h = Math.round(ap + am >= 1 ? (COMBINED_LONG - G) / (ap + am) : COMBINED_LONG);
+        const pw = Math.round(h * ap), mw = Math.round(h * am);
+        W = pw + G + mw; H = h;
+        photoRect = [0, 0, pw, h];
+        mapRect = [pw + G, 0, mw, h];
+      } else {
+        const inv = 1 / ap + 1 / am;
+        const w = Math.round(inv >= 1 ? (COMBINED_LONG - G) / inv : COMBINED_LONG);
+        const ph = Math.round(w / ap), mh = Math.round(w / am);
+        W = w; H = ph + G + mh;
+        photoRect = [0, 0, w, ph];
+        mapRect = [0, ph + G, w, mh];
+      }
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(photoCanvas, ...photoRect);
+      ctx.drawImage(mapCanvas, ...mapRect);
+      if (photoMissing(ctx, photoRect)) {
+        releaseCanvas(c);
+        throw new Error('photo did not draw into the combined image');
+      }
+      let dataUrl = c.toDataURL('image/jpeg', 0.9);
+      releaseCanvas(c);
+      dataUrl = embedExifGps(dataUrl, loc);
+      const blob = await (await fetch(dataUrl)).blob();
+      return { dataUrl, blob };
+    } finally {
+      releaseCanvas(mapCanvas);
+    }
+  }
+
+  // True when the photo area is still just the #111111 background. A real photo (camera noise
+  // plus the stamp) never matches it exactly at all five points. The caller then shares the
+  // stamped photo on its own rather than an image with a blank half.
+  function photoMissing(ctx, [x, y, w, h]) {
+    const pts = [[0.5, 0.5], [0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.9]];
+    return pts.every(([fx, fy]) => {
+      const d = ctx.getImageData(Math.floor(x + w * fx), Math.floor(y + h * fy), 1, 1).data;
+      return d[0] === 17 && d[1] === 17 && d[2] === 17;
+    });
+  }
+
+  // Great-circle distance in metres.
+  function distMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000, toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+  }
+
+  // Reverse-geocode a point: Nominatim, then Photon (both OpenStreetMap data).
+  async function geocodePoint(lat, lng) {
+    return (await reverseGeocodeNominatim(lat, lng)) || (await reverseGeocodePhoton(lat, lng));
+  }
+
+  // Refresh the on-screen status / meter / gate from the current fused fix.
+  function refreshLocationUI() {
+    if (!currentLocation) return;
+    const acc = currentLocation.acc;
+    const quality =
+      acc <= 15  ? '🎯 Excellent' :
+      acc <= 30  ? '✅ Good' :
+      acc <= 80  ? '⚠️ Approximate' :
+                   '📡 Weak — step outside';
+    const tight = acc <= READY_ACC && gpsSamples.length >= 3;
+    preciseReady = tight || maxWaitElapsed;
+    if (preciseReady) prefetchShareTiles(currentLocation.lat, currentLocation.lng, acc);
+
+    if (tight) {
+      if (maxWaitTimer) { clearTimeout(maxWaitTimer); maxWaitTimer = null; }
+      locStatusText.textContent = `${quality} · ±${acc}m — ready`;
+      if (locHint) locHint.textContent = 'Locked — you can take the photo.';
+    } else if (maxWaitElapsed) {
+      locStatusText.textContent = `⚠️ ±${acc}m — best available`;
+      if (locHint) locHint.textContent = 'GPS did not tighten. You can capture, or step outside for a sharper fix.';
+    } else {
+      locStatusText.textContent = `Sharpening the fix… ±${acc}m`;
+      if (locHint) locHint.textContent = 'Hold still, or step outside / near a window for a sharper GPS fix.';
+    }
+    locCoords.textContent = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`;
+    updateLiveMiniMap(currentLocation.lat, currentLocation.lng);
+    if (accFill) accFill.style.width = accPct(acc) + '%';
+    updateCaptureButtonState();
+  }
+
+  // Fires once MAX_WAIT elapses: unlock with the best fix we have so far.
+  function onMaxWait() {
+    maxWaitElapsed = true;
+    refreshLocationUI();
+  }
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+  }
+
+  function showToast(msg, duration = 3500) {
+    // On the preview screen, sit above the Save/Share bar and the share-fallback panel so the
+    // toast never covers a button the user needs next
+    let bottom = '';
+    if (prevScreen.classList.contains('active')) {
+      const bar = document.querySelector('.preview-actions');
+      const panel = document.getElementById('shareFallback');
+      bottom = `${bar.offsetHeight + (panel.hidden ? 0 : panel.offsetHeight) + 16}px`;
+    }
+    toast.style.bottom = bottom;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), duration);
+  }
+
+  function showLoading(text = 'Processing…') {
+    loadingText.textContent = text;
+    loadingOverlay.classList.add('show');
+  }
+
+  function hideLoading() {
+    loadingOverlay.classList.remove('show');
+  }
+
+  // ========== START FLOW ==========
+  startBtn.addEventListener('click', async () => {
+    showLoading('Requesting access…');
+    captureBtn.classList.add('not-ready');
+    try {
+      await startCamera();
+      startLocationWatch();
+      showScreen('camera-screen');
+    } catch (e) {
+      showToast(e.message || 'Could not start. Please grant permissions.');
+    } finally {
+      hideLoading();
+    }
+  });
+
+  // ========== CAMERA ==========
+  async function startCamera() {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1920 } },
+        audio: false
+      });
+      video.srcObject = stream;
+      video.play().catch(() => {});   // autoplay doesn't always restart after srcObject was cleared
+    } catch (err) {
+      console.error(err);
+      throw new Error('Camera permission denied. Please allow and try again.');
+    }
+  }
+
+  function stopCamera() {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    video.srcObject = null;
+  }
+
+  // Shrinking a canvas to 0×0 frees its pixel memory right away instead of waiting for GC —
+  // iOS Safari caps total canvas memory per page
+  function releaseCanvas(c) {
+    if (c) { c.width = 0; c.height = 0; }
+  }
+
+  switchCamBtn.addEventListener('click', async () => {
+    facingMode = facingMode === 'environment' ? 'user' : 'environment';
+    try { await startCamera(); } catch (e) { showToast(e.message); }
+  });
+
+  // ========== LOCATION ==========
+  let locationAttempt = 0;
+  let lastGeocodeAt = 0;
+  let geocodeInFlight = false;
+
+  function startLocationWatch() {
+    if (!('geolocation' in navigator)) {
+      showLocationError('Location not supported in this browser');
+      return;
+    }
+    locationAttempt = 0;
+    fixCount = 0;
+    maxWaitElapsed = false;
+    if (maxWaitTimer) clearTimeout(maxWaitTimer);
+    maxWaitTimer = setTimeout(onMaxWait, MAX_WAIT);  // auto-unlock with best fix
+    tryGetLocation();
+  }
+
+  // The high-accuracy GPS watch is NEVER downgraded. On a slow/no fix we only fire a
+  // one-shot coarse (network) reading as a placeholder while GPS keeps converging —
+  // switching the watch itself to low accuracy would lock the app at ±100 m for good.
+  let coarseRequested = false;
+
+  function tryGetLocation() {
+    locationAttempt++;
+    locStatusText.textContent = 'Getting precise location…';
+    if (!currentLocation) locAddress.textContent = 'Please wait…';
+
+    if (locationWatchId != null) {
+      navigator.geolocation.clearWatch(locationWatchId);
+      locationWatchId = null;
+    }
+
+    locationWatchId = navigator.geolocation.watchPosition(
+      onPosition,
+      (err) => {
+        console.warn('GPS watch error', err.code, err.message);
+        if (err.code !== 1 && currentLocation) return;   // already have a fix — keep watching quietly
+        if (err.code !== 1 && !coarseRequested) {
+          coarseRequested = true;
+          navigator.geolocation.getCurrentPosition(onPosition, () => {}, { enableHighAccuracy: false, timeout: 20000, maximumAge: 0 });
+          locStatusText.textContent = 'GPS slow — still trying… step outside if you can';
+          return;
+        }
+        if (err.code !== 1) return;                        // GPS watch keeps trying on its own
+        showLocationError('Location permission denied');
+      },
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
+    );
+  }
+
+  function onPosition(pos) {
+        const { latitude, longitude, accuracy } = pos.coords;
+        // Buffer every raw fix (tagging the first warm-up reading), then fuse the best.
+        gpsSamples.push({ lat: latitude, lng: longitude, acc: accuracy, t: Date.now(), first: fixCount === 0 });
+        fixCount++;
+        const est = computeEstimate();
+        if (!est) return;
+
+        const isFirstFix = !currentLocation;
+        currentLocation = {
+          lat: est.lat,
+          lng: est.lng,
+          acc: est.acc,
+          ts: new Date(),
+          address: currentLocation?.address || null,
+          addressFailed: currentLocation?.addressFailed || false
+        };
+
+        refreshLocationUI();
+
+
+        // Re-geocode on the first fix, after a failure, or when the point sharpens a lot
+        // (so a coarse first address gets corrected as GPS locks on).
+        const now = Date.now();
+        const sharpened = !isFirstFix && est.acc <= lastGeoAcc * 0.6;
+        const need =
+          isFirstFix ||
+          (currentLocation.addressFailed && now - lastGeocodeAt > 5000) ||
+          (sharpened && now - lastGeocodeAt > 4000);
+        if (need && !geocodeInFlight) {
+          lastGeoAcc = est.acc;
+          fetchAddress(est.lat, est.lng);
+        }
+  }
+
+  async function fetchAddress(lat, lng) {
+    if (geocodeInFlight) return;
+    geocodeInFlight = true;
+    lastGeocodeAt = Date.now();
+    locAddress.textContent = 'Looking up address…';
+
+    // OpenStreetMap only: Nominatim -> Photon
+    let addr = await reverseGeocodeNominatim(lat, lng);
+    if (!addr) {
+      locAddress.textContent = 'Trying another service…';
+      addr = await reverseGeocodePhoton(lat, lng);
+    }
+
+    geocodeInFlight = false;
+
+    if (addr) {
+      currentLocation.address = addr;
+      currentLocation.addressFailed = false;
+      locAddress.textContent = addr;
+    } else {
+      currentLocation.addressFailed = true;
+      locAddress.innerHTML = '<span style="color:#fb923c">Address lookup failed</span> <button id="retryAddrBtn" style="background:#fb923c;color:#0a0a0a;border:none;padding:4px 10px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;margin-left:6px;font-family:inherit">Retry</button>';
+      const retryBtn = document.getElementById('retryAddrBtn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          if (currentLocation) fetchAddress(currentLocation.lat, currentLocation.lng);
+        });
+      }
+    }
+    updateCaptureButtonState();
+  }
+
+  async function reverseGeocodeNominatim(lat, lng) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeoutId);
+      if (!r.ok) return null;
+      const data = await r.json();
+      return data?.display_name || null;
+    } catch (e) {
+      console.warn('Nominatim failed:', e);
+      return null;
+    }
+  }
+
+  async function reverseGeocodePhoton(lat, lng) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const r = await fetch(
+        `https://photon.komoot.io/reverse?lon=${lng}&lat=${lat}`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeoutId);
+      if (!r.ok) return null;
+      const data = await r.json();
+      const p = data?.features?.[0]?.properties;
+      if (!p) return null;
+      const raw = [p.name, p.street, p.district, p.city, p.county, p.state, p.postcode, p.country];
+      const parts = [];
+      for (const x of raw) if (x && !parts.includes(x)) parts.push(x);
+      return parts.length ? parts.join(', ') : null;
+    } catch (e) {
+      console.warn('Photon failed:', e);
+      return null;
+    }
+  }
+
+  function showLocationError(msg) {
+    locStatusText.textContent = msg;
+    locAddress.innerHTML = '<button id="retryLocBtn" style="background:#fb923c;color:#0a0a0a;border:none;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;margin-top:4px;font-family:inherit">Retry location</button>';
+    locCoords.textContent = 'Tap retry, or take photo without location';
+    document.getElementById('retryLocBtn').addEventListener('click', () => tryGetLocation());
+  }
+
+  function hideLocationError() {
+    // Cleared by status updates
+  }
+
+  async function reverseGeocode(lat, lng) {
+    // Legacy function kept for compatibility — delegates to new chain
+    return reverseGeocodeNominatim(lat, lng);
+  }
+
+  // ========== CAPTURE -> FINALIZE ==========
+  // Freeze the frame and stamp it with the fused GPS point directly.
+  captureBtn.addEventListener('click', () => {
+    if (!stream) return;
+    if (!currentLocation) { showToast('Waiting for GPS — hold on a moment'); return; }
+    if (!preciseReady) { showToast('Getting a precise fix — one moment…'); return; }
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) { showToast('Camera still starting — try again'); return; }
+    frozenCanvas = document.createElement('canvas');
+    frozenCanvas.width = vw; frozenCanvas.height = vh;
+    frozenCanvas.getContext('2d').drawImage(video, 0, 0, vw, vh);
+    // Camera off while previewing/sharing: a live camera plus the big images is enough for iOS
+    // to kill the page when the share sheet and WhatsApp open on top of it. Retake restarts it.
+    stopCamera();
+    finalizeCapture();
+  });
+
+  // Geocode the GPS point, stamp the map + text onto the photo, go to preview.
+  async function finalizeCapture() {
+    if (!currentLocation || !frozenCanvas) return;
+    // Snapshot the whole fix at the tap: the GPS watch keeps replacing currentLocation during
+    // the address lookup, and mixing old coordinates with a newer accuracy misstates precision
+    const { lat, lng, acc, address: liveAddress } = currentLocation;
+    const capturedAt = new Date();
+
+    showLoading('Finalising…');
+    let address = null;
+    try { address = await geocodePoint(lat, lng); } catch (e) {}
+
+    confirmedLocation = { lat, lng, acc, address: address || liveAddress || null, ts: capturedAt };
+
+    // The share map renders in parallel with the photo stamp; Save/Share wait for the combined
+    // photo + map image (capped by SHARE_MAP_WAIT)
+    const token = ++shareMapToken;
+    const loc = confirmedLocation;
+    shareMap = null;
+    shareImage = null;
+    shareMapPromise = renderShareMap(loc).catch(e => { console.warn('Share map failed:', e); return null; });
+    shareMapPromise.then(m => { if (token === shareMapToken) shareMap = m; });
+
+    try {
+      // Stamp straight onto the captured frame; that canvas is kept (not re-decoded from JPEG)
+      // until the combined share image is built, then released
+      const photoCanvas = frozenCanvas;
+      frozenCanvas = null;
+      const w = photoCanvas.width, h = photoCanvas.height;
+      await drawLocationOverlay(photoCanvas.getContext('2d'), w, h);
+
+      capturedDataUrl = photoCanvas.toDataURL('image/jpeg', 0.92);
+      capturedDataUrl = embedExifGps(capturedDataUrl, confirmedLocation);   // machine-readable GPS proof
+      capturedBlob = await (await fetch(capturedDataUrl)).blob();
+      shareImagePromise = shareMapPromise
+        .then(map => (map ? composeShareImage(photoCanvas, map.canvas, loc) : null))
+        .catch(e => { console.warn('Combined share image failed:', e); return null; })
+        .finally(() => releaseCanvas(photoCanvas));
+      shareImagePromise.then(img => { if (token === shareMapToken) shareImage = img; });
+      previewImg.src = capturedDataUrl;
+      showScreen('preview-screen');
+      showLocationCheck(confirmedLocation);
+      armPreviewButtons(token);
+    } catch (e) {
+      console.error(e);
+      showToast('Could not finalise photo');
+      startCamera().catch(() => {});
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // Write real EXIF GPS tags into the JPEG (what GPS Map Camera's ImageSaver does) so the
+  // photo carries machine-readable proof, not just burned-in pixels. Needs piexifjs (CDN);
+  // silently skipped if the CDN failed to load — the visual stamp is still there.
+  // NOTE: WhatsApp strips EXIF from photos sent as images; send as *document* to preserve it.
+  function embedExifGps(dataUrl, loc) {
+    if (!window.piexif || !loc) return dataUrl;
+    try {
+      const toDMS = v => {
+        v = Math.abs(v);
+        const d = Math.floor(v), mF = (v - d) * 60, m = Math.floor(mF);
+        return [[d, 1], [m, 1], [Math.round((mF - m) * 60 * 10000), 10000]];
+      };
+      const ascii = s => (s || '').replace(/[^\x20-\x7e]/g, '').slice(0, 240);
+      const t = loc.ts;
+      const p = n => String(n).padStart(2, '0');
+      const dtStr = `${t.getFullYear()}:${p(t.getMonth() + 1)}:${p(t.getDate())} ${p(t.getHours())}:${p(t.getMinutes())}:${p(t.getSeconds())}`;
+
+      const gps = {};
+      gps[piexif.GPSIFD.GPSLatitudeRef] = loc.lat >= 0 ? 'N' : 'S';
+      gps[piexif.GPSIFD.GPSLatitude] = toDMS(loc.lat);
+      gps[piexif.GPSIFD.GPSLongitudeRef] = loc.lng >= 0 ? 'E' : 'W';
+      gps[piexif.GPSIFD.GPSLongitude] = toDMS(loc.lng);
+
+      const zeroth = {};
+      zeroth[piexif.ImageIFD.ImageDescription] =
+        ascii(`${loc.address || ''} | ${loc.lat.toFixed(6)},${loc.lng.toFixed(6)} ±${loc.acc}m | ${plusCodeStr(loc.lat, loc.lng)}`);
+
+      const exif = {};
+      exif[piexif.ExifIFD.DateTimeOriginal] = dtStr;
+
+      return piexif.insert(piexif.dump({ '0th': zeroth, 'Exif': exif, 'GPS': gps }), dataUrl);
+    } catch (e) {
+      console.warn('EXIF embed failed:', e);
+      return dataUrl;
+    }
+  }
+
+  // White card with a QR that opens Google Maps at lat,lng. Drawn module-by-module on the
+  // canvas (no image load, so the canvas stays exportable). Returns false if the QR lib
+  // failed to load — the stamp then simply has no QR.
+  function drawMapsQr(ctx, x, y, size, lat, lng) {
+    if (typeof qrcode !== 'function') return false;
+    try {
+      // Short form of the Maps link: fewer QR modules, so each is bigger and still scans after
+      // WhatsApp shrinks the image
+      const qr = qrcode(0, 'M');
+      qr.addData(`https://maps.google.com/?q=${lat.toFixed(6)},${lng.toFixed(6)}`);
+      qr.make();
+      const n = qr.getModuleCount();
+
+      const cardR = size * 0.12;
+      const labelH = Math.round(size * 0.15);
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = size * 0.05;
+      ctx.fillStyle = '#ffffff';
+      roundRectPath(ctx, x, y, size, size, cardR);
+      ctx.fill();
+      ctx.restore();
+
+      // Whole-pixel modules: uneven fractional ones stop small QRs scanning once WhatsApp shrinks
+      // the image. A 2-module quiet zone is enough inside a white card.
+      const area = size - labelH - size * 0.04;
+      const cell = Math.max(1, Math.floor(area / (n + 4)));
+      const qrPx = cell * n;
+      const ox = Math.round(x + (size - qrPx) / 2);
+      const oy = Math.round(y + size * 0.04 + (area - qrPx) / 2);
+      ctx.fillStyle = '#000000';
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          if (qr.isDark(r, c)) ctx.fillRect(ox + c * cell, oy + r * cell, cell, cell);
+        }
+      }
+
+      ctx.fillStyle = '#111111';
+      ctx.font = `700 ${Math.round(labelH * 0.55)}px Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SCAN · OPEN MAPS', x + size / 2, y + size - labelH / 2 - size * 0.02);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      return true;
+    } catch (e) {
+      console.warn('QR draw failed:', e);
+      return false;
+    }
+  }
+
+  // GPS Map Camera style: mini-map square on the left, location text on the right.
+  async function drawLocationOverlay(ctx, w, h) {
+    const loc = confirmedLocation;
+    const pad = Math.round(w * 0.03);
+    // Map + QR cards are capped at 22% of width so portrait photos keep room for the text
+    const mapSize = Math.round(Math.min(h * 0.26 - pad * 2, w * 0.22));
+    const overlayHeight = mapSize + pad * 2;
+    const top = h - overlayHeight;
+
+    // Background gradient
+    const grad = ctx.createLinearGradient(0, top, 0, h);
+    grad.addColorStop(0, 'rgba(0,0,0,0.0)');
+    grad.addColorStop(0.25, 'rgba(0,0,0,0.72)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.95)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, top, w, overlayHeight);
+
+    // Mini-map card on the left — white frame + soft drop shadow
+    const mapX = pad, mapY = top + pad;
+    if (loc) {
+      const frame = Math.max(2, Math.round(mapSize * 0.03));
+      const cardR = mapSize * 0.12;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = w * 0.013;
+      ctx.shadowOffsetY = Math.round(h * 0.004);
+      ctx.fillStyle = '#ffffff';
+      roundRectPath(ctx, mapX, mapY, mapSize, mapSize, cardR);
+      ctx.fill();
+      ctx.restore();
+      await renderMiniMap(ctx, mapX + frame, mapY + frame, mapSize - frame * 2, loc.lat, loc.lng, 17, null, loc.acc);
+    }
+
+    // Text block on the right
+    // QR card on the right — scanning it opens Google Maps at the exact stamped point
+    const qrX = w - pad - mapSize;
+    const hasQr = loc && drawMapsQr(ctx, qrX, mapY, mapSize, loc.lat, loc.lng);
+
+    const tx = mapX + mapSize + pad * 1.3;
+    const tw = (hasQr ? qrX - pad * 1.3 : w - pad) - tx;
+    const baseSize = Math.max(13, Math.round(w / 54));
+    let y = top + pad + baseSize;
+
+    // Business label
+    ctx.fillStyle = '#fb923c';
+    ctx.font = `600 ${baseSize * 0.72}px Inter, sans-serif`;
+    ctx.fillText(fitText(ctx, business.toUpperCase(), tw), tx, y);
+    y += baseSize * 1.28;
+
+    // Address
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `600 ${baseSize}px Inter, sans-serif`;
+    if (loc && loc.address) {
+      const lines = wrapText(ctx, loc.address, tw);
+      for (const line of lines.slice(0, 2)) {
+        ctx.fillText(line, tx, y);
+        y += baseSize * 1.28;
+      }
+    } else {
+      ctx.fillText('Address not available', tx, y);
+      y += baseSize * 1.28;
+    }
+
+    // Coordinates, accuracy and time
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = `400 ${baseSize * 0.82}px Inter, sans-serif`;
+    if (loc) {
+      const coordTxt = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`;
+      ctx.fillText(coordTxt, tx, y);
+      if (loc.acc != null) {
+        // Accuracy gets its own colour so a weak fix can't pass as exact
+        const low = loc.acc > READY_ACC;
+        const ax = tx + ctx.measureText(coordTxt + '  ·  ').width;
+        ctx.fillText('  ·  ', tx + ctx.measureText(coordTxt).width, y);
+        ctx.fillStyle = low ? '#f87171' : '#4ade80';
+        ctx.font = `700 ${baseSize * 0.82}px Inter, sans-serif`;
+        ctx.fillText(low ? `±${loc.acc}m  LOW ACCURACY` : `±${loc.acc}m`, ax, y);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = `400 ${baseSize * 0.82}px Inter, sans-serif`;
+      }
+      y += baseSize * 1.15;
+      // Plus code line
+      ctx.fillText(plusCodeStr(loc.lat, loc.lng), tx, y);
+      y += baseSize * 1.15;
+      ctx.fillText(formatTime(loc.ts), tx, y);
+    }
+  }
+
+  function wrapText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const testLine = line ? line + ' ' + word : word;
+      if (ctx.measureText(testLine).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function formatTime(d) {
+    const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    return `${date}  ·  ${time}`;
+  }
+
+  // ========== LOCATION CHECK (big map + legend) ==========
+  let bigMap = null, bigMarker = null, bigCircle = null;
+
+  function showLocationCheck(loc) {
+    const box = document.getElementById('locCheck');
+    if (!loc) { box.style.display = 'none'; return; }
+    box.style.display = '';
+
+    const good = loc.acc <= READY_ACC;
+    const col = good ? '#4285f4' : '#ef4444';
+    document.getElementById('rowAddr').textContent = loc.address || 'Not available';
+    document.getElementById('rowCoords').textContent = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`;
+    document.getElementById('rowPlus').textContent = plusCodeStr(loc.lat, loc.lng);
+    document.getElementById('btnGmaps').href =
+      `https://www.google.com/maps/search/?api=1&query=${loc.lat.toFixed(6)},${loc.lng.toFixed(6)}`;
+
+    if (!window.L) { document.querySelector('.map-wrap').style.display = 'none'; return; }
+    if (!bigMap) {
+      // Tiles land on fractional pixels on most phones, leaving hairline seams between them;
+      // overlapping each tile by 1px hides them (Leaflet issue #3575)
+      const initTile = L.GridLayer.prototype._initTile;
+      L.GridLayer.include({
+        _initTile(tile) {
+          initTile.call(this, tile);
+          const size = this.getTileSize();
+          tile.style.width = size.x + 1 + 'px';
+          tile.style.height = size.y + 1 + 'px';
+        }
+      });
+      bigMap = L.map('bigMap', { zoomControl: true, attributionControl: true });
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+        subdomains: 'abc', maxNativeZoom: 19, maxZoom: 20,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+      }).addTo(bigMap);
+      L.control.scale({ metric: true, imperial: false }).addTo(bigMap);
+    }
+    if (bigMarker) bigMarker.remove();
+    if (bigCircle) bigCircle.remove();
+    const ll = L.latLng(loc.lat, loc.lng);
+    // Map sits inside a screen that was hidden until now — size it, then open directly at
+    // the zoom that fits the accuracy circle (the circle needs a map view before it can be drawn)
+    setTimeout(() => {
+      bigMap.invalidateSize();
+      bigMap.fitBounds(ll.toBounds(Math.max(loc.acc, 5) * 2), { padding: [30, 30], maxZoom: 19, animate: false });
+      bigCircle = L.circle(ll, { radius: loc.acc, color: col, weight: 2, fillColor: col, fillOpacity: 0.15 }).addTo(bigMap);
+      bigMarker = L.circleMarker(ll, { radius: 7, color: '#fff', weight: 3, fillColor: '#ea4335', fillOpacity: 1 }).addTo(bigMap);
+    }, 50);
+  }
+
+  // ========== PREVIEW ACTIONS ==========
+  const shareLabel = document.getElementById('shareLabel');
+  // iPadOS reports itself as a Mac, so also check for a touch screen
+  const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  // One tap shares one image — the stamped photo and the location map combined — with the
+  // details as its caption. (Two separate images from one tap arrive in whatever order WhatsApp
+  // picks.) iOS WhatsApp drops images that come with text, so there the details are copied to
+  // the clipboard for pasting into the caption box; if the clipboard is refused, a second tap
+  // sends them as their own message.
+  let shareStep = 0;
+  let captionCopyFailed = false;
+  const shareHint = document.getElementById('shareHint');
+  function shareStepNames() {
+    return IS_IOS && captionCopyFailed ? ['photo', 'details'] : ['photo'];
+  }
+  // The combined photo + map when it's ready; otherwise just the stamped photo
+  function mainShareImage() {
+    return shareImage || { blob: capturedBlob, dataUrl: capturedDataUrl };
+  }
+  function buildShareSteps() {
+    const text = buildShareText();
+    const file = new File([mainShareImage().blob], `location-${Date.now()}.jpg`, { type: 'image/jpeg' });
+    const steps = [IS_IOS
+      ? { name: 'photo', data: { files: [file] }, copyCaption: true }
+      : { name: 'photo', data: { files: [file], title: 'Location Photo', text } }];
+    if (IS_IOS && captionCopyFailed) steps.push({ name: 'details', data: { text } });
+    return { steps, text };
+  }
+  // Must run before share(): WebKit's clipboard write only checks the tap, share() uses it up
+  function copyCaption(text) {
+    try {
+      navigator.clipboard.writeText(text).catch(() => { captionCopyFailed = true; updateShareLabel(); });
+    } catch (e) {
+      captionCopyFailed = true;
+    }
+  }
+  function updateShareLabel() {
+    const names = shareStepNames();
+    if (shareStep >= names.length) shareLabel.textContent = 'Shared ✓ — share again';
+    else if (names.length === 1) shareLabel.textContent = 'Share to WhatsApp';
+    else shareLabel.textContent = `Share ${names[shareStep]} (${shareStep + 1}/${names.length})`;
+    // The share sheet covers the page, so the paste instruction has to be visible before the tap
+    shareHint.hidden = !(IS_IOS && !captionCopyFailed && shareStep === 0);
+  }
+
+  function setPreviewButtons(ready) {
+    shareBtn.disabled = !ready;
+    downloadBtn.disabled = !ready;
+    if (ready) updateShareLabel();
+    else shareLabel.textContent = 'Preparing map…';
+  }
+
+  // Hold Save/Share until the combined image is ready (or SHARE_MAP_WAIT passes), so share() can
+  // run straight from the tap — awaiting a slow render inside the click would lose the user gesture.
+  function armPreviewButtons(token) {
+    hideShareFallback();
+    shareStep = 0;
+    captionCopyFailed = false;
+    if (shareImage) { setPreviewButtons(true); return; }
+    setPreviewButtons(false);
+    Promise.race([shareImagePromise, new Promise(r => setTimeout(r, SHARE_MAP_WAIT))])
+      .then(() => { if (token === shareMapToken) setPreviewButtons(true); });
+  }
+
+  // What Save and the fallbacks hand over: the same single image that Share sends
+  function outgoingFiles() {
+    const img = mainShareImage();
+    return [{ name: `location-${Date.now()}.jpg`, blob: img.blob, dataUrl: img.dataUrl }];
+  }
+
+  function downloadDataUrl(dataUrl, name) {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  // Browsers ignore a second download fired in the same tick, so space them out
+  function downloadAll(files) {
+    files.forEach((f, i) => setTimeout(() => downloadDataUrl(f.dataUrl, f.name), i * 400));
+  }
+
+  retakeBtn.addEventListener('click', () => {
+    capturedBlob = null;
+    capturedDataUrl = null;
+    confirmedLocation = null;
+    frozenCanvas = null;
+    shareMapToken++;
+    shareMap = null;
+    shareMapPromise = null;
+    shareImage = null;
+    shareImagePromise = null;
+    shareStep = 0;
+    setPreviewButtons(true);
+    hideShareFallback();
+    lastMiniLat = null;
+    showScreen('camera-screen');
+    startCamera().catch(e => showToast(e.message));
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (!capturedDataUrl) return;
+    const files = outgoingFiles();
+    downloadAll(files);
+    // A second download from one tap makes the browser ask first ("download multiple files?")
+    showToast(files.length > 1 ? 'Saving photo and map — if your browser asks, tap Allow' : 'Saved to your device', 5000);
+  });
+
+  // Chrome on Android doesn't reject a second share() while one is open, so a double tap
+  // would open two share sheets
+  let sharing = false;
+  shareBtn.addEventListener('click', async () => {
+    if (!capturedBlob || sharing) return;
+    sharing = true;
+    setTimeout(() => { sharing = false; }, 1500);
+    const files = outgoingFiles();
+
+    // Built at the tap so a quick Retake can't swap in the live GPS fix
+    const { steps, text } = buildShareSteps();
+    if (shareStep >= steps.length) shareStep = 0;
+    const step = steps[shareStep];
+    if (typeof navigator.canShare === 'function' && navigator.canShare(step.data)) {
+      if (step.copyCaption) copyCaption(text);
+      try {
+        await navigator.share(step.data);
+        shareStep++;
+        const names = shareStepNames();   // re-read: a refused clipboard adds a 'details' step
+        if (shareStep < names.length) showToast(`${capitalise(step.name)} shared ✓ — now tap to share the ${names[shareStep]}`, 5000);
+        else if (names.length > 1) showToast('All shared ✓', 3000);
+        updateShareLabel();
+      } catch (e) {
+        // Only a real cancel is silent — "Share failed" also arrives as an AbortError
+        if (e.name === 'AbortError' && /cancel/i.test(e.message)) return;
+        // share() used up the tap, so opening WhatsApp from here would be popup-blocked;
+        // offer buttons instead so each action starts from a fresh tap
+        showShareFallback(files, text);
+      }
+      return;
+    }
+
+    // No share sheet (in-app browsers, desktop): the tap is still live, so save the image(s)
+    // and open WhatsApp with the text right away so they can be attached
+    downloadAll(files);
+    setTimeout(() => {
+      window.open(whatsAppUrl(text), '_blank');
+      showToast(files.length > 1 ? 'Photo and map saved (tap Allow if asked). Attach them in WhatsApp.' : 'Photo saved. Attach it in WhatsApp.', 6000);
+    }, files.length * 400);
+  });
+
+  function capitalise(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function whatsAppUrl(text) {
+    const t = encodeURIComponent(text);
+    return phone ? `https://wa.me/${phone}?text=${t}` : `https://wa.me/?text=${t}`;
+  }
+
+  const shareFallback = document.getElementById('shareFallback');
+  let fallbackFiles = [], fallbackText = '';
+  function showShareFallback(files, text) {
+    fallbackFiles = files;
+    fallbackText = text;
+    shareFallback.hidden = false;
+  }
+  function hideShareFallback() { shareFallback.hidden = true; }
+  document.getElementById('fbSave').addEventListener('click', () => {
+    downloadAll(fallbackFiles);
+    showToast(fallbackFiles.length > 1 ? 'Saving photo and map — if your browser asks, tap Allow' : 'Saved to your device', 5000);
+  });
+  document.getElementById('fbWhatsApp').addEventListener('click', () => window.open(whatsAppUrl(fallbackText), '_blank'));
+
+  function buildShareText() {
+    const loc = confirmedLocation || currentLocation;
+    if (!loc) return `Location photo for ${business}`;
+    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${loc.lat.toFixed(6)},${loc.lng.toFixed(6)}`;
+    const lines = [`Location for ${business}`];
+    if (loc.address) lines.push(loc.address);
+    lines.push(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}${loc.acc != null ? ` (±${loc.acc} m)` : ''} · ${plusCodeStr(loc.lat, loc.lng)}`);
+    lines.push(mapsLink);
+    return lines.join('\n');
+  }
+
+  // ========== CLEANUP ==========
+  window.addEventListener('beforeunload', () => {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    if (locationWatchId != null) navigator.geolocation.clearWatch(locationWatchId);
+  });
+</script>
+
+</body>
+</html>

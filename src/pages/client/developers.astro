@@ -1,6 +1,7 @@
 ---
 // API key: one per client. Generate shows the full key once; Regenerate replaces it (the old one stops working).
-// The key comes from GET /account, POST /account/keys makes a new one.
+// The key comes from GET /account, POST /account/keys makes a new one. Websites (POST /account/websites) are the
+// sites allowed to use the key from a browser (Maps JavaScript API); calls from other sites get 403.
 import { Copy } from '@lucide/astro';
 import AppShell from '../../components/client/AppShell.astro';
 import { ui } from '../../components/client/ui';
@@ -31,10 +32,23 @@ import { API } from '../../scripts/client-api';
   -H "Authorization: Bearer YOUR_KEY"</code></pre>
     </div>
   </section>
+
+  <section class={`${ui.card} mt-4`} aria-labelledby="web-title">
+    <div class={ui.cardHead}><h2 id="web-title" class={ui.h2}>Websites</h2></div>
+    <form id="websites-form" class="grid gap-3 p-4 sm:p-5" novalidate>
+      <label for="f-websites" class="text-sm font-semibold text-ink-900">Websites that can use your key in a browser</label>
+      <textarea id="f-websites" name="websites" rows="3" spellcheck="false" placeholder="https://yourcompany.com" class="block w-full rounded-xs border border-ink-300 bg-white px-3 py-2.5 font-mono text-sm text-ink-900 placeholder:text-ink-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/25 focus:outline-hidden"></textarea>
+      <p data-error role="alert" class={ui.error}></p>
+      <div class="flex items-center gap-3">
+        <button type="submit" class={ui.primary}>Save</button>
+        <span data-saved hidden class="text-sm font-medium text-emerald-700">Saved</span>
+      </div>
+    </form>
+  </section>
 </AppShell>
 
 <script>
-  import { api, type Result } from '../../scripts/client-api';
+  import { api, handleForm, type Result } from '../../scripts/client-api';
 
   type Key = { id: number; prefix: string; created_at: string; last_used_at: string | null };
 
@@ -60,6 +74,7 @@ import { API } from '../../scripts/client-api';
     $('[data-used]').textContent = key ? (key.last_used_at ? `Used ${when(key.last_used_at)}` : 'Not used yet') : '';
     generate.textContent = key ? 'Regenerate' : 'Generate';
     generate.className = key ? generate.dataset.secondary! : generate.dataset.primary!; // Regenerate is the quieter action
+    $<HTMLTextAreaElement>('#f-websites').value = (r.data.websites ?? []).join('\n');
     box.removeAttribute('aria-busy');
   }
 
@@ -84,6 +99,15 @@ import { API } from '../../scripts/client-api';
     } catch {
       getSelection()?.selectAllChildren(code); // clipboard blocked: key is selected, Ctrl+C works
     }
+  });
+
+  // Websites: one per line
+  const saved = $('[data-saved]');
+  const websites = $<HTMLTextAreaElement>('#f-websites');
+  websites.addEventListener('input', () => (saved.hidden = true));
+  handleForm($<HTMLFormElement>('#websites-form'), () => api('/account/websites', { websites: websites.value.split(/[\s,]+/) }), (r) => {
+    websites.value = r.data.join('\n');
+    saved.hidden = false;
   });
 
   load();

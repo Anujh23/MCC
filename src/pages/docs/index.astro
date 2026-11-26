@@ -3,12 +3,12 @@
 // sidebar of sections, then per section the explanation on the left and the request / response code on the right
 // (stacked below xl). Content: src/data/api-content.ts. Planned APIs aren't listed.
 import AppShell from '../../components/client/AppShell.astro';
-import { apiBase, apiErrors, apiProducts, curl } from '../../data/api-content';
+import { apiBase, apiErrors, apiProducts, curl, mapImage, mapsScript } from '../../data/api-content';
 import { href } from '../../data/site';
 
 const nav = [
   { label: 'Getting started', items: [{ label: 'Authentication', href: '#authentication' }, { label: 'Errors', href: '#errors' }] },
-  { label: 'APIs', items: apiProducts.map((p) => ({ label: p.title, href: `#${p.name}` })) },
+  { label: 'APIs', items: [...apiProducts.map((p) => ({ label: p.title, href: `#${p.name}` })), { label: 'Maps JavaScript', href: '#maps-js' }] },
 ];
 const json = (v: unknown) => JSON.stringify(v, null, 2);
 const section = 'scroll-mt-20 grid grid-cols-1 gap-6 border-t border-ink-200 py-10 first-of-type:border-t-0 first-of-type:pt-0 xl:grid-cols-2 xl:gap-10';
@@ -108,6 +108,21 @@ const td = 'border-t border-ink-100 px-3 py-2 align-top';
         </div>
       </section>
     ))}
+
+    <section id="maps-js" class={section}>
+      <div class="min-w-0 space-y-4">
+        <h2 class={h2}>Maps JavaScript</h2>
+        <p>Get the visitor’s coordinates and a map image in your own web page: add the script with your key, then call <code class={code}>MapsAPI.locate()</code>. It asks for location permission and is charged like the Maps API.</p>
+        <p><code class={code}>image</code> is a 640×400 PNG map with a pin. Use it in an <code class={code}>&lt;img&gt;</code>, or on a canvas with <code class={code}>crossOrigin = 'anonymous'</code>. Every located request has one, including Maps API links.</p>
+        <p>Show “© OpenStreetMap” next to the map: the map data’s licence requires it wherever the map is seen. Or add <code class={code}>?credit=1</code> to the image URL to put a small label on the image instead.</p>
+        <p>Add your website under <a href={href('/client/developers/')} class="font-semibold text-brand-700 underline underline-offset-4">API key → Websites</a> first. Calls from other websites get <code class={code}>403 origin_not_allowed</code>.</p>
+        <p class="text-ink-500">Map data © OpenStreetMap contributors. Location needs the visitor’s permission and an https page (or localhost).</p>
+      </div>
+      <div class="min-w-0 space-y-4">
+        <figure><figcaption class="cap">HTML</figcaption><pre class="code"><code>{mapsScript()}</code></pre></figure>
+        <figure><figcaption class="cap">MapsAPI.locate()</figcaption><pre class="code"><code>{json({ id: 'call_1048', request: 'loc_x7Kp2mQ9aB1c', lat: 28.6315, lng: 77.2167, accuracy_m: 12.3, located_at: '2026-11-25T10:34:12Z', image: mapImage, address: 'Outer Circle, Connaught Place, New Delhi, Delhi, 110001, India' })}</code></pre></figure>
+      </div>
+    </section>
   </div>
 </AppShell>
 

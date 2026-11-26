@@ -20,6 +20,7 @@ import { ui } from '../components/client/ui';
 
 <script>
   import { api } from '../scripts/client-api';
+  import { geoError, getFix } from '../scripts/geo';
 
   const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
   const token = new URLSearchParams(location.search).get('t') ?? '';
@@ -37,32 +38,6 @@ import { ui } from '../components/client/ui';
     expired: ['Link expired', 'Ask for a new link.'],
   };
 
-  // Best GPS fix within 15 s; stops early once it's within 30 m.
-  function fix(): Promise<GeolocationPosition> {
-    return new Promise((resolve, reject) => {
-      let best: GeolocationPosition | null = null;
-      const finish = () => {
-        navigator.geolocation.clearWatch(watch);
-        clearTimeout(timer);
-        best ? resolve(best) : reject(new Error('No location fix.'));
-      };
-      const watch = navigator.geolocation.watchPosition(
-        (p) => {
-          if (!best || p.coords.accuracy < best.coords.accuracy) best = p;
-          if (p.coords.accuracy <= 30) finish();
-        },
-        (e) => {
-          if (e.code !== e.PERMISSION_DENIED) return; // keep waiting on timeouts / weak signal
-          navigator.geolocation.clearWatch(watch);
-          clearTimeout(timer);
-          reject(e);
-        },
-        { enableHighAccuracy: true, maximumAge: 0 },
-      );
-      const timer = setTimeout(finish, 15_000);
-    });
-  }
-
   async function start() {
     if (!token) return show('Link not valid', 'Check the link you were sent.');
     const r = await api(`/locate/${encodeURIComponent(token)}`);
@@ -75,21 +50,17 @@ import { ui } from '../components/client/ui';
 
   share.addEventListener('click', async () => {
     error.textContent = '';
-    if (!('geolocation' in navigator)) return void (error.textContent = 'This browser can’t share location. Try another browser.');
     share.disabled = true;
     share.textContent = 'Getting your location…';
     try {
-      const p = await fix();
+      const p = await getFix();
       const r = await api(`/locate/${encodeURIComponent(token)}`, { lat: p.coords.latitude, lng: p.coords.longitude, accuracy_m: p.coords.accuracy });
       if (r.ok) return show('Location shared', 'You can close this page.');
       if (r.status === 409) return show(...ENDED.done);
       if (r.status === 410) return show(...ENDED.expired);
       error.textContent = 'Could not send your location. Try again.';
     } catch (e) {
-      error.textContent =
-        e instanceof GeolocationPositionError
-          ? 'Location is off for this page. Turn it on in your browser settings, then try again.'
-          : 'Could not get your location. Move to an open area and try again.';
+      error.textContent = geoError(e);
     }
     share.disabled = false;
     share.textContent = 'Share location';

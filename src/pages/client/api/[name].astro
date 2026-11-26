@@ -1,7 +1,9 @@
 ---
 // One page per API (/client/api/{name}/): Try it (POST /account/try/{name}, paid from the balance)
 // and the API's endpoint + curl. Pages come from src/data/api-content.ts; planned APIs get an empty page.
-// Maps API also lists its link requests (GET /account/locations): status and the coordinates once shared.
+// Maps API: Try asks for the browser's location, makes a link (charged) and shares the fix through it, then shows the
+// place name (display only), latitude, longitude and map image; its Requests card lists the requests (GET /account/locations)
+// with a link to each map image.
 import AppShell from '../../../components/client/AppShell.astro';
 import AuthForm from '../../../components/client/AuthForm.astro';
 import Field from '../../../components/client/Field.astro';
@@ -20,12 +22,12 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
 
 <AppShell title={title}>
   {p ? (
-    <div id="api" data-name={p.name} class="grid grid-cols-1 gap-4 aria-busy:invisible lg:grid-cols-2 lg:items-start" aria-busy="true">
+    <div id="api" data-name={p.name} data-location={p.tryLocation ? '' : undefined} class="grid grid-cols-1 gap-4 aria-busy:invisible lg:grid-cols-2 lg:items-start" aria-busy="true">
       <section class={ui.card} aria-labelledby="try-title">
         <div class={ui.cardHead}><h2 id="try-title" class={ui.h2}>Try it</h2></div>
         <div class="p-4 sm:p-5">
           <AuthForm id="try" submit={p.verb}>
-            {p.fields.map((f) => (
+            {!p.tryLocation && p.fields.map((f) => (
               <Field name={f.name} label={f.label} type={f.type === 'number' ? 'number' : 'text'} autocomplete="off" placeholder={`e.g. ${f.example}`} />
             ))}
             <p data-cost class="rounded-xs border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 empty:hidden"></p>
@@ -45,6 +47,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
             <span class="rounded-xs bg-brand-50 px-1.5 py-0.5 text-xs font-bold text-brand-700">{p.method}</span>{p.path}
           </p>
           <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>{curl(p)}</code></pre>
+          {p.script && <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>{p.script}</code></pre>}
         </div>
       </section>
 
@@ -67,15 +70,36 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
 </AppShell>
 
 <script>
-  import { api, handleForm } from '../../../scripts/client-api';
+  import { API, api, handleForm, type Result } from '../../../scripts/client-api';
   import { ui } from '../../../components/client/ui';
+  import { geoError, getFix, placeName } from '../../../scripts/geo';
 
   const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel)!;
   const box = document.querySelector<HTMLElement>('#api'); // null on a planned API's page
   const rupees = (paise: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(paise / 100);
   // Response field → label: "holder_type" → "Holder type", "data_as_of" → "Data as of", "micr" → "MICR".
   const ACRONYMS = new Set(['pan', 'gstin', 'ifsc', 'micr', 'upi', 'neft', 'rtgs', 'imps', 'url']);
-  const LABELS: Record<string, string> = { accuracy_m: 'Accuracy (m)', lat: 'Latitude', lng: 'Longitude' };
+  const LABELS: Record<string, string> = { accuracy_m: 'Accuracy (m)', lat: 'Latitude', lng: 'Longitude', image: 'Map' };
+
+  // Maps API Try: this browser's location → a link (charged like the API) → the fix shared through it → what came back,
+  // with the place name looked up for display only.
+  async function tryLocation(name: string): Promise<Result> {
+    let fix: GeolocationPosition;
+    try {
+      fix = await getFix();
+    } catch (e) {
+      return { ok: false, status: 400, data: { detail: geoError(e) } };
+    }
+    const link = await api(`/account/try/${name}`, { reference: 'Dashboard' });
+    if (!link.ok) return link;
+    const lat = +fix.coords.latitude.toFixed(7);
+    const lng = +fix.coords.longitude.toFixed(7);
+    const accuracy_m = +fix.coords.accuracy.toFixed(1);
+    const shared = await api(`/locate/${new URL(link.data.url).searchParams.get('t')}`, { lat, lng, accuracy_m });
+    if (!shared.ok) return shared;
+    const image = `${API}/v1/maps/image/${link.data.request}.png?credit=1`; // our own page: credit on the image
+    return { ok: true, status: 200, data: { place: await placeName(lat, lng), lat, lng, accuracy_m, image, request: link.data.request } };
+  }
   const label = (k: string) => {
     if (LABELS[k]) return LABELS[k];
     const s = k.split('_').map((w) => (ACRONYMS.has(w) ? w.toUpperCase() : w)).join(' ');
@@ -107,7 +131,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
     return wrap;
   }
 
-  type Loc = { request: string; reference: string; status: string; url: string | null; lat: number | null; lng: number | null; accuracy_m: number | null; located_at: string | null; expires_at: string };
+  type Loc = { request: string; reference: string; status: string; url: string | null; lat: number | null; lng: number | null; accuracy_m: number | null; located_at: string | null; expires_at: string; image: string | null };
   const STATUS: Record<string, string> = { pending: 'Waiting', done: 'Shared', expired: 'Expired' };
 
   // Maps API: the client's link requests, newest first.
@@ -120,16 +144,21 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
     body.replaceChildren(
       ...rows.map((x) => {
         const tr = document.createElement('tr');
-        const cells: [string, string][] = [
+        const cells: [string, string, string?][] = [ // text, classes, link
           [x.reference, ''],
           [STATUS[x.status] ?? x.status, ''],
-          x.lat === null ? ['—', 'text-ink-400'] : [`${x.lat}, ${x.lng} (±${Math.round(x.accuracy_m ?? 0)} m)`, 'font-mono text-xs whitespace-nowrap'],
+          x.lat === null ? ['—', 'text-ink-400'] : [`${x.lat}, ${x.lng} (±${Math.round(x.accuracy_m ?? 0)} m)`, 'font-mono text-xs whitespace-nowrap', x.image ? `${x.image}?credit=1` : undefined],
           x.located_at ? [when(x.located_at), 'tabular-nums'] : [`Expires ${when(x.expires_at)}`, 'tabular-nums text-ink-500'],
         ];
-        cells.forEach(([text, extra]) => {
+        cells.forEach(([text, extra, link]) => {
           const td = document.createElement('td');
           td.className = `border-t border-ink-100 px-4 py-3 align-top sm:px-5 ${extra}`;
           td.textContent = text;
+          if (link) {
+            const a = document.createElement('a');
+            Object.assign(a, { href: link, target: '_blank', rel: 'noopener', textContent: text, className: 'text-brand-700 underline underline-offset-4' });
+            td.replaceChildren(a);
+          }
           tr.append(td);
         });
         return tr;
@@ -154,7 +183,8 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
         price === undefined ? '' : `${rupees(price)} will be deducted from your balance.`;
     };
 
-    handleForm($<HTMLFormElement>('#try'), (values) => api(`/account/try/${name}`, values), async (r) => {
+    const submit = (values: Record<string, string>) => (box.hasAttribute('data-location') ? tryLocation(name) : api(`/account/try/${name}`, values));
+    handleForm($<HTMLFormElement>('#try'), submit, async (r) => {
       const { id: _id, ...fields } = r.data;
       result.replaceChildren(
         ...Object.entries(fields).filter(([, v]) => v !== null).flatMap(([k, v]) => {
@@ -165,6 +195,10 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
           dd.className = 'font-semibold break-words text-ink-900';
           dd.textContent = typeof v === 'boolean' ? (v ? 'Yes' : 'No') : typeof v === 'object' ? JSON.stringify(v) : String(v);
           if (k === 'url') dd.replaceChildren(copyable(String(v))); // Maps API: the link to send
+          if (k === 'image') {
+            const img = Object.assign(document.createElement('img'), { src: String(v), alt: 'Map', className: 'w-full rounded-xs border border-ink-200' });
+            dd.replaceChildren(img);
+          }
           return [dt, dd];
         }),
       );
