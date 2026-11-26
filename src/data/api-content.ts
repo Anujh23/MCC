@@ -16,6 +16,8 @@ export type ApiField = {
   type: 'string' | 'number' | 'file';
   example: string | number;
   doc: string;
+  /** false = documented in the fields table but left out of the curl example (an optional switch). */
+  curl?: false;
 };
 
 export type ApiProduct = {
@@ -102,6 +104,7 @@ export const apiProducts: ApiProduct[] = [
     fields: [
       { name: 'file', label: 'Statement (PDF)', type: 'file', example: 'statement.pdf', doc: 'The bank’s PDF. Up to 10 MB.' },
       { name: 'password', label: 'PDF password', type: 'string', example: 'your-pdf-password', doc: 'Optional. Only if the PDF is password protected.' },
+      { name: 'format', label: 'Format', type: 'string', example: 'xlsx', doc: 'Optional. json (default) or xlsx for the Excel report.', curl: false },
     ],
     response: {
       id: 'call_1050',
@@ -206,7 +209,7 @@ export function mapsScript(key = 'YOUR_KEY'): string {
 export function curl(p: ApiProduct): string {
   const auth = '  -H "Authorization: Bearer YOUR_KEY"';
   if (p.upload) {
-    const forms = p.fields.map((f) => `  -F "${f.name}=${f.type === 'file' ? '@' : ''}${f.example}"`);
+    const forms = p.fields.filter((f) => f.curl !== false).map((f) => `  -F "${f.name}=${f.type === 'file' ? '@' : ''}${f.example}"`);
     return [`curl ${apiBase}${p.path}`, auth, ...forms].join(' \\\n');
   }
   const body = Object.fromEntries(p.fields.map((f) => [f.name, f.example]));
