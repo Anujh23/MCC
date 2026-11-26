@@ -98,7 +98,7 @@ export const apiProducts: ApiProduct[] = [
     method: 'POST',
     path: '/v1/bsa/analyze',
     summary: 'Flag fake-looking statements and get income, EMIs and bounces.',
-    limits: 'Bank-downloaded PDFs only: no scans and no Account Aggregator PDFs. Send the password if the PDF has one. The statement is not stored. Only a successful analysis is charged.',
+    limits: 'Bank-downloaded PDFs only: no scans and no Account Aggregator PDFs. Send the password if the PDF has one. The statement is not stored.',
     fields: [
       { name: 'file', label: 'Statement (PDF)', type: 'file', example: 'statement.pdf', doc: 'The bank’s PDF. Up to 10 MB.' },
       { name: 'password', label: 'PDF password', type: 'string', example: 'your-pdf-password', doc: 'Optional. Only if the PDF is password protected.' },
@@ -149,7 +149,7 @@ export const apiProducts: ApiProduct[] = [
     result: {
       method: 'GET',
       path: '/v1/maps/link/{request}',
-      summary: 'Reads a request. Not charged: check it until status is done.',
+      summary: 'Reads a request. Check it until status is done.',
       example: 'loc_x7Kp2mQ9aB1c',
       response: {
         request: 'loc_x7Kp2mQ9aB1c', reference: 'LN-1042', status: 'done', url: null, expires_at: '2026-11-26T10:30:00Z',
@@ -184,6 +184,7 @@ export const apiErrors = [
   { status: 422, code: 'unsupported_file', when: 'BSA: no transactions could be read from the PDF' },
   { status: 422, code: 'aa_statement', when: 'BSA: Account Aggregator PDF; send the statement downloaded from the bank' },
   { status: 422, code: 'analysis_timeout', when: 'BSA: the PDF took too long to read; get a fresh download' },
+  { status: 429, code: 'busy', when: 'BSA: too many statements at once; retry after the Retry-After seconds' },
   { status: 500, code: 'server_error', when: 'Something failed on our side' },
 ];
 

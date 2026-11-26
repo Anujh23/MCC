@@ -27,7 +27,7 @@ const td = 'border-t border-ink-100 px-3 py-2 align-top';
         <h2 class={h2}>Authentication</h2>
         <p>Send your API key in the <code class={code}>Authorization</code> header. Get your key in the <a href={href('/client/developers/')} class="font-semibold text-brand-700 underline underline-offset-4">dashboard</a>.</p>
         <p>Each call is paid from your prepaid balance.</p>
-        <p><code class={code}>GET /v1/ping</code> checks your key. It isn’t charged.</p>
+        <p><code class={code}>GET /v1/ping</code> checks your key.</p>
       </div>
       <div class="min-w-0 space-y-4">
         <figure><figcaption class="cap">Request</figcaption><pre class="code"><code>{`curl ${apiBase}/v1/ping \\\n  -H "Authorization: Bearer YOUR_KEY"`}</code></pre></figure>
