@@ -4,11 +4,13 @@
 // Maps API: Try asks for the browser's location, makes a link (charged) and shares the fix through it, then shows the
 // place name (display only), latitude, longitude and map image; its Requests card lists the requests (GET /account/locations)
 // with a link to each map image.
+// BSA: Try uploads the statement PDF (multipart) and shows a compact summary with a download of the full JSON report;
+// a Supported banks card lists the banks (client app only).
 import AppShell from '../../../components/client/AppShell.astro';
 import AuthForm from '../../../components/client/AuthForm.astro';
 import Field from '../../../components/client/Field.astro';
 import { ui } from '../../../components/client/ui';
-import { apiPlanned, apiProducts, curl, type ApiProduct } from '../../../data/api-content';
+import { apiPlanned, apiProducts, bsaBanks, curl, type ApiProduct } from '../../../data/api-content';
 import { href } from '../../../data/site';
 
 export function getStaticPaths() {
@@ -22,12 +24,24 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
 
 <AppShell title={title}>
   {p ? (
-    <div id="api" data-name={p.name} data-location={p.tryLocation ? '' : undefined} class="grid grid-cols-1 gap-4 aria-busy:invisible lg:grid-cols-2 lg:items-start" aria-busy="true">
+    <div id="api" data-name={p.name} data-location={p.tryLocation ? '' : undefined} class="grid grid-cols-1 gap-4 aria-busy:invisible lg:grid-cols-2" aria-busy="true">
       <section class={ui.card} aria-labelledby="try-title">
         <div class={ui.cardHead}><h2 id="try-title" class={ui.h2}>Try it</h2></div>
         <div class="p-4 sm:p-5">
           <AuthForm id="try" submit={p.verb}>
-            {!p.tryLocation && p.fields.map((f) => (
+            {p.upload && (
+              <>
+                <div>
+                  <label for="f-file" class="text-sm font-semibold text-ink-900">Statement (PDF)</label>
+                  <input id="f-file" name="file" type="file" accept=".pdf,application/pdf" required class="mt-2 block w-full rounded-xs border border-ink-300 bg-white text-sm text-ink-900 file:mr-3 file:min-h-11 file:cursor-pointer file:border-0 file:border-r file:border-ink-300 file:bg-ink-50 file:px-4 file:text-sm file:font-semibold file:text-ink-900 hover:file:bg-ink-100 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/25 focus:outline-hidden" />
+                </div>
+                <div>
+                  <label for="f-password" class="text-sm font-semibold text-ink-900">PDF password</label>
+                  <input id="f-password" name="password" type="password" autocomplete="off" maxlength="256" class="mt-2 block w-full rounded-xs border border-ink-300 bg-white px-3 py-2.5 text-base text-ink-900 transition focus:border-brand-600 focus:ring-2 focus:ring-brand-500/25 focus:outline-hidden" />
+                </div>
+              </>
+            )}
+            {!p.tryLocation && !p.upload && p.fields.map((f) => (
               <Field name={f.name} label={f.label} type={f.type === 'number' ? 'number' : 'text'} autocomplete="off" placeholder={`e.g. ${f.example}`} />
             ))}
             <p data-cost class="rounded-xs border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 empty:hidden"></p>
@@ -46,10 +60,27 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
           <p class="flex flex-wrap items-center gap-2 font-mono text-sm text-ink-900">
             <span class="rounded-xs bg-brand-50 px-1.5 py-0.5 text-xs font-bold text-brand-700">{p.method}</span>{p.path}
           </p>
-          <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>{curl(p)}</code></pre>
-          {p.script && <pre class="overflow-x-auto rounded-xs bg-ink-950 p-4 text-xs leading-relaxed text-ink-100"><code>{p.script}</code></pre>}
+          <pre class="rounded-xs bg-ink-950 p-4 text-xs leading-relaxed break-all whitespace-pre-wrap text-ink-100"><code>{curl(p)}</code></pre>
+          {p.script && <pre class="rounded-xs bg-ink-950 p-4 text-xs leading-relaxed break-all whitespace-pre-wrap text-ink-100"><code>{p.script}</code></pre>}
         </div>
       </section>
+
+      {p.upload && (
+        <section data-report hidden class={`${ui.card} scroll-mt-20 lg:col-span-2`} aria-labelledby="report-title">
+          <div class={ui.cardHead}><h2 id="report-title" class={ui.h2}>Report</h2></div>
+          <div data-report-body class="grid grid-cols-1 gap-6 p-4 text-sm sm:p-5 lg:grid-cols-2 lg:gap-10"></div>
+        </section>
+      )}
+
+      {p.name === 'bsa' && (
+        <section class={`${ui.card} lg:col-span-2`} aria-labelledby="banks-title">
+          <div class={ui.cardHead}><h2 id="banks-title" class={ui.h2}>Supported banks</h2></div>
+          <ul class="columns-2 gap-x-6 p-4 text-sm text-ink-700 sm:p-5 md:columns-3 xl:columns-4">
+            {bsaBanks.map((b) => <li class="break-inside-avoid py-1">{b}</li>)}
+            <li class="break-inside-avoid py-1 text-ink-500">+ more</li>
+          </ul>
+        </section>
+      )}
 
       {p.name === 'maps' && (
         <section class={`${ui.card} lg:col-span-2`} aria-labelledby="req-title">
@@ -167,9 +198,101 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
     $('[data-requests-empty]').hidden = rows.length > 0;
   }
 
+  const inr = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+  const VERDICT: Record<string, string> = {
+    ORIGINAL: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    SUSPICIOUS: 'border-amber-200 bg-amber-50 text-amber-900',
+    FAKE: 'border-rose-200 bg-rose-50 text-rose-900',
+  };
+  const QUALITY: Record<string, string> = { READY: 'text-emerald-700', REVIEW: 'text-amber-700', NOT_USABLE: 'text-rose-700' };
+  const SEVERITY: Record<string, string> = { high: 'text-rose-700', medium: 'text-amber-700', low: 'text-ink-500' };
+  const el = (tag: string, cls = '', text = '') => Object.assign(document.createElement(tag), { className: cls, textContent: text });
+  const day = (d?: string) => (d ? new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : '');
+
+  // BSA report card: [verdict, downloads, data-quality note (only when not READY), risk flags] | [key figures].
+  // Only the verdict is shown: why it was flagged (and UPI Mobiles) is in the Excel and JSON, never on screen - no
+  // detection logic for users (owner, 2026-11-26).
+  function renderReport(d: any): HTMLElement[] {
+    const verdict: string = d.authenticity?.verdict ?? '';
+    const left = el('div', 'min-w-0 space-y-4');
+    const head = el('div', `border p-3 ${VERDICT[verdict] ?? 'border-ink-200 bg-ink-50 text-ink-900'}`);
+    head.append(el('p', 'text-xs font-semibold', 'Verdict'), el('p', 'text-lg font-bold', verdict.replace('_', ' ') || '—'));
+    left.append(head, downloads(d));
+    const q = d.data_quality ?? {};
+    if (q.message && q.level !== 'READY') left.append(el('p', 'text-ink-600', q.message));
+    // the "Document is fake / suspicious" flag repeats the verdict box
+    const flags: { severity: string; message: string }[] = (d.risk_flags ?? []).filter(
+      (f: any) => verdict === 'ORIGINAL' || !/^Document is/i.test(f.message ?? ''),
+    );
+    if (flags.length) {
+      const ul = el('ul', 'space-y-1.5 text-ink-700');
+      flags.forEach((f) => {
+        const li = el('li', 'break-words');
+        const sev = f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : '';
+        if (sev) li.append(el('span', `font-semibold ${SEVERITY[f.severity] ?? 'text-ink-500'}`, sev), ' ');
+        li.append(f.message);
+        ul.append(li);
+      });
+      left.append(el('h3', 'font-semibold text-ink-900', 'Risk flags'), ul);
+    }
+
+    const m = d.meta ?? {};
+    const s = d.summary ?? {};
+    const rows: [string, string, string?][] = [
+      ['Data quality', q.level ? q.level.replace('_', ' ') : '—', QUALITY[q.level]],
+      ['Bank', m.bank_name ?? '—'],
+      ['Account holder', m.account_holder ?? '—'],
+      ['Account', m.account_number ?? '—'],
+      ['Period', m.period_from && m.period_to ? `${day(m.period_from)} to ${day(m.period_to)}` : '—'],
+      ['Transactions', m.txn_count == null ? '—' : String(m.txn_count)],
+      ['Monthly income', s.monthly_income == null ? 'No salary detected' : inr(s.monthly_income)],
+      ['Existing EMI', s.existing_emi == null ? '—' : inr(s.existing_emi)],
+      ['Bounces', s.bounce_count == null ? '—' : String(s.bounce_count)],
+      ['Average balance (ABB)', s.abb == null ? '—' : inr(s.abb)],
+    ];
+    const dl = el('dl', 'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] content-start gap-x-4 gap-y-2');
+    rows.forEach(([k, v, cls]) => dl.append(el('dt', 'text-ink-500', k), el('dd', `font-semibold break-words text-ink-900 ${cls ?? ''}`, v)));
+    return [left, dl];
+  }
+
+  // Excel (primary) = BSA's workbook, built by the API from this report (POST /account/bsa/excel, free); JSON = the report.
+  function downloads(d: any): HTMLElement {
+    const save = (blob: Blob, ext: string) => {
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `bsa-report-${d.id ?? 'report'}.${ext}` });
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    };
+    const button = (label: string, cls: string, onClick: (b: HTMLButtonElement) => void) => {
+      const b = el('button', cls, label) as HTMLButtonElement;
+      b.type = 'button';
+      b.addEventListener('click', () => onClick(b));
+      return b;
+    };
+    const excel = button('Download Excel', ui.primary, async (b) => {
+      b.disabled = true;
+      try {
+        const r = await fetch(`${API}/account/bsa/excel`, {
+          method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d),
+        });
+        if (!r.ok) throw new Error();
+        save(await r.blob(), 'xlsx');
+        b.textContent = 'Download Excel';
+      } catch {
+        b.textContent = 'Excel failed. Try again';
+      } finally {
+        b.disabled = false;
+      }
+    });
+    const json = button('Download JSON', ui.secondary, () => save(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }), 'json'));
+    const row = el('div', 'grid grid-cols-2 gap-3');
+    row.append(excel, json);
+    return row;
+  }
+
   if (box) {
     const name = box.dataset.name!;
     const result = $('[data-result]');
+    const report = document.querySelector<HTMLElement>('[data-report]');
     const costNote = $('[data-cost]');
 
     // Where the next call is paid from, from the latest balances.
@@ -183,8 +306,17 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
         price === undefined ? '' : `${rupees(price)} will be deducted from your balance.`;
     };
 
-    const submit = (values: Record<string, string>) => (box.hasAttribute('data-location') ? tryLocation(name) : api(`/account/try/${name}`, values));
-    handleForm($<HTMLFormElement>('#try'), submit, async (r) => {
+    const form = $<HTMLFormElement>('#try');
+    const submit = (values: Record<string, string>) =>
+      box.hasAttribute('data-location') ? tryLocation(name) : api(`/account/try/${name}`, report ? new FormData(form) : values);
+    handleForm(form, submit, async (r) => {
+      if (report) {
+        report.querySelector('[data-report-body]')!.replaceChildren(...renderReport(r.data));
+        report.hidden = false;
+        report.scrollIntoView({ block: 'start' });
+        await refresh();
+        return;
+      }
       const { id: _id, ...fields } = r.data;
       result.replaceChildren(
         ...Object.entries(fields).filter(([, v]) => v !== null).flatMap(([k, v]) => {

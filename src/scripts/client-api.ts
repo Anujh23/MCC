@@ -6,14 +6,14 @@ export const API = import.meta.env.PUBLIC_CLIENT_API_URL ?? (import.meta.env.DEV
 
 export type Result = { ok: boolean; status: number; data: any };
 
-/** GET without a body, POST with one. Never throws: a network failure is status 0. */
-export async function api(path: string, body?: object): Promise<Result> {
+/** GET without a body, POST with one (JSON, or multipart when given FormData). Never throws: a network failure is status 0. */
+export async function api(path: string, body?: object | FormData): Promise<Result> {
   try {
     const res = await fetch(API + path, {
       method: body ? 'POST' : 'GET',
       credentials: 'include',
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
+      headers: body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : undefined,
+      body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
     });
     return { ok: res.ok, status: res.status, data: res.status === 204 ? null : await res.json().catch(() => null) };
   } catch {
