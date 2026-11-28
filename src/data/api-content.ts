@@ -132,6 +132,45 @@ export const apiProducts: ApiProduct[] = [
     },
   },
   {
+    name: 'payslip',
+    group: 'Income',
+    title: 'Payslip Checker',
+    verb: 'Check',
+    upload: true,
+    method: 'POST',
+    path: '/v1/payslip/check',
+    summary: 'Flag fake-looking payslips and get the salary figures.',
+    limits: 'The PDF as issued by the employer or payroll system. Send the password if the PDF has one. The payslip is not stored.',
+    fields: [
+      { name: 'file', label: 'Payslip (PDF)', type: 'file', example: 'payslip.pdf', doc: 'The payslip PDF. Up to 10 MB.' },
+      { name: 'password', label: 'PDF password', type: 'string', example: 'your-pdf-password', doc: 'Optional. Only if the PDF is password protected.' },
+    ],
+    response: {
+      id: 'call_1060',
+      verdict: 'GENUINE',
+      risk: 'LOW',
+      confidence: 'HIGH',
+      summary: 'Totals, PF and TDS add up and the file was saved once, as generated.',
+      red_flags: [],
+      looks_fine: ['Saved once, as generated', 'Earnings and deductions add up'],
+      unlocked: false,
+      checks: [{ label: 'Totals', status: 'pass', detail: 'Earnings, deductions and net pay add up on 1 payslip.' }],
+      ids: { uan: '100000000001', uan_valid: true, pf_number: 'XX/XXX/0000001/000/0000001' },
+      payslips: [
+        {
+          pay_month: '2026-08', employer_name: 'Sample Employer Pvt Ltd', employee_name: 'Sample Name', employee_id: 'S0001', designation: 'Analyst',
+          gross: 52000, basic: 26000, da: 0, hra: 13000, wage_share: 0.5, pf: 1800, esi: 0, pt: 200, tds: 4200, total_deductions: 6200,
+          net_pay: 45800, net_pay_in_words_value: 45800, paid_days: 31, total_days: 31, lop_days: 0,
+        },
+      ],
+      metadata: {
+        producer: 'Sample Payroll', creator: null, xmp_tools: null, author: null, title: null, created: '01 Sep 2026, 10:15', modified: '01 Sep 2026, 10:15',
+        pages: 1, pdf_version: 'PDF-1.7', encrypted: false, saves: 1, fonts: ['Arial'], size_kb: 48.2,
+      },
+    },
+    values: { verdict: ['GENUINE', 'NEEDS_REVIEW', 'PROBABLY_FAKE', 'FAKE'], risk: ['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'], confidence: ['LOW', 'MEDIUM', 'HIGH'], status: ['pass', 'warn', 'fail', 'review'] },
+  },
+  {
     name: 'maps',
     group: 'Location',
     title: 'Maps API',
@@ -163,9 +202,7 @@ export const apiProducts: ApiProduct[] = [
 ];
 
 /** Not built yet: listed in the client app with an empty page, left out of the docs. Move to apiProducts when live. */
-export const apiPlanned: { name: string; group: ApiGroup; title: string }[] = [
-  { name: 'payslip', group: 'Income', title: 'Payslip Checker' },
-];
+export const apiPlanned: { name: string; group: ApiGroup; title: string }[] = [];
 
 /** Banks the BSA reads (client app only, not in the docs). */
 export const bsaBanks: string[] = [
@@ -183,11 +220,12 @@ export const apiErrors = [
   { status: 402, code: 'insufficient_balance', when: 'Balance too low for the call' },
   { status: 404, code: 'not_found', when: 'Nothing found, e.g. an unknown IFSC' },
   { status: 422, code: 'invalid_request', when: 'Input missing or in the wrong format' },
-  { status: 422, code: 'password_required', when: 'BSA: the PDF needs its password, or the password is wrong' },
+  { status: 422, code: 'password_required', when: 'BSA, Payslip: the PDF needs its password, or the password is wrong' },
+  { status: 422, code: 'not_payslip', when: 'Payslip: the PDF is not a payslip' },
   { status: 422, code: 'unsupported_file', when: 'BSA: no transactions could be read from the PDF' },
   { status: 422, code: 'aa_statement', when: 'BSA: Account Aggregator PDF; send the statement downloaded from the bank' },
   { status: 422, code: 'analysis_timeout', when: 'BSA: the PDF took too long to read; get a fresh download' },
-  { status: 429, code: 'busy', when: 'BSA: too many statements at once; retry after the Retry-After seconds' },
+  { status: 429, code: 'busy', when: 'BSA, Payslip: too many files at once; retry after the Retry-After seconds' },
   { status: 500, code: 'server_error', when: 'Something failed on our side' },
 ];
 

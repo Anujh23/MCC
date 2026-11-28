@@ -6,6 +6,8 @@
 // with a link to each map image.
 // BSA: Try uploads the statement PDF (multipart) and shows a compact summary with a download of the full JSON report;
 // a Supported banks card lists the banks (client app only).
+// Payslip Checker: same upload flow; the Report card shows the credit desk's full report (verdict, checks, payslip, PDF
+// details) and a JSON download of the same data.
 import AppShell from '../../../components/client/AppShell.astro';
 import AuthForm from '../../../components/client/AuthForm.astro';
 import Field from '../../../components/client/Field.astro';
@@ -32,7 +34,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
             {p.upload && (
               <>
                 <div>
-                  <label for="f-file" class="text-sm font-semibold text-ink-900">Statement (PDF)</label>
+                  <label for="f-file" class="text-sm font-semibold text-ink-900">{p.fields[0].label}</label>
                   <input id="f-file" name="file" type="file" accept=".pdf,application/pdf" required class="mt-2 block w-full rounded-xs border border-ink-300 bg-white text-sm text-ink-900 file:mr-3 file:min-h-11 file:cursor-pointer file:border-0 file:border-r file:border-ink-300 file:bg-ink-50 file:px-4 file:text-sm file:font-semibold file:text-ink-900 hover:file:bg-ink-100 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/25 focus:outline-hidden" />
                 </div>
                 <div>
@@ -68,7 +70,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
       {p.upload && (
         <section data-report hidden class={`${ui.card} scroll-mt-20 lg:col-span-2`} aria-labelledby="report-title">
           <div class={ui.cardHead}><h2 id="report-title" class={ui.h2}>Report</h2></div>
-          <div data-report-body class="grid grid-cols-1 gap-6 p-4 text-sm sm:p-5 lg:grid-cols-2 lg:gap-10"></div>
+          <div data-report-body class="grid grid-cols-1 gap-6 p-4 text-sm sm:p-5 lg:grid-cols-2 lg:gap-x-10"></div>
         </section>
       )}
 
@@ -202,6 +204,9 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
   const VERDICT: Record<string, string> = {
     ORIGINAL: 'border-emerald-200 bg-emerald-50 text-emerald-900',
     SUSPICIOUS: 'border-amber-200 bg-amber-50 text-amber-900',
+    GENUINE: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    NEEDS_REVIEW: 'border-amber-200 bg-amber-50 text-amber-900',
+    PROBABLY_FAKE: 'border-rose-200 bg-rose-50 text-rose-900',
     FAKE: 'border-rose-200 bg-rose-50 text-rose-900',
   };
   const QUALITY: Record<string, string> = { READY: 'text-emerald-700', REVIEW: 'text-amber-700', NOT_USABLE: 'text-rose-700' };
@@ -212,12 +217,18 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
   // BSA report card: [verdict, downloads, data-quality note (only when not READY), risk flags] | [key figures].
   // Only the verdict is shown: why it was flagged (and UPI Mobiles) is in the Excel and JSON, never on screen - no
   // detection logic for users (owner, 2026-11-26).
+  // The verdict box both reports share: the coloured verdict word is the one dominant element.
+  function verdictBox(verdict: string, ...lines: string[]): HTMLElement {
+    const box = el('div', `border p-4 ${VERDICT[verdict] ?? 'border-ink-200 bg-ink-50 text-ink-900'}`);
+    box.append(el('p', 'text-xs font-semibold', 'Verdict'), el('p', 'text-2xl font-bold tracking-tight', verdict.replace(/_/g, ' ') || '—'));
+    lines.filter(Boolean).forEach((t, i) => box.append(el('p', i ? 'mt-3 text-sm leading-relaxed' : 'mt-1 text-sm font-semibold', t)));
+    return box;
+  }
+
   function renderReport(d: any): HTMLElement[] {
     const verdict: string = d.authenticity?.verdict ?? '';
     const left = el('div', 'min-w-0 space-y-4');
-    const head = el('div', `border p-3 ${VERDICT[verdict] ?? 'border-ink-200 bg-ink-50 text-ink-900'}`);
-    head.append(el('p', 'text-xs font-semibold', 'Verdict'), el('p', 'text-lg font-bold', verdict.replace('_', ' ') || '—'));
-    left.append(head, downloads(d));
+    left.append(verdictBox(verdict), downloads(d));
     const q = d.data_quality ?? {};
     if (q.message && q.level !== 'READY') left.append(el('p', 'text-ink-600', q.message));
     // the "Document is fake / suspicious" flag repeats the verdict box
@@ -239,7 +250,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
     const m = d.meta ?? {};
     const s = d.summary ?? {};
     const rows: [string, string, string?][] = [
-      ['Data quality', q.level ? q.level.replace('_', ' ') : '—', QUALITY[q.level]],
+      ['Data quality', q.level ? q.level.replace(/_/g, ' ') : '—', QUALITY[q.level]],
       ['Bank', m.bank_name ?? '—'],
       ['Account holder', m.account_holder ?? '—'],
       ['Account', m.account_number ?? '—'],
@@ -255,10 +266,140 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
     return [left, dl];
   }
 
+  // Payslip Checker report card, the same report as the owner's credit desk:
+  // [verdict box (risk, confidence, summary), JSON download, red flags, how to clear an unlocked file, looks fine] | [checks]
+  // then full width: payslip (employer, employee, UAN, PF number, one table row per month) and PDF details.
+  const STATUS_MARK: Record<string, [string, string, string]> = { // glyph, colour, screen-reader word
+    pass: ['✓', 'text-emerald-700', 'Passed'],
+    warn: ['!', 'text-amber-700', 'Warning'],
+    fail: ['✕', 'text-rose-700', 'Failed'],
+    review: ['?', 'text-amber-700', 'Needs review'],
+  };
+  const cap = (s: string) => s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, ' ');
+
+  function marked(status: string, text: string, cls = ''): HTMLElement {
+    const [glyph, colour, word] = STATUS_MARK[status] ?? STATUS_MARK.warn;
+    const p = el('span', `flex gap-2 ${cls}`);
+    p.append(el('span', `grid h-5 w-4 shrink-0 place-items-center font-bold ${colour}`, glyph), el('span', 'sr-only', `${word}: `), el('span', 'min-w-0', text));
+    p.firstElementChild!.setAttribute('aria-hidden', 'true');
+    return p;
+  }
+
+  function section(title: string, ...body: Node[]): HTMLElement {
+    const s = el('section', 'min-w-0 space-y-3');
+    s.append(el('h3', 'font-semibold text-ink-900', title), ...body);
+    return s;
+  }
+
+  function pairs(rows: [string, string | Node][], wide = false): HTMLElement {
+    const dl = el('dl', `grid min-w-0 grid-cols-[9rem_minmax(0,1fr)] content-start gap-x-4 gap-y-2 ${wide ? 'lg:grid-cols-[9rem_minmax(0,1fr)_9rem_minmax(0,1fr)] lg:gap-x-6' : ''}`);
+    rows.forEach(([k, v]) => {
+      const dd = el('dd', `break-words ${v ? 'font-semibold text-ink-900' : 'text-ink-400'}`);
+      dd.append(v || '—');
+      dl.append(el('dt', 'text-ink-500', k), dd);
+    });
+    return dl;
+  }
+
+  function renderPayslip(d: any): HTMLElement[] {
+    const verdict: string = d.verdict ?? '';
+    const money = (v: unknown) => (typeof v === 'number' && v ? inr(v) : '—');
+    const slips: any[] = Array.isArray(d.payslips) ? d.payslips : [];
+    const ids = d.ids ?? {};
+    const m = d.metadata ?? {};
+
+    const left = el('div', 'min-w-0 space-y-6');
+    const head = [d.risk && `${cap(d.risk)} risk`, d.confidence && `${cap(d.confidence)} confidence`].filter(Boolean).join(' · ');
+    left.append(verdictBox(verdict, head, d.summary), downloads(d, false));
+    const list = (items: string[], status: string) => {
+      const ul = el('ul', 'space-y-1.5 text-ink-700');
+      items.forEach((t) => {
+        const li = el('li');
+        li.append(marked(status, t));
+        ul.append(li);
+      });
+      return ul;
+    };
+    if (d.red_flags?.length) left.append(section('Red flags', list(d.red_flags, 'fail')));
+    if (d.unlocked) {
+      const ol = el('ol', 'list-decimal space-y-1 pl-5 text-ink-700');
+      ol.append(
+        el('li', '', 'Ask for the original password-protected PDF and check it with its password.'),
+        el('li', '', `Match the net pay${slips[0]?.net_pay ? ` (${inr(slips[0].net_pay)})` : ''} with the salary credit in the bank statement.`),
+        el('li', '', 'Verify the UAN on EPFO.'),
+      );
+      left.append(section('To clear it', ol));
+    }
+    if (d.looks_fine?.length) left.append(section('Looks fine', list(d.looks_fine, 'pass')));
+
+    // phones: label above its detail; from sm: label | detail
+    const checks = el('dl', 'grid min-w-0 grid-cols-1 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-2.5');
+    (d.checks ?? []).forEach((c: any) => {
+      const dt = el('dt', 'font-semibold text-ink-900');
+      dt.append(marked(c.status, c.label));
+      checks.append(dt, el('dd', 'break-words pb-3 pl-6 text-ink-700 sm:pb-0 sm:pl-0', c.detail));
+    });
+    const right = section('Checks', checks);
+
+    // Payslip: who and which IDs, then one row per month
+    const uan = ids.uan ? `${ids.uan} · ${ids.uan_valid ? '12 digits' : `${ids.uan.length} digits, not valid`}` : 'Not on payslip';
+    const p = slips[0] ?? {};
+    const who: [string, string][] = slips.length
+      ? [['Employer', p.employer_name], ['Employee', p.employee_name], ['Employee ID', p.employee_id], ['Designation', p.designation]]
+      : [];
+    const payslip = section(slips.length > 1 ? `Payslips (${slips.length} months)` : 'Payslip', pairs([...who, ['UAN', uan], ['PF number', ids.pf_number || 'Not on payslip']], true));
+    if (slips.length) {
+      const cols = ['Month', 'Days paid', 'Gross', 'Basic + DA', 'HRA', 'PF', 'TDS', 'Net pay', 'In words'];
+      const table = el('table', 'w-full text-sm whitespace-nowrap');
+      const tr = el('tr');
+      const align = (i: number) => (i ? 'text-right' : 'text-left');
+      const stick = (i: number) => (i ? '' : 'sticky left-0 border-r border-r-ink-200'); // Month stays put while the rest scrolls
+      cols.forEach((c, i) => tr.append(el('th', `${ui.th.replace('text-left', align(i))} bg-ink-50 ${stick(i)}`, c)));
+      const thead = el('thead');
+      thead.append(tr);
+      const tbody = el('tbody', 'text-ink-900');
+      slips.forEach((s) => {
+        const share = s.wage_share ? ` (${Math.round(s.wage_share * 100)}%)` : '';
+        const days = s.paid_days ? `${s.paid_days}${s.total_days ? ` / ${s.total_days}` : ''}${s.lop_days ? ` (${s.lop_days} LOP)` : ''}` : 'Not printed';
+        const wordsOff = s.net_pay_in_words_value && Math.abs(s.net_pay_in_words_value - s.net_pay) > 1;
+        const cells: [string, string?][] = [
+          [s.pay_month || '—', 'font-semibold'],
+          [days, s.paid_days ? '' : 'font-semibold text-rose-700'],
+          [money(s.gross)],
+          [money((s.basic || 0) + (s.da || 0)) + share],
+          [money(s.hra)],
+          [money(s.pf)],
+          [money(s.tds)],
+          [money(s.net_pay), 'font-semibold'],
+          [money(s.net_pay_in_words_value), wordsOff ? 'font-semibold text-rose-700' : ''],
+        ];
+        const row = el('tr');
+        cells.forEach(([t, cls], i) => row.append(el('td', `${ui.td} ${align(i)} tabular-nums ${i ? '' : `${stick(i)} bg-white`} ${cls ?? ''}`, t)));
+        tbody.append(row);
+      });
+      table.append(thead, tbody);
+      const scroll = el('div', '-mx-4 overflow-x-auto border-y border-ink-200 focus-visible:outline-2 focus-visible:outline-brand-500 sm:mx-0 sm:border-x');
+      Object.assign(scroll, { tabIndex: 0, role: 'region' });
+      scroll.setAttribute('aria-label', 'Months');
+      scroll.append(table);
+      payslip.append(scroll);
+    }
+
+    const pdf = section('PDF details', pairs([
+      ['Producer', m.producer], ['Creator', m.creator], ...(m.xmp_tools?.length ? [['Tool history', m.xmp_tools.join(', ')] as [string, string]] : []),
+      ['Author', m.author], ['Title', m.title], ['Created', m.created], ['Modified', m.modified],
+      ['Pages', m.pages == null ? '' : String(m.pages)], ['PDF version', m.pdf_version],
+      ['Password protected', m.encrypted ? 'Yes' : 'No'], ['Times saved', m.saves == null ? '' : String(m.saves)],
+      ['Fonts', (m.fonts ?? []).join(', ')], ['File size', m.size_kb == null ? '' : `${m.size_kb} KB`],
+    ], true));
+    [payslip, pdf].forEach((s) => s.classList.add('border-t', 'border-ink-100', 'pt-6', 'lg:col-span-2'));
+    return [left, right, payslip, pdf];
+  }
+
   // Excel (primary) = BSA's workbook, built by the API from this report (POST /account/bsa/excel, free); JSON = the report.
-  function downloads(d: any): HTMLElement {
+  function downloads(d: any, excelToo = true): HTMLElement {
     const save = (blob: Blob, ext: string) => {
-      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `bsa-report-${d.id ?? 'report'}.${ext}` });
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${box?.dataset.name}-report-${d.id ?? 'report'}.${ext}` });
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     };
@@ -284,8 +425,9 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
       }
     });
     const json = button('Download JSON', ui.secondary, () => save(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }), 'json'));
-    const row = el('div', 'grid grid-cols-2 gap-3');
-    row.append(excel, json);
+    const row = el('div', excelToo ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3');
+    if (excelToo) row.append(excel);
+    row.append(json);
     return row;
   }
 
@@ -311,7 +453,7 @@ const { title, p } = Astro.props as { title: string; p: ApiProduct | null };
       box.hasAttribute('data-location') ? tryLocation(name) : api(`/account/try/${name}`, report ? new FormData(form) : values);
     handleForm(form, submit, async (r) => {
       if (report) {
-        report.querySelector('[data-report-body]')!.replaceChildren(...renderReport(r.data));
+        report.querySelector('[data-report-body]')!.replaceChildren(...(name === 'payslip' ? renderPayslip(r.data) : renderReport(r.data)));
         report.hidden = false;
         report.scrollIntoView({ block: 'start' });
         await refresh();
